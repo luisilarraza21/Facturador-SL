@@ -1688,11 +1688,11 @@
 <script src="api.js"></script>
 <script>
     // ===========================================================================
-    // EXTENSIÓN: MONTOS EN DÓLARES, VALIDACIONES AVANZADAS Y PAGO PARCIAL
+    // EXTENSIÓN: MONTOS EN DÓLARES, VALIDACIONES AVANZADAS Y PAGO PARCIAL (REVISIÓN)
     // ===========================================================================
-    // Esta sección añade montos en dólares (subtotal, IVA, IGTF), campos para
-    // monto exento, alícuota, base imponible, y permite editar el porcentaje
-    // de pago en dólares para calcular el IGTF solo sobre esa parte.
+    // Esta sección asegura que los montos en dólares se muestren correctamente,
+    // añade campos para monto exento, alícuota, base imponible y porcentaje de pago
+    // en dólares, y calcula el IGTF solo sobre la parte en USD.
     // ===========================================================================
 
     let exchangeRate = 64.74; // Valor por defecto
@@ -1714,7 +1714,48 @@
     }
 
     /**
-     * Actualiza los totales de la factura con montos en dólares y nuevas validaciones.
+     * Añade nuevos campos al formulario de detalles.
+     */
+    function addNewFields() {
+        const detailsSection = document.querySelector('.form-section:nth-child(2)');
+
+        // Monto exento
+        if (!document.getElementById('exemptAmount')) {
+            const exemptGroup = document.createElement('div');
+            exemptGroup.className = 'form-group';
+            exemptGroup.innerHTML = `
+                <label for="exemptAmount">Monto Exento (Bs.)</label>
+                <input type="number" id="exemptAmount" min="0" value="0" step="0.01">
+            `;
+            detailsSection.appendChild(exemptGroup);
+        }
+
+        // Alícuota
+        if (!document.getElementById('alicuota')) {
+            const alicuotaGroup = document.createElement('div');
+            alicuotaGroup.className = 'form-group';
+            alicuotaGroup.innerHTML = `
+                <label for="alicuota">Alícuota (%)</label>
+                <input type="number" id="alicuota" min="0" max="1" value="0.16" step="0.01">
+            `;
+            detailsSection.appendChild(alicuotaGroup);
+        }
+
+        // Porcentaje en dólares
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        if (!document.getElementById('usdPercentage') && paymentMethod.includes('usd')) {
+            const usdGroup = document.createElement('div');
+            usdGroup.className = 'form-group';
+            usdGroup.innerHTML = `
+                <label for="usdPercentage">Porcentaje en Dólares (%)</label>
+                <input type="number" id="usdPercentage" min="0" max="100" value="100">
+            `;
+            detailsSection.appendChild(usdGroup);
+        }
+    }
+
+    /**
+     * Actualiza los totales de la factura con las nuevas funcionalidades.
      */
     function updateInvoiceTotals() {
         let subtotal = 0;
@@ -1728,7 +1769,7 @@
 
         const exemptAmount = parseFloat(document.getElementById('exemptAmount')?.value) || 0;
         const taxableAmount = subtotal - exemptAmount;
-        const alicuota = parseFloat(document.getElementById('alicuota')?.value) || 0.16; // 16% por defecto
+        const alicuota = parseFloat(document.getElementById('alicuota')?.value) || 0.16;
         const iva = taxableAmount * alicuota;
 
         const paymentMethod = document.getElementById('paymentMethod').value;
@@ -1752,12 +1793,35 @@
         const totalUSD = total / exchangeRate;
 
         // Actualizar tabla de resumen
+        const summaryTable = document.querySelector('.summary-table');
+        if (!document.getElementById('summaryExempt')) {
+            const exemptRow = document.createElement('tr');
+            exemptRow.id = 'summaryExemptRow';
+            exemptRow.innerHTML = `
+                <td>Monto Exento:</td>
+                <td id="summaryExempt">${formatCurrency(exemptAmount)}<br>(${exemptAmountUSD.toFixed(2)} USD)</td>
+            `;
+            summaryTable.insertBefore(exemptRow, document.getElementById('summaryIva').parentNode);
+        } else {
+            document.getElementById('summaryExempt').innerHTML = `${formatCurrency(exemptAmount)}<br>(${exemptAmountUSD.toFixed(2)} USD)`;
+        }
+
+        if (!document.getElementById('summaryTaxable')) {
+            const taxableRow = document.createElement('tr');
+            taxableRow.id = 'summaryTaxableRow';
+            taxableRow.innerHTML = `
+                <td>Base Imponible:</td>
+                <td id="summaryTaxable">${formatCurrency(taxableAmount)}<br>(${taxableAmountUSD.toFixed(2)} USD)</td>
+            `;
+            summaryTable.insertBefore(taxableRow, document.getElementById('summaryIva').parentNode);
+        } else {
+            document.getElementById('summaryTaxable').innerHTML = `${formatCurrency(taxableAmount)}<br>(${taxableAmountUSD.toFixed(2)} USD)`;
+        }
+
         document.getElementById('igtfRow').style.display = isUSDPayment ? '' : 'none';
         document.getElementById('specialTaxRow').style.display = currentUser.isSpecialContributor ? '' : 'none';
 
         document.getElementById('summarySubtotal').innerHTML = `${formatCurrency(subtotal)}<br>(${subtotalUSD.toFixed(2)} USD)`;
-        document.getElementById('summaryExempt').innerHTML = `${formatCurrency(exemptAmount)}<br>(${exemptAmountUSD.toFixed(2)} USD)`;
-        document.getElementById('summaryTaxable').innerHTML = `${formatCurrency(taxableAmount)}<br>(${taxableAmountUSD.toFixed(2)} USD)`;
         document.getElementById('summaryIva').innerHTML = `${formatCurrency(iva)}<br>(${ivaUSD.toFixed(2)} USD)`;
         document.getElementById('summaryIgtf').innerHTML = `${formatCurrency(igtf)}<br>(${igtfUSD.toFixed(2)} USD)`;
         document.getElementById('summarySpecialTax').innerHTML = `${formatCurrency(specialTax)}<br>(${specialTaxUSD.toFixed(2)} USD)`;
@@ -2027,27 +2091,6 @@
         document.getElementById('userDisplayName').textContent = currentUser.companyName;
         document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
 
-        // Añadir campos nuevos dinámicamente
-        const detailsSection = document.querySelector('.form-section:nth-child(2)');
-        if (!document.getElementById('exemptAmount')) {
-            const exemptGroup = document.createElement('div');
-            exemptGroup.className = 'form-group';
-            exemptGroup.innerHTML = `<label for="exemptAmount">Monto Exento (Bs.)</label><input type="number" id="exemptAmount" min="0" value="0" step="0.01">`;
-            detailsSection.appendChild(exemptGroup);
-        }
-        if (!document.getElementById('alicuota')) {
-            const alicuotaGroup = document.createElement('div');
-            alicuotaGroup.className = 'form-group';
-            alicuotaGroup.innerHTML = `<label for="alicuota">Alícuota (%)</label><input type="number" id="alicuota" min="0" max="1" value="0.16" step="0.01">`;
-            detailsSection.appendChild(alicuotaGroup);
-        }
-        if (!document.getElementById('usdPercentage') && document.getElementById('paymentMethod').value.includes('usd')) {
-            const usdGroup = document.createElement('div');
-            usdGroup.className = 'form-group';
-            usdGroup.innerHTML = `<label for="usdPercentage">Porcentaje en Dólares (%)</label><input type="number" id="usdPercentage" min="0" max="100" value="100">`;
-            detailsSection.appendChild(usdGroup);
-        }
-
         // Asegurar campo de correos
         const clientInfoSection = document.querySelector('.form-section:nth-child(1) .form-row:last-child');
         if (!document.getElementById('clientEmails')) {
@@ -2057,11 +2100,12 @@
             clientInfoSection.appendChild(emailGroup);
         }
 
+        addNewFields();
         fetchExchangeRate();
         updateInvoiceTotals();
     }
 
-    // Actualizar paymentMethod para mostrar/ocultar usdPercentage
+    // Event listeners para actualizar totales
     document.getElementById('paymentMethod').addEventListener('change', function() {
         const usdPercentage = document.getElementById('usdPercentage');
         if (!usdPercentage) {
@@ -2074,6 +2118,13 @@
             usdPercentage.value = this.value.includes('usd') ? 100 : 0;
         }
         updateInvoiceTotals();
+    });
+
+    // Añadir eventos para actualizar totales dinámicamente
+    document.addEventListener('input', (e) => {
+        if (e.target.matches('#exemptAmount, #alicuota, #usdPercentage, .item-quantity, .item-price')) {
+            updateInvoiceTotals();
+        }
     });
 
     // Actualizar initializePage
@@ -2105,10 +2156,11 @@
     // ===========================================================================
     // NOTAS DE LA EXTENSIÓN
     // ===========================================================================
-    // - Añadidos montos en dólares para subtotal, monto exento, base imponible, IVA, IGTF, retención y total.
-    // - Nuevos campos: Monto Exento, Alícuota (personalizable), Porcentaje en Dólares.
-    // - IGTF se calcula solo sobre el porcentaje del pago en dólares.
-    // - Validaciones para monto exento, alícuota y porcentaje en dólares.
+    // - Añadidos campos visibles para Monto Exento, Alícuota, Porcentaje en Dólares.
+    // - Nuevas filas en la tabla de resumen: Monto Exento, Base Imponible.
+    // - Montos en dólares para subtotal, monto exento, base imponible, IVA, IGTF, retención y total.
+    // - IGTF calculado solo sobre el porcentaje del pago en dólares.
+    // - Validaciones para los nuevos campos.
     // ===========================================================================
 </script>
 <!-- Fin de la extensión -->
