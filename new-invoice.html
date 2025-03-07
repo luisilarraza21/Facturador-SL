@@ -1614,5 +1614,9 @@
     // - Corregida la validación de correos electrónicos múltiples, con mensaje de error específico.
     // - Preparado para futura integración con API real por tu equipo de desarrollo.
     // ===========================================================================
+    <script>
+    console.log("Probando API:", typeof getExchangeRate === 'function' ? 'Funciona' : 'No funciona');
+    getExchangeRate().then(response => console.log("Tasa:", response.rate));
+</script>
 </script>
 <!-- Fin de la extensión -->
