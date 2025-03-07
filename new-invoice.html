@@ -1331,6 +1331,193 @@
     }
 
     /**
+    <!-- Inicio de la extensión: API de tasa del dólar, montos en dólares y validación de correos -->
+<script src="api.js"></script>
+<script>
+    // ===========================================================================
+    // EXTENSIÓN: INTEGRACIÓN DE API DE TASA DEL DÓLAR, MONTOS EN DÓLARES Y VALIDACIÓN DE CORREOS
+    // ===========================================================================
+    // Esta sección integra la API simulada para la tasa del dólar del BCV,
+    // muestra montos en bolívares y dólares, y corrige la validación de correos
+    // electrónicos múltiples.
+    // ===========================================================================
+
+    let exchangeRate = 64.74; // Valor por defecto en caso de fallo
+
+    /**
+     * Obtiene la tasa del dólar del BCV al cargar la página.
+     */
+    async function fetchExchangeRate() {
+        try {
+            const response = await getExchangeRate();
+            if (response.success) {
+                exchangeRate = response.rate;
+                showAlert(`Tasa del dólar del BCV (${response.date}): ${exchangeRate} VES/USD`, 'info');
+            } else {
+                showAlert('No se pudo obtener la tasa del dólar. Usando valor por defecto.', 'warning');
+            }
+        } catch (error) {
+            showAlert('Error al conectar con la API de tasa del dólar. Usando valor por defecto.', 'danger');
+        }
+        updateInvoiceTotals(); // Actualizar montos con la tasa
+    }
+
+    /**
+     * Actualiza los totales de la factura con montos en bolívares y dólares.
+     */
+    function updateInvoiceTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const rowSubtotal = quantity * price;
+            row.querySelector('.item-subtotal').textContent = rowSubtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            subtotal += rowSubtotal;
+        });
+
+        const ivaRate = 0.16;
+        const igtfRate = 0.03;
+        const specialTaxRate = 0.01;
+
+        const iva = subtotal * ivaRate;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const isUSDPayment = paymentMethod.includes('usd');
+        const igtf = isUSDPayment ? subtotal * igtfRate : 0;
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const specialTax = currentUser.isSpecialContributor ? subtotal * specialTaxRate : 0;
+        const total = subtotal + iva + igtf - specialTax;
+
+        // Calcular montos en dólares
+        const subtotalUSD = subtotal / exchangeRate;
+        const ivaUSD = iva / exchangeRate;
+        const igtfUSD = igtf / exchangeRate;
+        const specialTaxUSD = specialTax / exchangeRate;
+        const totalUSD = total / exchangeRate;
+
+        // Actualizar tabla de resumen
+        document.getElementById('igtfRow').style.display = isUSDPayment ? '' : 'none';
+        document.getElementById('specialTaxRow').style.display = currentUser.isSpecialContributor ? '' : 'none';
+
+        document.getElementById('summarySubtotal').innerHTML = `${formatCurrency(subtotal)}<br>(${subtotalUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryIva').innerHTML = `${formatCurrency(iva)}<br>(${ivaUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryIgtf').innerHTML = `${formatCurrency(igtf)}<br>(${igtfUSD.toFixed(2)} USD)`;
+        document.getElementById('summarySpecialTax').innerHTML = `${formatCurrency(specialTax)}<br>(${specialTaxUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryTotal').innerHTML = `${formatCurrency(total)}<br>(${totalUSD.toFixed(2)} USD)`;
+    }
+
+    /**
+     * Valida el formulario con correos electrónicos corregidos.
+     */
+    function validateInvoiceForm(invoiceData) {
+        let isValid = true;
+        const errors = [];
+
+        if (!invoiceData.clientName) {
+            errors.push('El nombre o razón social es obligatorio.');
+            document.getElementById('clientName').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientName').classList.remove('has-error');
+        }
+
+        if (!invoiceData.clientId || !validateClientId(invoiceData.clientId)) {
+            errors.push('La cédula o RIF es obligatoria y debe seguir un formato válido (Ej: V-12345678 o J-12345678-9).');
+            document.getElementById('clientId').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientId').classList.remove('has-error');
+        }
+
+        if (!invoiceData.clientAddress) {
+            errors.push('La dirección es obligatoria.');
+            document.getElementById('clientAddress').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientAddress').classList.remove('has-error');
+        }
+
+        if (invoiceData.clientPhone && !validatePhone(invoiceData.clientPhone)) {
+            errors.push('El teléfono no es válido (dejar vacío si no aplica).');
+            document.getElementById('clientPhone').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientPhone').classList.remove('has-error');
+        }
+
+        // Validación de correos electrónicos
+        const emailInput = document.getElementById('clientEmails');
+        if (emailInput && emailInput.value.trim()) {
+            const emails = emailInput.value.split(',').map(email => email.trim());
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const invalidEmails = emails.filter(email => !emailRegex.test(email));
+            if (invalidEmails.length > 0) {
+                errors.push(`Los siguientes correos no son válidos: ${invalidEmails.join(', ')}.`);
+                emailInput.classList.add('has-error');
+                isValid = false;
+            } else {
+                emailInput.classList.remove('has-error');
+            }
+        }
+
+        if (!invoiceData.date) {
+            errors.push('La fecha de emisión es obligatoria.');
+            document.getElementById('invoiceDate').classList.add('has-error');
+            isValid = false;
+        } else {
+            const invoiceDate = new Date(invoiceData.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (invoiceDate > today) {
+                errors.push('La fecha no puede ser futura.');
+                document.getElementById('invoiceDate').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('invoiceDate').classList.remove('has-error');
+            }
+        }
+
+        if (!invoiceData.paymentMethod) {
+            errors.push('El método de pago es obligatorio.');
+            document.getElementById('paymentMethod').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('paymentMethod').classList.remove('has-error');
+        }
+
+        if (invoiceData.items.length === 0) {
+            errors.push('Debe haber al menos un artículo.');
+            isValid = false;
+        } else {
+            document.querySelectorAll('#itemsTableBody tr').forEach((row, index) => {
+                const description = row.querySelector('.item-description').value.trim();
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                if (description && (quantity <= 0 || price <= 0)) {
+                    errors.push(`Artículo ${index + 1} tiene cantidad o precio inválido.`);
+                    if (quantity <= 0) row.querySelector('.item-quantity').classList.add('has-error');
+                    if (price <= 0) row.querySelector('.item-price').classList.add('has-error');
+                    isValid = false;
+                } else {
+                    row.querySelector('.item-quantity').classList.remove('has-error');
+                    row.querySelector('.item-price').classList.remove('has-error');
+                }
+            });
+        }
+
+        if (invoiceData.total <= 0) {
+            errors.push('El total debe ser mayor a 0.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showAlert(errors.join(' '), 'warning');
+        }
+
+        return isValid;
+    }
+
+    /**
      * Muestra la vista previa con montos en dólares.
      */
     function previewInvoice() {
@@ -1350,11 +1537,14 @@
             </div>
             <div class="preview-client-info">
                 <h3>Datos del Cliente</h3>
-                <p><strong>${invoiceData.clientName}</strong><br>RIF/CI: ${invoiceData.clientId}<br>Dirección: ${invoiceData.clientAddress}<br>${invoiceData.clientPhone ? `Teléfono: ${invoiceData.clientPhone}<br>` : ''}${invoiceData.clientEmails.length > 0 ? `Emails: ${invoiceData.clientEmails.join(', ')}<br>` : ''}</p>
+                <p><strong>${invoiceData.clientName}</strong><br>RIF/CI: ${invoiceData.clientId}<br>Dirección: ${invoiceData.clientAddress}<br>${invoiceData.clientPhone ? `Teléfono: ${invoiceData.clientPhone}<br>` : ''}${invoiceData.clientEmails && invoiceData.clientEmails.length > 0 ? `Emails: ${invoiceData.clientEmails.join(', ')}<br>` : ''}</p>
             </div>
             <table>
                 <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
-                <tbody>${invoiceData.items.map(item => `<tr><td>${item.description}</td><td>${item.quantity}</td><td>${formatCurrency(item.price)}</td><td>${formatCurrency(item.subtotal)}</td></tr>`).join('')}</tbody>
+                <tbody>${invoiceData.items.map(item => {
+                    const itemSubtotalUSD = item.subtotal / exchangeRate;
+                    return `<tr><td>${item.description}</td><td>${item.quantity}</td><td>${formatCurrency(item.price)}</td><td>${formatCurrency(item.subtotal)} (${itemSubtotalUSD.toFixed(2)} USD)</td></tr>`;
+                }).join('')}</tbody>
                 <tfoot>
                     <tr><td colspan="3" style="text-align: right;">Subtotal:</td><td>${formatCurrency(invoiceData.subtotal)} (${(invoiceData.subtotal / exchangeRate).toFixed(2)} USD)</td></tr>
                     <tr><td colspan="3" style="text-align: right;">IVA (16%):</td><td>${formatCurrency(invoiceData.iva)} (${(invoiceData.iva / exchangeRate).toFixed(2)} USD)</td></tr>
@@ -1381,7 +1571,7 @@
         document.getElementById('userDisplayName').textContent = currentUser.companyName;
         document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
 
-        // Añadir campo de correos electrónicos dinámicamente (por si no se añadió antes)
+        // Asegurar que el campo de correos se añada
         const clientInfoSection = document.querySelector('.form-section:nth-child(1) .form-row:last-child');
         if (!document.getElementById('clientEmails')) {
             const emailGroup = document.createElement('div');
@@ -1397,7 +1587,7 @@
         updateInvoiceTotals();
     }
 
-    // Actualizar initializePage para incluir la tasa del dólar
+    // Actualizar initializePage
     document.addEventListener('DOMContentLoaded', initializePage);
 
     // ===========================================================================
@@ -1411,14 +1601,17 @@
         .summary-table tr:last-child td:last-child {
             font-size: 18px;
         }
+        .items-table td:last-child {
+            line-height: 1.5;
+        }
     </style>
 
     // ===========================================================================
     // NOTAS DE LA EXTENSIÓN
     // ===========================================================================
     // - Añadida API simulada en api.js para la tasa del dólar del BCV (64.74 VES/USD).
-    // - Mostrados montos en bolívares y dólares en la tabla de resumen y vista previa.
-    // - Corregida y asegurada la validación de correos electrónicos múltiples.
+    // - Mostrados montos en bolívares y dólares en la tabla de resumen, vista previa y ítems.
+    // - Corregida la validación de correos electrónicos múltiples, con mensaje de error específico.
     // - Preparado para futura integración con API real por tu equipo de desarrollo.
     // ===========================================================================
 </script>
