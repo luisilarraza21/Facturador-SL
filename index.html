@@ -416,10 +416,8 @@
                 }
             });
         });
-    </script>
+  </script>
 </body>
-</html>
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1184,7 +1182,11 @@
             document.getElementById('invoiceList').classList.add('hidden');
             document.getElementById('invoiceForm').classList.remove('hidden');
             
-            // Limpiar
+                       // Limpiar formulario
+            document.getElementById('invoiceForm').reset();
+            document.getElementById('clientItems').innerHTML = '';
+            // Resto de la limpieza de campos si es necesario
+        });
             // Cargar historial de facturas
 function loadInvoices() {
     const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
