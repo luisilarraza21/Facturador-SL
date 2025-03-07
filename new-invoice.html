@@ -1684,3 +1684,431 @@
 </script>
 <button onclick="testValidation()">Probar Validación</button>
 <!-- Fin de la extensión simplificada -->
+<!-- Inicio de la extensión: Montos en dólares, validaciones avanzadas y pago parcial -->
+<script src="api.js"></script>
+<script>
+    // ===========================================================================
+    // EXTENSIÓN: MONTOS EN DÓLARES, VALIDACIONES AVANZADAS Y PAGO PARCIAL
+    // ===========================================================================
+    // Esta sección añade montos en dólares (subtotal, IVA, IGTF), campos para
+    // monto exento, alícuota, base imponible, y permite editar el porcentaje
+    // de pago en dólares para calcular el IGTF solo sobre esa parte.
+    // ===========================================================================
+
+    let exchangeRate = 64.74; // Valor por defecto
+
+    /**
+     * Obtiene la tasa del dólar del BCV al cargar la página.
+     */
+    async function fetchExchangeRate() {
+        try {
+            const response = await getExchangeRate();
+            if (response.success) {
+                exchangeRate = response.rate;
+                showAlert(`Tasa del dólar del BCV (${response.date}): ${exchangeRate} VES/USD`, 'info');
+            }
+        } catch (error) {
+            showAlert('Error al cargar la tasa. Usando valor por defecto.', 'warning');
+        }
+        updateInvoiceTotals();
+    }
+
+    /**
+     * Actualiza los totales de la factura con montos en dólares y nuevas validaciones.
+     */
+    function updateInvoiceTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const rowSubtotal = quantity * price;
+            row.querySelector('.item-subtotal').textContent = rowSubtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            subtotal += rowSubtotal;
+        });
+
+        const exemptAmount = parseFloat(document.getElementById('exemptAmount')?.value) || 0;
+        const taxableAmount = subtotal - exemptAmount;
+        const alicuota = parseFloat(document.getElementById('alicuota')?.value) || 0.16; // 16% por defecto
+        const iva = taxableAmount * alicuota;
+
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const isUSDPayment = paymentMethod.includes('usd');
+        const usdPercentage = parseFloat(document.getElementById('usdPercentage')?.value) || (isUSDPayment ? 100 : 0) / 100;
+        const igtfRate = 0.03;
+        const igtf = isUSDPayment ? (subtotal * usdPercentage) * igtfRate : 0;
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const specialTaxRate = 0.01;
+        const specialTax = currentUser.isSpecialContributor ? taxableAmount * specialTaxRate : 0;
+        const total = taxableAmount + iva + igtf - specialTax;
+
+        // Calcular montos en dólares
+        const subtotalUSD = subtotal / exchangeRate;
+        const exemptAmountUSD = exemptAmount / exchangeRate;
+        const taxableAmountUSD = taxableAmount / exchangeRate;
+        const ivaUSD = iva / exchangeRate;
+        const igtfUSD = igtf / exchangeRate;
+        const specialTaxUSD = specialTax / exchangeRate;
+        const totalUSD = total / exchangeRate;
+
+        // Actualizar tabla de resumen
+        document.getElementById('igtfRow').style.display = isUSDPayment ? '' : 'none';
+        document.getElementById('specialTaxRow').style.display = currentUser.isSpecialContributor ? '' : 'none';
+
+        document.getElementById('summarySubtotal').innerHTML = `${formatCurrency(subtotal)}<br>(${subtotalUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryExempt').innerHTML = `${formatCurrency(exemptAmount)}<br>(${exemptAmountUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryTaxable').innerHTML = `${formatCurrency(taxableAmount)}<br>(${taxableAmountUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryIva').innerHTML = `${formatCurrency(iva)}<br>(${ivaUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryIgtf').innerHTML = `${formatCurrency(igtf)}<br>(${igtfUSD.toFixed(2)} USD)`;
+        document.getElementById('summarySpecialTax').innerHTML = `${formatCurrency(specialTax)}<br>(${specialTaxUSD.toFixed(2)} USD)`;
+        document.getElementById('summaryTotal').innerHTML = `${formatCurrency(total)}<br>(${totalUSD.toFixed(2)} USD)`;
+    }
+
+    /**
+     * Valida el formulario con las nuevas validaciones.
+     */
+    function validateInvoiceForm(invoiceData) {
+        let isValid = true;
+        const errors = [];
+
+        if (!invoiceData.clientName) {
+            errors.push('El nombre o razón social es obligatorio.');
+            document.getElementById('clientName').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientName').classList.remove('has-error');
+        }
+
+        if (!invoiceData.clientId || !validateClientId(invoiceData.clientId)) {
+            errors.push('La cédula o RIF es obligatoria y debe seguir un formato válido (Ej: V-12345678 o J-12345678-9).');
+            document.getElementById('clientId').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientId').classList.remove('has-error');
+        }
+
+        if (!invoiceData.clientAddress) {
+            errors.push('La dirección es obligatoria.');
+            document.getElementById('clientAddress').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientAddress').classList.remove('has-error');
+        }
+
+        if (invoiceData.clientPhone && !validatePhone(invoiceData.clientPhone)) {
+            errors.push('El teléfono no es válido (dejar vacío si no aplica).');
+            document.getElementById('clientPhone').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientPhone').classList.remove('has-error');
+        }
+
+        const emailInput = document.getElementById('clientEmails');
+        if (emailInput && emailInput.value.trim()) {
+            const emails = emailInput.value.split(',').map(email => email.trim());
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const invalidEmails = emails.filter(email => !emailRegex.test(email));
+            if (invalidEmails.length > 0) {
+                errors.push(`Correos inválidos: ${invalidEmails.join(', ')}`);
+                emailInput.classList.add('has-error');
+                isValid = false;
+            } else {
+                emailInput.classList.remove('has-error');
+            }
+        }
+
+        if (!invoiceData.date) {
+            errors.push('La fecha de emisión es obligatoria.');
+            document.getElementById('invoiceDate').classList.add('has-error');
+            isValid = false;
+        } else {
+            const invoiceDate = new Date(invoiceData.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (invoiceDate > today) {
+                errors.push('La fecha no puede ser futura.');
+                document.getElementById('invoiceDate').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('invoiceDate').classList.remove('has-error');
+            }
+        }
+
+        if (!invoiceData.paymentMethod) {
+            errors.push('El método de pago es obligatorio.');
+            document.getElementById('paymentMethod').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('paymentMethod').classList.remove('has-error');
+        }
+
+        const exemptAmount = parseFloat(document.getElementById('exemptAmount')?.value) || 0;
+        if (exemptAmount < 0) {
+            errors.push('El monto exento no puede ser negativo.');
+            document.getElementById('exemptAmount').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('exemptAmount').classList.remove('has-error');
+        }
+
+        const alicuota = parseFloat(document.getElementById('alicuota')?.value) || 0.16;
+        if (alicuota < 0 || alicuota > 1) {
+            errors.push('La alícuota debe estar entre 0% y 100%.');
+            document.getElementById('alicuota').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('alicuota').classList.remove('has-error');
+        }
+
+        const usdPercentage = parseFloat(document.getElementById('usdPercentage')?.value) || 0;
+        if (usdPercentage < 0 || usdPercentage > 100) {
+            errors.push('El porcentaje en dólares debe estar entre 0% y 100%.');
+            document.getElementById('usdPercentage').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('usdPercentage').classList.remove('has-error');
+        }
+
+        if (invoiceData.items.length === 0) {
+            errors.push('Debe haber al menos un artículo.');
+            isValid = false;
+        } else {
+            document.querySelectorAll('#itemsTableBody tr').forEach((row, index) => {
+                const description = row.querySelector('.item-description').value.trim();
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                if (description && (quantity <= 0 || price <= 0)) {
+                    errors.push(`Artículo ${index + 1} tiene cantidad o precio inválido.`);
+                    if (quantity <= 0) row.querySelector('.item-quantity').classList.add('has-error');
+                    if (price <= 0) row.querySelector('.item-price').classList.add('has-error');
+                    isValid = false;
+                } else {
+                    row.querySelector('.item-quantity').classList.remove('has-error');
+                    row.querySelector('.item-price').classList.remove('has-error');
+                }
+            });
+        }
+
+        if (invoiceData.total <= 0) {
+            errors.push('El total debe ser mayor a 0.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showAlert(errors.join(' '), 'warning');
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Recopila los datos del formulario con las nuevas propiedades.
+     */
+    function getInvoiceFormData() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        const clientName = document.getElementById('clientName').value.trim();
+        const clientId = document.getElementById('clientId').value.trim().toUpperCase();
+        const clientAddress = document.getElementById('clientAddress').value.trim();
+        const clientPhone = document.getElementById('clientPhone').value.trim();
+        const clientEmails = document.getElementById('clientEmails') ? document.getElementById('clientEmails').value.trim().split(',').map(email => email.trim()) : [];
+        const invoiceDate = document.getElementById('invoiceDate').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const invoiceNotes = document.getElementById('invoiceNotes').value.trim();
+        const exemptAmount = parseFloat(document.getElementById('exemptAmount')?.value) || 0;
+        const alicuota = parseFloat(document.getElementById('alicuota')?.value) || 0.16;
+        const usdPercentage = parseFloat(document.getElementById('usdPercentage')?.value) || (paymentMethod.includes('usd') ? 100 : 0) / 100;
+
+        const items = [];
+        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+            const description = row.querySelector('.item-description').value.trim();
+            if (description) {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const subtotal = quantity * price;
+                items.push({ description, quantity, price, subtotal });
+            }
+        });
+
+        let subtotal = 0;
+        items.forEach(item => subtotal += item.subtotal);
+
+        const taxableAmount = subtotal - exemptAmount;
+        const iva = taxableAmount * alicuota;
+        const igtf = paymentMethod.includes('usd') ? (subtotal * usdPercentage) * 0.03 : 0;
+        const specialTax = currentUser.isSpecialContributor ? taxableAmount * 0.01 : 0;
+        const total = taxableAmount + iva + igtf - specialTax;
+
+        return {
+            id: Date.now().toString(),
+            sellerId: currentUser.email,
+            sellerName: currentUser.companyName,
+            sellerRif: currentUser.rif,
+            sellerAddress: currentUser.address,
+            sellerPhone: currentUser.phone,
+            sellerEmail: currentUser.email,
+            isSpecialContributor: currentUser.isSpecialContributor,
+            clientName,
+            clientId,
+            clientAddress,
+            clientPhone,
+            clientEmails,
+            date: invoiceDate,
+            paymentMethod,
+            notes: invoiceNotes,
+            exemptAmount,
+            alicuota,
+            usdPercentage,
+            items,
+            subtotal,
+            taxableAmount,
+            iva,
+            igtf,
+            specialTax,
+            total,
+            createdAt: new Date().toISOString(),
+            status: 'emitida'
+        };
+    }
+
+    /**
+     * Muestra la vista previa con montos en dólares.
+     */
+    function previewInvoice() {
+        const invoiceData = getInvoiceFormData();
+        if (!validateInvoiceForm(invoiceData)) return;
+
+        const invoicePreview = document.getElementById('invoicePreview');
+        invoicePreview.innerHTML = `
+            <div class="preview-header">
+                <div class="preview-logo">FacturaML</div>
+                <div><strong>Factura #: (pendiente)</strong><br>Fecha: ${formatDate(invoiceData.date)}</div>
+            </div>
+            <div class="preview-title">FACTURA</div>
+            <div class="preview-company-info">
+                <h3>Datos del Emisor</h3>
+                <p><strong>${invoiceData.sellerName}</strong><br>RIF: ${invoiceData.sellerRif}<br>Dirección: ${invoiceData.sellerAddress}<br>Teléfono: ${invoiceData.sellerPhone}<br>Email: ${invoiceData.sellerEmail}</p>
+            </div>
+            <div class="preview-client-info">
+                <h3>Datos del Cliente</h3>
+                <p><strong>${invoiceData.clientName}</strong><br>RIF/CI: ${invoiceData.clientId}<br>Dirección: ${invoiceData.clientAddress}<br>${invoiceData.clientPhone ? `Teléfono: ${invoiceData.clientPhone}<br>` : ''}${invoiceData.clientEmails.length > 0 ? `Emails: ${invoiceData.clientEmails.join(', ')}<br>` : ''}</p>
+            </div>
+            <table>
+                <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
+                <tbody>${invoiceData.items.map(item => {
+                    const itemSubtotalUSD = item.subtotal / exchangeRate;
+                    return `<tr><td>${item.description}</td><td>${item.quantity}</td><td>${formatCurrency(item.price)}</td><td>${formatCurrency(item.subtotal)} (${itemSubtotalUSD.toFixed(2)} USD)</td></tr>`;
+                }).join('')}</tbody>
+                <tfoot>
+                    <tr><td colspan="3" style="text-align: right;">Subtotal:</td><td>${formatCurrency(invoiceData.subtotal)} (${(invoiceData.subtotal / exchangeRate).toFixed(2)} USD)</td></tr>
+                    <tr><td colspan="3" style="text-align: right;">Monto Exento:</td><td>${formatCurrency(invoiceData.exemptAmount)} (${(invoiceData.exemptAmount / exchangeRate).toFixed(2)} USD)</td></tr>
+                    <tr><td colspan="3" style="text-align: right;">Base Imponible:</td><td>${formatCurrency(invoiceData.taxableAmount)} (${(invoiceData.taxableAmount / exchangeRate).toFixed(2)} USD)</td></tr>
+                    <tr><td colspan="3" style="text-align: right;">IVA (${(invoiceData.alicuota * 100).toFixed(2)}%):</td><td>${formatCurrency(invoiceData.iva)} (${(invoiceData.iva / exchangeRate).toFixed(2)} USD)</td></tr>
+                    ${invoiceData.igtf > 0 ? `<tr><td colspan="3" style="text-align: right;">IGTF (3% sobre ${invoiceData.usdPercentage * 100}% USD):</td><td>${formatCurrency(invoiceData.igtf)} (${(invoiceData.igtf / exchangeRate).toFixed(2)} USD)</td></tr>` : ''}
+                    ${invoiceData.specialTax > 0 ? `<tr><td colspan="3" style="text-align: right;">Retención Contribuyente Especial:</td><td>${formatCurrency(invoiceData.specialTax)} (${(invoiceData.specialTax / exchangeRate).toFixed(2)} USD)</td></tr>` : ''}
+                    <tr class="total-row"><td colspan="3" style="text-align: right;">Total:</td><td>${formatCurrency(invoiceData.total)} (${(invoiceData.total / exchangeRate).toFixed(2)} USD)</td></tr>
+                </tfoot>
+            </table>
+            ${invoiceData.notes ? `<div class="notes"><h3>Notas</h3><p>${invoiceData.notes}</p></div>` : ''}
+            <div class="footer"><p>Gracias por su compra.</p></div>
+        `;
+        document.getElementById('previewModal').style.display = 'block';
+    }
+
+    /**
+     * Inicializa la página con los nuevos campos.
+     */
+    function initializePage() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        document.getElementById('userDisplayName').textContent = currentUser.companyName;
+        document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+
+        // Añadir campos nuevos dinámicamente
+        const detailsSection = document.querySelector('.form-section:nth-child(2)');
+        if (!document.getElementById('exemptAmount')) {
+            const exemptGroup = document.createElement('div');
+            exemptGroup.className = 'form-group';
+            exemptGroup.innerHTML = `<label for="exemptAmount">Monto Exento (Bs.)</label><input type="number" id="exemptAmount" min="0" value="0" step="0.01">`;
+            detailsSection.appendChild(exemptGroup);
+        }
+        if (!document.getElementById('alicuota')) {
+            const alicuotaGroup = document.createElement('div');
+            alicuotaGroup.className = 'form-group';
+            alicuotaGroup.innerHTML = `<label for="alicuota">Alícuota (%)</label><input type="number" id="alicuota" min="0" max="1" value="0.16" step="0.01">`;
+            detailsSection.appendChild(alicuotaGroup);
+        }
+        if (!document.getElementById('usdPercentage') && document.getElementById('paymentMethod').value.includes('usd')) {
+            const usdGroup = document.createElement('div');
+            usdGroup.className = 'form-group';
+            usdGroup.innerHTML = `<label for="usdPercentage">Porcentaje en Dólares (%)</label><input type="number" id="usdPercentage" min="0" max="100" value="100">`;
+            detailsSection.appendChild(usdGroup);
+        }
+
+        // Asegurar campo de correos
+        const clientInfoSection = document.querySelector('.form-section:nth-child(1) .form-row:last-child');
+        if (!document.getElementById('clientEmails')) {
+            const emailGroup = document.createElement('div');
+            emailGroup.className = 'form-group';
+            emailGroup.innerHTML = `<label for="clientEmails">Correo Electrónico(s) (separados por coma)</label><input type="email" id="clientEmails" placeholder="Ej: correo1@example.com">`;
+            clientInfoSection.appendChild(emailGroup);
+        }
+
+        fetchExchangeRate();
+        updateInvoiceTotals();
+    }
+
+    // Actualizar paymentMethod para mostrar/ocultar usdPercentage
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+        const usdPercentage = document.getElementById('usdPercentage');
+        if (!usdPercentage) {
+            const detailsSection = document.querySelector('.form-section:nth-child(2)');
+            const usdGroup = document.createElement('div');
+            usdGroup.className = 'form-group';
+            usdGroup.innerHTML = `<label for="usdPercentage">Porcentaje en Dólares (%)</label><input type="number" id="usdPercentage" min="0" max="100" value="${this.value.includes('usd') ? 100 : 0}">`;
+            detailsSection.appendChild(usdGroup);
+        } else {
+            usdPercentage.value = this.value.includes('usd') ? 100 : 0;
+        }
+        updateInvoiceTotals();
+    });
+
+    // Actualizar initializePage
+    document.addEventListener('DOMContentLoaded', initializePage);
+
+    // ===========================================================================
+    // ESTILOS ADICIONALES
+    // ===========================================================================
+    <style>
+        .summary-table td:last-child {
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .summary-table tr:last-child td:last-child {
+            font-size: 18px;
+        }
+        .items-table td:last-child {
+            line-height: 1.5;
+        }
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+    </style>
+
+    // ===========================================================================
+    // NOTAS DE LA EXTENSIÓN
+    // ===========================================================================
+    // - Añadidos montos en dólares para subtotal, monto exento, base imponible, IVA, IGTF, retención y total.
+    // - Nuevos campos: Monto Exento, Alícuota (personalizable), Porcentaje en Dólares.
+    // - IGTF se calcula solo sobre el porcentaje del pago en dólares.
+    // - Validaciones para monto exento, alícuota y porcentaje en dólares.
+    // ===========================================================================
+</script>
+<!-- Fin de la extensión -->
