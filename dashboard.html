@@ -3226,3 +3226,87 @@
     // ===========================================================================
 </script>
 <!-- Fin de la nueva extensión -->
+<!-- Inicio de la extensión: Actualización de pestañas "Facturas" y "Clientes" -->
+<script>
+    // ===========================================================================
+    // EXTENSIÓN: ACTUALIZACIÓN DE PESTAÑAS "FACTURAS" Y "CLIENTES"
+    // ===========================================================================
+    // Esta sección actualiza las pestañas "Facturas" y "Clientes" para mostrar
+    // superficialmente las facturas generadas y los datos de los clientes desde
+    // localStorage.
+    // ===========================================================================
+
+    /**
+     * Carga las facturas en la pestaña "Facturas".
+     */
+    function loadInvoices() {
+        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        const tbody = document.getElementById('invoicesTableBody');
+        tbody.innerHTML = '';
+        invoices.forEach(invoice => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${invoice.controlNumber || 'N/A'}</td>
+                <td>${formatDate(invoice.date)}</td>
+                <td>${invoice.clientName}</td>
+                <td>${formatCurrency(invoice.subtotal)}</td>
+                <td>${formatCurrency(invoice.iva)}</td>
+                <td>${formatCurrency(invoice.igtf)}</td>
+                <td>${formatCurrency(invoice.total)}</td>
+                <td><button class="btn btn-secondary">Ver</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    /**
+     * Carga los clientes en la pestaña "Clientes".
+     */
+    function loadClients() {
+        const clients = JSON.parse(localStorage.getItem('clients')) || [];
+        const tbody = document.getElementById('clientsTableBody');
+        tbody.innerHTML = '';
+        clients.forEach(client => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${client.clientName}</td>
+                <td>${client.clientId}</td>
+                <td>${client.clientAddress}</td>
+                <td>${client.clientPhone || 'N/A'}</td>
+                <td>0</td> <!-- Placeholder para facturas emitidas, a implementar -->
+                <td><button class="btn btn-secondary">Ver</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    /**
+     * Actualiza las estadísticas y las pestañas al cargar o guardar.
+     */
+    function updateDashboardStats() {
+        loadInvoices();
+        loadClients();
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.availableInvoices < 10) {
+            document.getElementById('lowInvoicesWarning').classList.remove('hidden');
+        }
+    }
+
+    // Llamar a las funciones al cargar la página y al cambiar pestañas
+    document.addEventListener('DOMContentLoaded', updateDashboardStats);
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            setTimeout(updateDashboardStats, 100); // Pequeño retraso para asegurar el cambio de pestaña
+        });
+    });
+
+    // ===========================================================================
+    // NOTAS DE LA EXTENSIÓN
+    // ===========================================================================
+    - Las facturas se muestran en "Facturas" con número, fecha, cliente y total.
+    - Los clientes se muestran en "Clientes" con nombre, cédula/RIF, dirección y teléfono.
+    - Los datos se actualizan dinámicamente desde localStorage.
+    - Placeholder para contar facturas emitidas por cliente (a implementar).
+    // ===========================================================================
+</script>
+<!-- Fin de la extensión -->
