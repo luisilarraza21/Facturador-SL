@@ -1620,3 +1620,67 @@
 </script>
 </script>
 <!-- Fin de la extensión -->
+<!-- Inicio de la extensión simplificada -->
+<script src="api.js"></script>
+<script>
+    let exchangeRate = 64.74; // Valor por defecto
+
+    async function fetchExchangeRate() {
+        try {
+            const response = await getExchangeRate();
+            if (response.success) {
+                exchangeRate = response.rate;
+                alert(`Tasa del dólar: ${exchangeRate} VES/USD`);
+            }
+        } catch (error) {
+            alert('Error al cargar la tasa. Usando valor por defecto.');
+        }
+    }
+
+    function validateInvoiceForm(invoiceData) {
+        let isValid = true;
+        const errors = [];
+
+        if (!invoiceData.clientName) {
+            errors.push('El nombre es obligatorio.');
+            isValid = false;
+        }
+
+        const emailInput = document.getElementById('clientEmails');
+        if (emailInput && emailInput.value.trim()) {
+            const emails = emailInput.value.split(',').map(email => email.trim());
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const invalidEmails = emails.filter(email => !emailRegex.test(email));
+            if (invalidEmails.length > 0) {
+                errors.push(`Correos inválidos: ${invalidEmails.join(', ')}`);
+                isValid = false;
+            }
+        }
+
+        if (errors.length > 0) {
+            alert(errors.join('\n'));
+        }
+        return isValid;
+    }
+
+    function initializePage() {
+        fetchExchangeRate();
+        const clientInfoSection = document.querySelector('.form-section:nth-child(1) .form-row:last-child');
+        if (!document.getElementById('clientEmails')) {
+            const emailGroup = document.createElement('div');
+            emailGroup.className = 'form-group';
+            emailGroup.innerHTML = `<label for="clientEmails">Correo(s)</label><input type="email" id="clientEmails" placeholder="Ej: correo1@example.com">`;
+            clientInfoSection.appendChild(emailGroup);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initializePage);
+
+    // Prueba manual
+    function testValidation() {
+        const invoiceData = { clientName: document.getElementById('clientName').value, clientEmails: document.getElementById('clientEmails').value };
+        validateInvoiceForm(invoiceData);
+    }
+</script>
+<button onclick="testValidation()">Probar Validación</button>
+<!-- Fin de la extensión simplificada -->
