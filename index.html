@@ -137,7 +137,21 @@
         }
     </style>
 </head>
-<body>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script>
+    // Código de inicialización
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        loginUser();
+    });
+    
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        registerUser();
+    });
+</script>
+</body>
     <div class="navbar">
         <div class="logo">FacturaML</div>
     </div>
@@ -366,7 +380,23 @@
             }, 1500);
         }
         
-       // Función para iniciar sesión
+   // Estructura de datos de usuarios (esto podría venir de una base de datos en una aplicación real)
+// Si usas una base de datos, esta parte sería reemplazada por llamadas a API
+let users = [
+    {
+        id: 1,
+        name: "Usuario Demo",
+        email: "demo@facturaml.com",
+        password: "12345",
+        company: "Empresa Demo",
+        rif: "J-12345678-9",
+        address: "Caracas, Venezuela",
+        phone: "0412-1234567"
+    }
+    // Otros usuarios...
+];
+
+// Función para iniciar sesión
 function loginUser() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -392,29 +422,142 @@ function loginUser() {
         showError('Correo o contraseña incorrectos');
     }
 }
+
+// Función para registrar nuevo usuario
+function registerUser() {
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const confirmPassword = document.getElementById('registerConfirmPassword').value;
+    const company = document.getElementById('registerCompany').value;
+    const rif = document.getElementById('registerRif').value;
+    const address = document.getElementById('registerAddress').value;
+    const phone = document.getElementById('registerPhone').value;
+    
+    // Validaciones
+    if (!name || !email || !password || !confirmPassword || !company || !rif) {
+        showError('Por favor completa todos los campos obligatorios');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showError('Las contraseñas no coinciden');
+        return;
+    }
+    
+    // Verificar si el email ya existe
+    if (users.some(u => u.email === email)) {
+        showError('Este correo ya está registrado');
+        return;
+    }
+    
+    // Crear nuevo usuario
+    const newUser = {
+        id: users.length + 1,
+        name,
+        email,
+        password,
+        company,
+        rif,
+        address,
+        phone
+    };
+    
+    // Agregar a la lista de usuarios
+    users.push(newUser);
+    
+    // Guardar sesión
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    showSuccess('¡Registro exitoso!');
+    
+    // Redireccionar al dashboard
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 1500);
+}
+
+// Función para cerrar sesión
+function logoutUser() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'index.html';
+}
+
+// Función para verificar si el usuario está autenticado
+function checkAuthentication() {
+    const currentUser = localStorage.getItem('currentUser');
+    
+    if (!currentUser) {
+        window.location.href = 'index.html';
+        return null;
+    }
+    
+    return JSON.parse(currentUser);
+}
+
+// Función para obtener el usuario actual
+function getCurrentUser() {
+    const currentUser = localStorage.getItem('currentUser');
+    return currentUser ? JSON.parse(currentUser) : null;
+}
+
+// Función para actualizar los datos del perfil del usuario
+function updateUserProfile(updatedData) {
+    const currentUser = getCurrentUser();
+    
+    if (!currentUser) {
+        return false;
+    }
+    
+    // Actualizar datos del usuario en la "base de datos"
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    
+    if (userIndex !== -1) {
+        // Actualizar los campos permitidos
+        users[userIndex] = {
+            ...users[userIndex],
+            name: updatedData.name || users[userIndex].name,
+            company: updatedData.company || users[userIndex].company,
+            rif: updatedData.rif || users[userIndex].rif,
+            address: updatedData.address || users[userIndex].address,
+            phone: updatedData.phone || users[userIndex].phone
+        };
         
-        // Eventos para cambiar entre tabs
-        loginTab.addEventListener('click', () => switchTab('login'));
-        registerTab.addEventListener('click', () => switchTab('register'));
-        showLoginLink.addEventListener('click', () => switchTab('login'));
-        showRegisterLink.addEventListener('click', () => switchTab('register'));
+        // Si se actualiza la contraseña
+        if (updatedData.password) {
+            users[userIndex].password = updatedData.password;
+        }
         
-        // Eventos para botones de acción
-        registerButton.addEventListener('click', registerUser);
-        loginButton.addEventListener('click', loginUser);
+        // Actualizar el usuario en localStorage
+        localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
         
-        // Evento para permitir envío con Enter
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    if (loginForm.style.display === 'block') {
-                        loginUser();
-                    } else {
-                        registerUser();
-                    }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+        return true;
+    }
+    
+    return false;
+}
+
+// Estas funciones dependen de utils.js, así que deben estar importadas
+// o definidas aquí si no se ha modularizado aún
+function showError(message) {
+    // Esta función la definirás en utils.js
+    console.error(message);
+    alert(message); // Implementación temporal hasta que tengas utils.js
+}
+
+function showSuccess(message) {
+    // Esta función la definirás en utils.js
+    console.log(message);
+    alert(message); // Implementación temporal hasta que tengas utils.js
+}
+
+// Exportar funciones si estás usando módulos ES6
+// Si no estás usando módulos, esto no es necesario
+export {
+    loginUser,
+    registerUser,
+    logoutUser,
+    checkAuthentication,
+    getCurrentUser,
+    updateUserProfile
+};
