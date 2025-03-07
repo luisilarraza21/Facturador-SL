@@ -1857,3 +1857,790 @@
         // ===========================================================================
     </script>
 <!-- Fin de la segunda parte -->
+    <!-- Inicio de la extensión: Nueva Factura en todas las pestañas -->
+<script>
+    // ===========================================================================
+    // EXTENSIÓN: FUNCIONALIDAD DE "NUEVA FACTURA" EN TODAS LAS PESTAÑAS
+    // ===========================================================================
+    // Esta sección extiende el código para incluir la funcionalidad de "Nueva Factura"
+    // en las pestañas "Facturas", "Clientes" y "Mi Perfil". Incluye un formulario
+    // reutilizable con calculadora de IVA, IGTF (para pagos en USD), y retenciones
+    // para contribuyentes especiales, con guardado en localStorage y validaciones.
+    // ===========================================================================
+
+    /**
+     * Muestra el formulario de nueva factura en la pestaña correspondiente.
+     * @param {string} tab - Nombre de la pestaña ("Invoices", "Clients", "Profile").
+     */
+    function showInvoiceForm(tab) {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        // Verificar si hay facturas disponibles
+        if (!currentUser || currentUser.availableInvoices <= 0) {
+            showAlert('No tienes facturas disponibles. Por favor, compra más facturas para continuar.', 'danger');
+            return;
+        }
+
+        // Ocultar el contenido actual de la pestaña y mostrar el formulario
+        document.getElementById(`content${tab}`).innerHTML = `
+            <div id="invoiceFormContainer">
+                <h3 class="section-title">Nueva Factura</h3>
+                <div class="invoice-form">
+                    <div class="form-section">
+                        <h4>Información del Cliente</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientName">Nombre o Razón Social*</label>
+                                <input type="text" id="clientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientId">Cédula o RIF*</label>
+                                <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientAddress">Dirección*</label>
+                                <input type="text" id="clientAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientPhone">Teléfono</label>
+                                <input type="text" id="clientPhone">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4>Detalles de la Factura</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="invoiceDate">Fecha de Emisión*</label>
+                                <input type="date" id="invoiceDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentMethod">Método de Pago*</label>
+                                <select id="paymentMethod" required>
+                                    <option value="transferencia_bs">Transferencia en Bs.</option>
+                                    <option value="pago_movil">Pago Móvil</option>
+                                    <option value="efectivo_bs">Efectivo en Bs.</option>
+                                    <option value="efectivo_usd">Efectivo en USD</option>
+                                    <option value="transferencia_usd">Transferencia en USD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="invoiceNotes">Notas</label>
+                            <textarea id="invoiceNotes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4>Artículos</h4>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th width="40%">Descripción</th>
+                                    <th width="15%">Cantidad</th>
+                                    <th width="20%">Precio Unitario</th>
+                                    <th width="20%">Subtotal</th>
+                                    <th width="5%"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <tr>
+                                    <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                                    <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                                    <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                                    <td class="item-subtotal">0.00</td>
+                                    <td><button class="btn-secondary remove-item">X</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-secondary" id="addItemBtn" style="margin-top: 10px">Agregar Artículo</button>
+                        
+                        <table class="summary-table">
+                            <tr>
+                                <td>Subtotal:</td>
+                                <td class="text-right" id="summarySubtotal">0.00 Bs.</td>
+                            </tr>
+                            <tr>
+                                <td>IVA (16%):</td>
+                                <td class="text-right" id="summaryIva">0.00 Bs.</td>
+                            </tr>
+                            <tr id="igtfRow">
+                                <td>IGTF (3%):</td>
+                                <td class="text-right" id="summaryIgtf">0.00 Bs.</td>
+                            </tr>
+                            <tr id="specialTaxRow">
+                                <td>Retención Contribuyente Especial:</td>
+                                <td class="text-right" id="summarySpecialTax">0.00 Bs.</td>
+                            </tr>
+                            <tr>
+                                <td>Total:</td>
+                                <td class="text-right" id="summaryTotal">0.00 Bs.</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
+                        <button class="btn btn-success" id="previewInvoiceBtn">Vista Previa</button>
+                        <button class="btn" id="saveInvoiceBtn">Generar Factura</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Establecer la fecha actual
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('invoiceDate').value = today;
+
+        // Actualizar totales iniciales
+        updateInvoiceTotals();
+
+        // Enfocar el primer campo
+        document.getElementById('clientName').focus();
+
+        // Configurar event listeners específicos para esta instancia del formulario
+        setupInvoiceFormListeners();
+    }
+
+    /**
+     * Agrega un nuevo ítem a la tabla de artículos de la factura.
+     */
+    function addInvoiceItem() {
+        const itemsTableBody = document.getElementById('itemsTableBody');
+        const lastRow = itemsTableBody.lastElementChild;
+
+        // Verificar que la última fila tenga descripción antes de agregar una nueva
+        const lastDescription = lastRow.querySelector('.item-description').value.trim();
+        if (!lastDescription) {
+            showAlert('Por favor, completa la descripción del artículo antes de agregar otro.', 'warning');
+            lastRow.querySelector('.item-description').focus();
+            return;
+        }
+
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+            <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+            <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+            <td class="item-subtotal">0.00</td>
+            <td><button class="btn-secondary remove-item">X</button></td>
+        `;
+        itemsTableBody.appendChild(newRow);
+
+        // Actualizar totales
+        updateInvoiceTotals();
+
+        // Enfocar el campo de descripción del nuevo ítem
+        newRow.querySelector('.item-description').focus();
+    }
+
+    /**
+     * Actualiza el subtotal de una fila específica en la tabla de ítems.
+     * @param {HTMLElement} row - La fila de la tabla a actualizar.
+     */
+    function updateRowSubtotal(row) {
+        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const subtotal = quantity * price;
+
+        // Formatear el subtotal sin incluir "Bs." para consistencia
+        row.querySelector('.item-subtotal').textContent = subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    /**
+     * Actualiza los totales de la factura con calculadora incluída (IVA, IGTF, retenciones).
+     */
+    function updateInvoiceTotals() {
+        let subtotal = 0;
+
+        // Calcular subtotal sumando los ítems
+        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+            const rowSubtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+            subtotal += rowSubtotal;
+        });
+
+        // Calcular impuestos
+        const ivaRate = 0.16; // 16% IVA
+        const igtfRate = 0.03; // 3% IGTF para pagos en USD
+        const specialTaxRate = 0.01; // 1% retención para contribuyentes especiales
+
+        const iva = subtotal * ivaRate;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const isUSDPayment = paymentMethod.includes('usd');
+        const igtf = isUSDPayment ? subtotal * igtfRate : 0;
+
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        const specialTax = currentUser.isSpecialContributor ? subtotal * specialTaxRate : 0;
+        const total = subtotal + iva + igtf - specialTax;
+
+        // Mostrar u ocultar filas de impuestos según corresponda
+        document.getElementById('igtfRow').style.display = isUSDPayment ? '' : 'none';
+        document.getElementById('specialTaxRow').style.display = currentUser.isSpecialContributor ? '' : 'none';
+
+        // Actualizar los valores en la interfaz
+        document.getElementById('summarySubtotal').textContent = formatCurrency(subtotal);
+        document.getElementById('summaryIva').textContent = formatCurrency(iva);
+        document.getElementById('summaryIgtf').textContent = formatCurrency(igtf);
+        document.getElementById('summarySpecialTax').textContent = formatCurrency(specialTax);
+        document.getElementById('summaryTotal').textContent = formatCurrency(total);
+    }
+
+    /**
+     * Recopila los datos del formulario de factura.
+     * @returns {Object} - Objeto con los datos de la factura.
+     */
+    function getInvoiceFormData() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        const clientName = document.getElementById('clientName').value.trim();
+        const clientId = document.getElementById('clientId').value.trim().toUpperCase();
+        const clientAddress = document.getElementById('clientAddress').value.trim();
+        const clientPhone = document.getElementById('clientPhone').value.trim();
+        const invoiceDate = document.getElementById('invoiceDate').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const invoiceNotes = document.getElementById('invoiceNotes').value.trim();
+
+        const items = [];
+        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+            const description = row.querySelector('.item-description').value.trim();
+            if (description) {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const subtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+                items.push({ description, quantity, price, subtotal });
+            }
+        });
+
+        let subtotal = 0;
+        items.forEach(item => subtotal += item.subtotal);
+
+        const ivaRate = 0.16;
+        const igtfRate = 0.03;
+        const specialTaxRate = 0.01;
+
+        const iva = subtotal * ivaRate;
+        const isUSDPayment = paymentMethod.includes('usd');
+        const igtf = isUSDPayment ? subtotal * igtfRate : 0;
+        const specialTax = currentUser.isSpecialContributor ? subtotal * specialTaxRate : 0;
+        const total = subtotal + iva + igtf - specialTax;
+
+        return {
+            id: Date.now().toString(),
+            sellerId: currentUser.email,
+            sellerName: currentUser.companyName,
+            sellerRif: currentUser.rif,
+            sellerAddress: currentUser.address,
+            sellerPhone: currentUser.phone,
+            sellerEmail: currentUser.email,
+            isSpecialContributor: currentUser.isSpecialContributor,
+            clientName,
+            clientId,
+            clientAddress,
+            clientPhone,
+            date: invoiceDate,
+            paymentMethod,
+            notes: invoiceNotes,
+            items,
+            subtotal,
+            iva,
+            igtf,
+            specialTax,
+            total,
+            createdAt: new Date().toISOString(),
+            status: 'emitida'
+        };
+    }
+
+    /**
+     * Valida el formulario de factura.
+     * @param {Object} invoiceData - Datos de la factura a validar.
+     * @returns {boolean} - True si es válido, false si hay errores.
+     */
+    function validateInvoiceForm(invoiceData) {
+        let isValid = true;
+        const errors = [];
+
+        if (!invoiceData.clientName) {
+            errors.push('El nombre o razón social del cliente es obligatorio.');
+            document.getElementById('clientName').classList.add('has-error');
+            document.getElementById('clientName').style.borderColor = 'red';
+            isValid = false;
+        } else {
+            document.getElementById('clientName').classList.remove('has-error');
+            document.getElementById('clientName').style.borderColor = '';
+        }
+
+        if (!invoiceData.clientId || !validateClientId(invoiceData.clientId)) {
+            errors.push('La cédula o RIF del cliente es obligatorio y debe tener un formato válido (Ej: V-12345678 o J-12345678-9).');
+            document.getElementById('clientId').classList.add('has-error');
+            document.getElementById('clientId').style.borderColor = 'red';
+            isValid = false;
+        } else {
+            document.getElementById('clientId').classList.remove('has-error');
+            document.getElementById('clientId').style.borderColor = '';
+        }
+
+        if (!invoiceData.clientAddress) {
+            errors.push('La dirección del cliente es obligatoria.');
+            document.getElementById('clientAddress').classList.add('has-error');
+            document.getElementById('clientAddress').style.borderColor = 'red';
+            isValid = false;
+        } else {
+            document.getElementById('clientAddress').classList.remove('has-error');
+            document.getElementById('clientAddress').style.borderColor = '';
+        }
+
+        if (invoiceData.clientPhone && !validatePhone(invoiceData.clientPhone)) {
+            errors.push('El teléfono no tiene un formato válido (Ej: +584121234567 o 04121234567).');
+            document.getElementById('clientPhone').classList.add('has-error');
+            document.getElementById('clientPhone').style.borderColor = 'red';
+            isValid = false;
+        } else {
+            document.getElementById('clientPhone').classList.remove('has-error');
+            document.getElementById('clientPhone').style.borderColor = '';
+        }
+
+        if (!invoiceData.date) {
+            errors.push('La fecha de emisión es obligatoria.');
+            document.getElementById('invoiceDate').classList.add('has-error');
+            document.getElementById('invoiceDate').style.borderColor = 'red';
+            isValid = false;
+        } else {
+            const invoiceDate = new Date(invoiceData.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (invoiceDate > today) {
+                errors.push('La fecha de emisión no puede ser futura.');
+                document.getElementById('invoiceDate').classList.add('has-error');
+                document.getElementById('invoiceDate').style.borderColor = 'red';
+                isValid = false;
+            } else {
+                document.getElementById('invoiceDate').classList.remove('has-error');
+                document.getElementById('invoiceDate').style.borderColor = '';
+            }
+        }
+
+        if (!invoiceData.paymentMethod) {
+            errors.push('El método de pago es obligatorio.');
+            document.getElementById('paymentMethod').classList.add('has-error');
+            document.getElementById('paymentMethod').style.borderColor = 'red';
+            isValid = false;
+        } else {
+            document.getElementById('paymentMethod').classList.remove('has-error');
+            document.getElementById('paymentMethod').style.borderColor = '';
+        }
+
+        if (invoiceData.items.length === 0) {
+            errors.push('Debe agregar al menos un artículo a la factura.');
+            isValid = false;
+        } else {
+            document.querySelectorAll('#itemsTableBody tr').forEach((row, index) => {
+                const description = row.querySelector('.item-description').value.trim();
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+
+                if (description && (quantity <= 0 || price <= 0)) {
+                    errors.push(`El artículo ${index + 1} tiene cantidad o precio inválido.`);
+                    if (quantity <= 0) row.querySelector('.item-quantity').style.borderColor = 'red';
+                    if (price <= 0) row.querySelector('.item-price').style.borderColor = 'red';
+                    isValid = false;
+                } else {
+                    row.querySelector('.item-quantity').style.borderColor = '';
+                    row.querySelector('.item-price').style.borderColor = '';
+                }
+            });
+        }
+
+        if (invoiceData.total <= 0) {
+            errors.push('El total de la factura debe ser mayor a 0.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showAlert(errors.join(' '), 'warning');
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Genera una vista previa de la factura en un modal.
+     */
+    function previewInvoice() {
+        const invoiceData = getInvoiceFormData();
+
+        if (!validateInvoiceForm(invoiceData)) {
+            return;
+        }
+
+        const previewModal = document.getElementById('previewModal');
+        const invoicePreview = document.getElementById('invoicePreview');
+
+        invoicePreview.innerHTML = `
+            <div class="preview-header">
+                <div class="preview-logo">FacturaML</div>
+                <div>
+                    <strong>Factura #: (pendiente)</strong><br>
+                    Fecha: ${formatDate(invoiceData.date)}
+                </div>
+            </div>
+            <div class="preview-title">FACTURA</div>
+            <div class="preview-company-info">
+                <h3>Datos del Emisor</h3>
+                <p>
+                    <strong>${invoiceData.sellerName}</strong><br>
+                    RIF: ${invoiceData.sellerRif}<br>
+                    Dirección: ${invoiceData.sellerAddress}<br>
+                    Teléfono: ${invoiceData.sellerPhone}<br>
+                    Email: ${invoiceData.sellerEmail}
+                </p>
+            </div>
+            <div class="preview-client-info">
+                <h3>Datos del Cliente</h3>
+                <p>
+                    <strong>${invoiceData.clientName}</strong><br>
+                    RIF/CI: ${invoiceData.clientId}<br>
+                    Dirección: ${invoiceData.clientAddress}<br>
+                    ${invoiceData.clientPhone ? `Teléfono: ${invoiceData.clientPhone}<br>` : ''}
+                </p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${invoiceData.items.map(item => `
+                        <tr>
+                            <td>${item.description}</td>
+                            <td>${item.quantity}</td>
+                            <td>${formatCurrency(item.price)}</td>
+                            <td>${formatCurrency(item.subtotal)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">Subtotal:</td>
+                        <td>${formatCurrency(invoiceData.subtotal)}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: right;">IVA (16%):</td>
+                        <td>${formatCurrency(invoiceData.iva)}</td>
+                    </tr>
+                    ${invoiceData.igtf > 0 ? `
+                    <tr>
+                        <td colspan="3" style="text-align: right;">IGTF (3%):</td>
+                        <td>${formatCurrency(invoiceData.igtf)}</td>
+                    </tr>
+                    ` : ''}
+                    ${invoiceData.specialTax > 0 ? `
+                    <tr>
+                        <td colspan="3" style="text-align: right;">Retención Contribuyente Especial:</td>
+                        <td>${formatCurrency(invoiceData.specialTax)}</td>
+                    </tr>
+                    ` : ''}
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align: right;">Total:</td>
+                        <td>${formatCurrency(invoiceData.total)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            ${invoiceData.notes ? `
+            <div class="notes">
+                <h3>Notas</h3>
+                <p>${invoiceData.notes}</p>
+            </div>
+            ` : ''}
+            <div class="footer">
+                <p>Gracias por su compra. Este documento es una factura legal.</p>
+            </div>
+        `;
+
+        previewModal.style.display = 'block';
+    }
+
+    /**
+     * Guarda la factura en localStorage y actualiza la interfaz.
+     */
+    function saveInvoice() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        if (currentUser.availableInvoices <= 0) {
+            showAlert('No tienes facturas disponibles. Por favor, compra más facturas para continuar.', 'danger');
+            return;
+        }
+
+        const invoiceData = getInvoiceFormData();
+
+        if (!validateInvoiceForm(invoiceData)) {
+            return;
+        }
+
+        let lastControlNumber = parseInt(localStorage.getItem('lastControlNumber') || '0');
+        const newControlNumber = lastControlNumber + 1;
+        invoiceData.controlNumber = newControlNumber;
+
+        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        invoices.push(invoiceData);
+        localStorage.setItem('invoices', JSON.stringify(invoices));
+        localStorage.setItem('lastControlNumber', newControlNumber.toString());
+
+        currentUser.availableInvoices -= 1;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        showAlert(`Factura #${newControlNumber} generada exitosamente.`, 'success');
+        cancelInvoiceForm();
+        updateDashboardStats();
+        loadInvoices();
+        switchTab('Invoices'); // Regresar a la pestaña Facturas tras guardar
+    }
+
+    /**
+     * Cancela el formulario y regresa a la pestaña correspondiente.
+     */
+    function cancelInvoiceForm() {
+        const tab = document.querySelector('.tab.active').id.replace('tab', '');
+        document.getElementById(`content${tab}`).innerHTML = getTabContent(tab);
+        setupEventListeners(); // Reconfigurar listeners tras cancelar
+    }
+
+    /**
+     * Devuelve el contenido HTML predeterminado de una pestaña.
+     * @param {string} tab - Nombre de la pestaña ("Invoices", "Clients", "Profile").
+     * @returns {string} - HTML del contenido de la pestaña.
+     */
+    function getTabContent(tab) {
+        if (tab === 'Invoices') {
+            return `
+                <h3>Historial de Facturas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Monto</th>
+                            <th>IVA</th>
+                            <th>IGTF</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoicesTableBody">
+                        <!-- Rows will be populated dynamically -->
+                    </tbody>
+                </table>
+                <button class="btn" id="newInvoiceBtn">Nueva Factura</button>
+            `;
+        } else if (tab === 'Clients') {
+            return `
+                <h3>Mis Clientes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre/Razón Social</th>
+                            <th>Cédula/RIF</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                            <th>Facturas Emitidas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                        <!-- Rows will be populated dynamically -->
+                    </tbody>
+                </table>
+                <button class="btn" id="newInvoiceBtn">Nueva Factura</button>
+            `;
+        } else if (tab === 'Profile') {
+            return `
+                <h3>Información de mi Empresa</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profileCompanyName">Nombre o Razón Social</label>
+                        <input type="text" id="profileCompanyName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileRif">RIF</label>
+                        <input type="text" id="profileRif" readonly>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="profileAddress">Dirección Fiscal</label>
+                        <input type="text" id="profileAddress" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="profilePhone">Teléfono</label>
+                        <input type="text" id="profilePhone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profileEmail">Correo Electrónico</label>
+                    <input type="email" id="profileEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Estatus de Contribuyente</label>
+                    <div id="profileTaxStatus">Normal</div>
+                </div>
+                <div style="margin-top: 30px;">
+                    <h3>Plan de Facturación</h3>
+                    <div class="alert alert-info">
+                        Tienes activado el plan de <strong>Talonario de 100 Facturas</strong>
+                    </div>
+                    <div id="lowInvoicesWarning" class="alert alert-warning hidden">
+                        Te quedan menos de 10 facturas disponibles. ¡Considera comprar más pronto!
+                    </div>
+                    <button class="btn" id="buyMoreInvoicesBtn">Comprar más facturas</button>
+                </div>
+                <button class="btn" id="newInvoiceBtn" style="margin-top: 20px">Nueva Factura</button>
+            `;
+        }
+        return '';
+    }
+
+    /**
+     * Configura los event listeners para la funcionalidad de "Nueva Factura" en todas las pestañas.
+     */
+    function setupInvoiceFormListeners() {
+        document.querySelectorAll('#newInvoiceBtn').forEach(button => {
+            button.addEventListener('click', () => {
+                const tab = document.querySelector('.tab.active').id.replace('tab', '');
+                showInvoiceForm(tab);
+            });
+        });
+
+        document.getElementById('cancelInvoiceBtn')?.addEventListener('click', cancelInvoiceForm);
+        document.getElementById('addItemBtn')?.addEventListener('click', addInvoiceItem);
+        document.getElementById('previewInvoiceBtn')?.addEventListener('click', previewInvoice);
+        document.getElementById('saveInvoiceBtn')?.addEventListener('click', saveInvoice);
+
+        document.addEventListener('click', handleRemoveItem);
+        function handleRemoveItem(e) {
+            if (e.target.classList.contains('remove-item')) {
+                const row = e.target.closest('tr');
+                const tbody = row.parentElement;
+                if (tbody.children.length > 1) {
+                    row.remove();
+                    updateInvoiceTotals();
+                } else {
+                    showAlert('Debe haber al menos un artículo en la factura.', 'warning');
+                }
+            }
+        }
+
+        document.addEventListener('input', handleItemInput);
+        function handleItemInput(e) {
+            if (e.target.classList.contains('item-quantity') || e.target.classList.contains('item-price')) {
+                const row = e.target.closest('tr');
+                updateRowSubtotal(row);
+                updateInvoiceTotals();
+            }
+        }
+
+        document.getElementById('paymentMethod')?.addEventListener('change', updateInvoiceTotals);
+
+        document.getElementById('closePreviewModal')?.addEventListener('click', () => {
+            document.getElementById('previewModal').style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('previewModal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    /**
+     * Actualiza los listeners tras cambiar de pestaña o cargar contenido.
+     */
+    function updateListeners() {
+        setupEventListeners();
+        setupInvoiceFormListeners();
+    }
+
+    // Actualizar listeners al cambiar de pestaña
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.id.replace('tab', '');
+            document.getElementById(`content${tabName}`).innerHTML = getTabContent(tabName);
+            updateListeners();
+        });
+    });
+
+    // ===========================================================================
+    // ESTILOS ADICIONALES PARA LA EXTENSIÓN
+    // ===========================================================================
+    // Añade estilos específicos para el formulario de "Nueva Factura" en todas las pestañas.
+    // ===========================================================================
+
+    <style>
+        .invoice-form-container {
+            animation: fadeIn 0.5s ease;
+            margin-top: 20px;
+        }
+        .form-section h4 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #444;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .has-error input, .has-error select {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5;
+        }
+        .preview-modal {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        @media (max-width: 600px) {
+            .invoice-form {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                flex-direction: column;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+
+    <!-- Agregar botón de prueba para simulaciones -->
+    <div style="margin: 20px 0; text-align: center;">
+        <button class="btn btn-secondary" id="testButton">Probar Simulaciones</button>
+    </div>
+
+    <script>
+        // Configurar botón de prueba
+        document.getElementById('testButton').addEventListener('click', () => {
+            simulateBulkInvoices(5); // Generar 5 facturas de prueba
+            setTimeout(simulateConnectionError, 2000); // Simular error después de 2 segundos
+            setTimeout(testEdgeCaseInvoice, 4000); // Probar caso extremo después de 4 segundos
+        });
+
+        // ===========================================================================
+        // NOTAS DE EXTENSIÓN Y DOCUMENTACIÓN
+        // ===========================================================================
+        // Esta extensión agrega la funcionalidad de "Nueva Factura" a las tres pestañas
+        // con calculadora incluída (IVA 16%, IGTF 3% para USD, retención 1% para
+        // contribuyentes especiales). El código es modular y puede extenderse con:
+        // - Exportación de facturas a PDF.
+        - Integración con un backend para sincronización.
+        - Gestión avanzada de clientes.
+        //
+        // Líneas aproximadas de esta extensión: 500+ (puedes añadir más si necesitas).
+        // ===========================================================================
+    </script>
+<!-- Fin de la extensión -->
