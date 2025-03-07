@@ -1262,40 +1262,51 @@
     }
 
     /**
-     * Muestra una vista previa de la factura desde el historial.
-     * @param {Event} event - Evento del botón "Ver".
-     */
-    function viewInvoice(event) {
-        const invoiceId = event.target.getAttribute('data-id');
-        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-        const invoice = invoices.find(i => i.id === invoiceId);
+     /**
+ * Muestra un modal avanzado para la vista previa de una factura.
+ * @param {object} invoice - Datos de la factura a previsualizar.
+ */
+function showInvoicePreview(invoice) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
 
-        if (invoice) {
-            const previewContent = `
-                <h3>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'} #${invoice.controlNumber}</h3>
-                <p><strong>Emisor:</strong> ${invoice.sellerName} (RIF: ${invoice.sellerRif})</p>
-                <p><strong>Cliente:</strong> ${invoice.clientName} (RIF/Cédula: ${invoice.clientId})</p>
-                <p><strong>Fecha:</strong> ${formatDate(invoice.date)}</p>
-                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                    <thead>
-                        <tr style="background: #f8f9fa;">
-                            <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
-                            <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
-                            <th style="border: 1px solid #ddd; padding: 8px;">Precio</th>
-                            <th style="border: 1px solid #ddd; padding: 8px;">Subtotal</th>
+    const previewContent = `
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 90%; max-height: 90%; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            <h3>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'} #${invoice.controlNumber}</h3>
+            <p><strong>Emisor:</strong> ${invoice.sellerName} (RIF: ${invoice.sellerRif})</p>
+            <p><strong>Cliente:</strong> ${invoice.clientName} (RIF/Cédula: ${invoice.clientId})</p>
+            <p><strong>Fecha:</strong> ${formatDate(invoice.date)}</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background: #2968c8; color: white;">
+                        <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Precio</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${invoice.items.map(item => `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.description}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.price)}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.subtotal)}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        ${invoice.items.map(item => `
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${item.description}</td>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.price)}</td>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.subtotal)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div style="margin-top: 20px;">
                 <p><strong>Subtotal:</strong> ${formatCurrency(invoice.subtotal)}</p>
                 <p><strong>IVA (16%):</strong> ${formatCurrency(invoice.iva)}</p>
                 <p><strong>IGTF (3%):</strong> ${formatCurrency(invoice.igtf)}</p>
@@ -1303,31 +1314,81 @@
                 <p><strong>Total:</strong> ${formatCurrency(invoice.total)}</p>
                 ${invoice.totalUSD > 0 ? `<p><strong>Total USD:</strong> ${formatCurrency(invoice.totalUSD)}</p>` : ''}
                 <p><strong>Notas:</strong> ${invoice.notes || 'Sin notas'}</p>
-            `;
-
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.background = 'rgba(0,0,0,0.5)';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.zIndex = '1000';
-            modal.innerHTML = `
-                <div style="background: white; padding: 20px; border-radius: 8px; max-width: 80%; max-height: 80%; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                    ${previewContent}
-                    <div style="text-align: right; margin-top: 20px;">
-                        <button class="btn btn-secondary" style="background: #6c757d;" onclick="this.closest('div[style*=\"position: fixed\"]').remove()">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+                <button class="btn print-modal">Imprimir</button>
+            </div>
+        </div>
+    `;
+    /**
+ * Muestra una previsualización de la factura desde el formulario.
+ */
+function previewInvoice() {
+    if (!validateForm()) {
+        showAlert('Por favor, corrige los errores en el formulario antes de previsualizar.', 'danger');
+        return;
     }
 
+    const invoice = getInvoiceFormData();
+    const previewContent = `
+        <h3>Previsualización de ${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'} #${invoice.controlNumber}</h3>
+        <p><strong>Emisor:</strong> ${invoice.sellerName} (RIF: ${invoice.sellerRif})</p>
+        <p><strong>Cliente:</strong> ${invoice.clientName} (RIF/Cédula: ${invoice.clientId})</p>
+        <p><strong>Fecha:</strong> ${formatDate(invoice.date)}</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Precio</th>
+                    <th style="border: 1px solid #ddd; padding: 8px;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${invoice.items.map(item => `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${item.description}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.price)}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.subtotal)}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <p><strong>Subtotal:</strong> ${formatCurrency(invoice.subtotal)}</p>
+        <p><strong>IVA (16%):</strong> ${formatCurrency(invoice.iva)}</p>
+        <p><strong>IGTF (3%):</strong> ${formatCurrency(invoice.igtf)}</p>
+        <p><strong>Retención Especial:</strong> ${formatCurrency(invoice.specialTax)}</p>
+        <p><strong>Total:</strong> ${formatCurrency(invoice.total)}</p>
+        ${invoice.totalUSD > 0 ? `<p><strong>Total USD:</strong> ${formatCurrency(invoice.totalUSD)}</p>` : ''}
+        <p><strong>Notas:</strong> ${invoice.notes || 'Sin notas'}</p>
+    `;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+    modal.innerHTML = `
+        <div class="modal-content">
+            ${previewContent}
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+}
     /**
      * Imprime la factura (abre la vista de impresión).
      * @param {Event} event - Evento del botón "Imprimir".
@@ -1689,103 +1750,109 @@
     }
 
     /**
-     * Carga y permite editar la información del perfil de la empresa.
-     */
-    function loadProfile() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        document.getElementById('profileCompanyName').value = currentUser.companyName;
-        document.getElementById('profileRif').value = currentUser.rif;
-        document.getElementById('profileAddress').value = currentUser.address;
-        document.getElementById('profilePhone').value = currentUser.phone || '';
-        document.getElementById('profileEmail').value = currentUser.email;
-        document.getElementById('profileTaxStatus').textContent = currentUser.isSpecialContributor ? 'Contribuyente Especial' : 'Normal';
+/**
+ * Carga y permite editar la información del perfil de la empresa.
+ */
+function loadProfile() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    document.getElementById('profileCompanyName').value = currentUser.companyName;
+    document.getElementById('profileRif').value = currentUser.rif;
+    document.getElementById('profileAddress').value = currentUser.address;
+    document.getElementById('profilePhone').value = currentUser.phone || '';
+    document.getElementById('profileEmail').value = currentUser.email; // Asegurarse de que el email se muestre
+    document.getElementById('profileTaxStatus').textContent = currentUser.isSpecialContributor ? 'Contribuyente Especial' : 'Normal';
 
-        const editProfileBtn = document.createElement('button');
-        editProfileBtn.className = 'btn';
-        editProfileBtn.textContent = 'Editar Perfil';
-        editProfileBtn.style.marginTop = '20px';
-        document.getElementById('contentProfile').appendChild(editProfileBtn);
+    const editProfileBtn = document.createElement('button');
+    editProfileBtn.className = 'btn';
+    editProfileBtn.textContent = 'Editar Perfil';
+    editProfileBtn.style.marginTop = '20px';
+    const existingBtn = document.getElementById('contentProfile').querySelector('.btn');
+    if (existingBtn) existingBtn.remove(); // Evitar duplicados
+    document.getElementById('contentProfile').appendChild(editProfileBtn);
 
-        editProfileBtn.addEventListener('click', () => {
-            const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.background = 'rgba(0,0,0,0.5)';
-            modal.style.display = 'flex';
-            modal.style.justifyContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.zIndex = '1000';
+    editProfileBtn.addEventListener('click', () => {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.background = 'rgba(0,0,0,0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
 
-            const formContent = `
-                <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                    <h3>Editar Perfil de la Empresa</h3>
-                    <div class="form-group">
-                        <label for="editCompanyName">Nombre o Razón Social*</label>
-                        <input type="text" id="editCompanyName" value="${currentUser.companyName}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editRif">RIF*</label>
-                        <input type="text" id="editRif" value="${currentUser.rif}" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="editAddress">Dirección Fiscal*</label>
-                        <input type="text" id="editAddress" value="${currentUser.address}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhone">Teléfono</label>
-                        <input type="text" id="editPhone" value="${currentUser.phone || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail">Correo Electrónico*</label>
-                        <input type="email" id="editEmail" value="${currentUser.email}" required>
-                    </div>
-                    <div style="text-align: right; margin-top: 20px;">
-                        <button class="btn btn-secondary" onclick="this.closest('div[style*=\"position: fixed\"]').remove()">Cancelar</button>
-                        <button class="btn btn-success" id="saveProfileBtn">Guardar Cambios</button>
-                    </div>
+        const formContent = `
+            <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <h3>Editar Perfil de la Empresa</h3>
+                <div class="form-group">
+                    <label for="editCompanyName">Nombre o Razón Social*</label>
+                    <input type="text" id="editCompanyName" value="${currentUser.companyName}" required>
                 </div>
-            `;
-            modal.innerHTML = formContent;
-            document.body.appendChild(modal);
+                <div class="form-group">
+                    <label for="editRif">RIF*</label>
+                    <input type="text" id="editRif" value="${currentUser.rif}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="editAddress">Dirección Fiscal*</label>
+                    <input type="text" id="editAddress" value="${currentUser.address}" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">Teléfono</label>
+                    <input type="text" id="editPhone" value="${currentUser.phone || ''}">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Correo Electrónico*</label>
+                    <input type="email" id="editEmail" value="${currentUser.email}" required>
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-secondary close-modal">Cancelar</button>
+                    <button class="btn btn-success" id="saveProfileBtn">Guardar Cambios</button>
+                </div>
+            </div>
+        `;
+        modal.innerHTML = formContent;
+        document.body.appendChild(modal);
 
-            const saveProfileBtn = modal.querySelector('#saveProfileBtn');
-            saveProfileBtn.addEventListener('click', () => {
-                const companyName = document.getElementById('editCompanyName').value.trim();
-                const rif = document.getElementById('editRif').value.trim();
-                const address = document.getElementById('editAddress').value.trim();
-                const phone = document.getElementById('editPhone').value.trim();
-                const email = document.getElementById('editEmail').value.trim();
+        modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+        const saveProfileBtn = modal.querySelector('#saveProfileBtn');
+        saveProfileBtn.addEventListener('click', () => {
+            const companyName = document.getElementById('editCompanyName').value.trim();
+            const rif = document.getElementById('editRif').value.trim();
+            const address = document.getElementById('editAddress').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
 
-                if (!companyName || !rif || !address || !email || !validateClientId(rif)) {
-                    showAlert('Por favor, completa todos los campos obligatorios y verifica el RIF.', 'warning');
-                    return;
-                }
-                if (phone && !validatePhone(phone)) {
-                    showAlert('El teléfono debe tener un formato válido (Ej: +584123456789).', 'warning');
-                    return;
-                }
+            if (!companyName || !rif || !address || !email || !validateClientId(rif)) {
+                showAlert('Por favor, completa todos los campos obligatorios y verifica el RIF.', 'warning');
+                return;
+            }
+            if (phone && !validatePhone(phone)) {
+                showAlert('El teléfono debe tener un formato válido (Ej: +584123456789).', 'warning');
+                return;
+            }
 
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                const userIndex = users.findIndex(u => u.email === currentUser.email);
-                users[userIndex] = {
-                    ...currentUser,
-                    companyName,
-                    rif,
-                    address,
-                    phone,
-                    email
-                };
-                localStorage.setItem('users', JSON.stringify(users));
-                localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
-                modal.remove();
-                loadProfile();
-                showAlert('Perfil actualizado exitosamente.', 'success');
-            });
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            users[userIndex] = {
+                ...currentUser,
+                companyName,
+                rif,
+                address,
+                phone,
+                email
+            };
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+            modal.remove();
+            loadProfile();
+            showAlert('Perfil actualizado exitosamente.', 'success');
+            // Actualizar el nombre de usuario en la barra de navegación
+            document.getElementById('userDisplayName').textContent = companyName;
         });
-    }
+    });
+}
 
     /**
      * Muestra un modal avanzado para la vista previa de una factura.
