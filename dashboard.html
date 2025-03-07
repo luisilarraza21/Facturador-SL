@@ -773,32 +773,34 @@
             document.getElementById(`tab${tab}`).classList.add('active');
         }
 
-        /**
-         * Actualiza las estadísticas del dashboard.
-         */
-        function updateDashboardStats() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
-            const userInvoices = invoices.filter(invoice => invoice.sellerId === currentUser.email);
-            const invoiceLimit = parseInt(localStorage.getItem('invoiceLimit') || '100');
-            const lastControlNumber = localStorage.getItem('lastControlNumber') || '0';
+/**
+ * Actualiza las estadísticas del dashboard.
+ */
+function updateDashboardStats() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const userInvoices = invoices.filter(invoice => invoice.sellerId === currentUser.email);
+    const invoiceLimit = parseInt(localStorage.getItem('invoiceLimit') || '100');
+    const lastControlNumber = localStorage.getItem('lastControlNumber') || '0';
 
-            let totalAmount = 0;
-            userInvoices.forEach(invoice => totalAmount += invoice.total);
+    let totalAmount = 0;
+    userInvoices.forEach(invoice => totalAmount += invoice.total);
 
-            document.getElementById('availableInvoices').textContent = invoiceLimit;
-            document.getElementById('issuedInvoices').textContent = userInvoices.length;
-            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
-            document.getElementById('lastInvoiceNumber').textContent = lastControlNumber;
+    // Calcular facturas disponibles restando las emitidas del límite total
+    const availableInvoices = Math.max(0, invoiceLimit - userInvoices.length);
 
-            const lowInvoicesWarning = document.getElementById('lowInvoicesWarning');
-            if (invoiceLimit < 10) {
-                lowInvoicesWarning.classList.remove('hidden');
-            } else {
-                lowInvoicesWarning.classList.add('hidden');
-            }
-        }
+    document.getElementById('availableInvoices').textContent = availableInvoices;
+    document.getElementById('issuedInvoices').textContent = userInvoices.length;
+    document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+    document.getElementById('lastInvoiceNumber').textContent = lastControlNumber;
 
+    const lowInvoicesWarning = document.getElementById('lowInvoicesWarning');
+    if (availableInvoices < 10) {
+        lowInvoicesWarning.classList.remove('hidden');
+    } else {
+        lowInvoicesWarning.classList.add('hidden');
+    }
+}
         /**
          * Muestra el formulario de nueva factura.
          */
@@ -1189,21 +1191,33 @@
         document.body.appendChild(modal);
     }
 
-    /**
-     * Guarda la factura en localStorage.
-     */
-    function saveInvoice() {
-        if (!validateForm()) {
-            showAlert('Por favor, corrige los errores en el formulario.', 'danger');
-            return;
-        }
+   /**
+ * Guarda la factura en localStorage.
+ */
+function saveInvoice() {
+    if (!validateForm()) {
+        showAlert('Por favor, corrige los errores en el formulario.', 'danger');
+        return;
+    }
 
-        const invoiceLimit = parseInt(localStorage.getItem('invoiceLimit') || '100');
-        if (invoiceLimit <= 0) {
-            showAlert('No tienes facturas disponibles. Por favor, compra más facturas.', 'danger');
-            return;
-        }
+    const invoiceLimit = parseInt(localStorage.getItem('invoiceLimit') || '100');
+    if (invoiceLimit <= 0) {
+        showAlert('No tienes facturas disponibles. Por favor, compra más facturas.', 'danger');
+        return;
+    }
 
+    const invoice = getInvoiceFormData();
+
+    let invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    invoices.push(invoice);
+    localStorage.setItem('invoices', JSON.stringify(invoices));
+    localStorage.setItem('invoiceLimit', (invoiceLimit - 1).toString());
+
+    showAlert('Factura generada exitosamente.', 'success');
+    loadInvoices();
+    cancelInvoice();
+    updateDashboardStats();
+}
         const invoice = getInvoiceFormData();
 
         let invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
@@ -1217,49 +1231,55 @@
         updateDashboardStats();
     }
 
-    /**
-     * Carga las facturas en la tabla de historial.
-     */
-    function loadInvoices() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-        const userInvoices = invoices.filter(invoice => invoice.sellerId === currentUser.email);
-        const tbody = document.getElementById('invoicesTableBody');
-        tbody.innerHTML = '';
+/**
+ * Carga las facturas en la tabla de historial.
+ */
+function loadInvoices() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const userInvoices = invoices.filter(invoice => invoice.sellerId === currentUser.email);
+    const tbody = document.getElementById('invoicesTableBody');
+    tbody.innerHTML = '';
 
-        if (userInvoices.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">No hay facturas emitidas.</td></tr>';
-            return;
-        }
-
-        userInvoices.forEach(invoice => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${invoice.controlNumber}</td>
-                <td>${formatDate(invoice.date)}</td>
-                <td>${invoice.clientName}</td>
-                <td>${formatCurrency(invoice.subtotal)}</td>
-                <td>${formatCurrency(invoice.iva)}</td>
-                <td>${formatCurrency(invoice.igtf)}</td>
-                <td>${formatCurrency(invoice.total)}</td>
-                <td>${invoice.totalUSD > 0 ? formatCurrency(invoice.totalUSD) : 'N/A'}</td>
-                <td>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'}</td>
-                <td>${invoice.operationCode}</td>
-                <td>
-                    <button class="btn btn-secondary view-invoice" data-id="${invoice.id}">Ver</button>
-                    <button class="btn btn-secondary print-invoice" data-id="${invoice.id}">Imprimir</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        document.querySelectorAll('.view-invoice').forEach(btn => {
-            btn.addEventListener('click', viewInvoice);
-        });
-        document.querySelectorAll('.print-invoice').forEach(btn => {
-            btn.addEventListener('click', printInvoice);
-        });
+    if (userInvoices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">No hay facturas emitidas.</td></tr>';
+        return;
     }
+
+    // Ordenar facturas por controlNumber de forma descendente
+    userInvoices.sort((a, b) => parseInt(b.controlNumber) - parseInt(a.controlNumber));
+
+    userInvoices.forEach(invoice => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${invoice.controlNumber}</td>
+            <td>${formatDate(invoice.date)}</td>
+            <td>${invoice.clientName}</td>
+            <td>${formatCurrency(invoice.subtotal)}</td>
+            <td>${formatCurrency(invoice.iva)}</td>
+            <td>${formatCurrency(invoice.igtf)}</td>
+            <td>${formatCurrency(invoice.total)}</td>
+            <td>${invoice.totalUSD > 0 ? formatCurrency(invoice.totalUSD) : 'N/A'}</td>
+            <td>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'}</td>
+            <td>${invoice.operationCode || 'N/A'}</td>
+            <td>
+                <button class="btn btn-secondary view-invoice" data-id="${invoice.id}">Ver</button>
+                <button class="btn btn-secondary print-invoice" data-id="${invoice.id}">Imprimir</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.querySelectorAll('.view-invoice').forEach(btn => {
+        btn.addEventListener('click', viewInvoice);
+    });
+    document.querySelectorAll('.print-invoice').forEach(btn => {
+        btn.addEventListener('click', printInvoice);
+    });
+
+    // Actualizar las estadísticas después de cargar las facturas
+    updateDashboardStats();
+}
 
     /**
      /**
@@ -1854,77 +1874,87 @@ function loadProfile() {
     });
 }
 
-    /**
-     * Muestra un modal avanzado para la vista previa de una factura.
-     * @param {object} invoice - Datos de la factura a previsualizar.
-     */
-    function showInvoicePreview(invoice) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.background = 'rgba(0,0,0,0.5)';
-        modal.style.display = 'flex';
-        modal.style.justifyContent = 'center';
-        modal.style.alignItems = 'center';
-        modal.style.zIndex = '1000';
+   /**
+ * Muestra un modal avanzado para la vista previa de una factura.
+ * @param {object} invoice - Datos de la factura a previsualizar.
+ */
+function showInvoicePreview(invoice) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.background = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
 
-        const previewContent = `
-            <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 90%; max-height: 90%; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                <h3>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'} #${invoice.controlNumber}</h3>
-                <p><strong>Emisor:</strong> ${invoice.sellerName} (RIF: ${invoice.sellerRif})</p>
-                <p><strong>Cliente:</strong> ${invoice.clientName} (RIF/Cédula: ${invoice.clientId})</p>
-                <p><strong>Fecha:</strong> ${formatDate(invoice.date)}</p>
-                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                    <thead>
-                        <tr style="background: #2968c8; color: white;">
-                            <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
-                            <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
-                            <th style="border: 1px solid #ddd; padding: 8px;">Precio</th>
-                            <th style="border: 1px solid #ddd; padding: 8px;">Subtotal</th>
+    const previewContent = `
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 90%; max-height: 90%; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            <h3>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'} #${invoice.controlNumber}</h3>
+            <p><strong>Emisor:</strong> ${invoice.sellerName} (RIF: ${invoice.sellerRif})</p>
+            <p><strong>Dirección Emisor:</strong> ${invoice.sellerAddress}</p>
+            <p><strong>Teléfono Emisor:</strong> ${invoice.sellerPhone || 'N/A'}</p>
+            <p><strong>Cliente:</strong> ${invoice.clientName} (RIF/Cédula: ${invoice.clientId})</p>
+            <p><strong>Dirección Cliente:</strong> ${invoice.clientAddress}</p>
+            <p><strong>Teléfono Cliente:</strong> ${invoice.clientPhone || 'N/A'}</p>
+            <p><strong>Fecha:</strong> ${formatDate(invoice.date)}</p>
+            <p><strong>Método de Pago:</strong> ${invoice.paymentMethod.replace('_', ' ').toUpperCase()}</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <thead>
+                    <tr style="background: #2968c8; color: white;">
+                        <th style="border: 1px solid #ddd; padding: 8px;">Descripción</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Cantidad</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Precio</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${invoice.items.map(item => `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.description}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.price)}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.subtotal)}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        ${invoice.items.map(item => `
-                            <tr>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${item.description}</td>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${item.quantity}</td>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.price)}</td>
-                                <td style="border: 1px solid #ddd; padding: 8px;">${formatCurrency(item.subtotal)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <div style="margin-top: 20px;">
-                    <p><strong>Subtotal:</strong> ${formatCurrency(invoice.subtotal)}</p>
-                    <p><strong>IVA (16%):</strong> ${formatCurrency(invoice.iva)}</p>
-                    <p><strong>IGTF (3%):</strong> ${formatCurrency(invoice.igtf)}</p>
-                    <p><strong>Retención Especial:</strong> ${formatCurrency(invoice.specialTax)}</p>
-                    <p><strong>Total:</strong> ${formatCurrency(invoice.total)}</p>
-                    ${invoice.totalUSD > 0 ? `<p><strong>Total USD:</strong> ${formatCurrency(invoice.totalUSD)}</p>` : ''}
-                    <p><strong>Notas:</strong> ${invoice.notes || 'Sin notas'}</p>
-                </div>
-                <div style="text-align: right; margin-top: 20px;">
-                    <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cerrar</button>
-                    <button class="btn" onclick="window.print(); this.closest('.modal').remove()">Imprimir</button>
-                </div>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div style="margin-top: 20px;">
+                <p><strong>Subtotal:</strong> ${formatCurrency(invoice.subtotal)}</p>
+                <p><strong>IVA (16%):</strong> ${formatCurrency(invoice.iva)}</p>
+                <p><strong>IGTF (3%):</strong> ${formatCurrency(invoice.igtf)}</p>
+                <p><strong>Retención Especial:</strong> ${formatCurrency(invoice.specialTax)}</p>
+                <p><strong>Total:</strong> ${formatCurrency(invoice.total)}</p>
+                ${invoice.totalUSD > 0 ? `<p><strong>Total USD:</strong> ${formatCurrency(invoice.totalUSD)}</p>` : ''}
+                <p><strong>Notas:</strong> ${invoice.notes || 'Sin notas'}</p>
             </div>
-        `;
-        modal.innerHTML = previewContent;
-        document.body.appendChild(modal);
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+                <button class="btn print-modal">Imprimir</button>
+            </div>
+        </div>
+    `;
+    modal.innerHTML = previewContent;
+    document.body.appendChild(modal);
 
-        // Reemplazar la función viewInvoice para usar este modal
-        window.viewInvoice = function(event) {
-            const invoiceId = event.target.getAttribute('data-id');
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const invoice = invoices.find(i => i.id === invoiceId);
-            if (invoice) showInvoicePreview(invoice);
-        };
-    }
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+    modal.querySelector('.print-modal').addEventListener('click', () => {
+        printInvoice({ target: { getAttribute: () => invoice.id } });
+        modal.remove();
+    });
 
+    // Reemplazar la función viewInvoice para usar este modal
+    window.viewInvoice = function(event) {
+        const invoiceId = event.target.getAttribute('data-id');
+        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const invoice = invoices.find(i => i.id === invoiceId);
+        if (invoice) showInvoicePreview(invoice);
+    };
+}
     /**
      * Simula la compra de más facturas.
      */
