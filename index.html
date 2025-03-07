@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facturador ML Venezuela</title>
+    <title>Facturador ML Venezuela - Registro</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,132 +25,17 @@
             font-size: 24px;
             color: #333;
         }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .badge {
-            background-color: #2968c8;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
         .container {
-            max-width: 1200px;
-            margin: 20px auto;
+            max-width: 500px;
+            margin: 40px auto;
             padding: 20px;
         }
         .card {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #2968c8;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-        }
-        .tab.active {
-            border-bottom: 3px solid #2968c8;
-            font-weight: bold;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            background: #2968c8;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #1d4f9e;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f8f8f8;
-        }
-        .action-icon {
-            color: #2968c8;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .alert {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .alert-link {
-            color: #2968c8;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        /* Estilos para la página de registro/login */
-        .auth-container {
-            max-width: 500px;
-            margin: 80px auto;
             padding: 30px;
+            margin-bottom: 20px;
         }
         .auth-logo {
             text-align: center;
@@ -166,6 +51,7 @@
             padding: 15px;
             cursor: pointer;
             border-bottom: 2px solid #ddd;
+            transition: all 0.3s ease;
         }
         .auth-tab.active {
             border-bottom: 2px solid #2968c8;
@@ -174,1011 +60,362 @@
         .auth-form {
             margin-top: 20px;
         }
-        .btn-block {
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input, select {
             width: 100%;
-            padding: 15px;
-            margin-top: 10px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
         }
-        /* Estilos para el modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2968c8;
         }
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-        }
-        .close {
-            float: right;
-            font-size: 24px;
-            font-weight: bold;
+        .btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #1d4f9e;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-4 {
+            margin-top: 20px;
+        }
+        .link {
+            color: #2968c8;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Contenido dinámico se cargará aquí -->
+    <div class="navbar">
+        <div class="logo">FacturaML</div>
+    </div>
+    
+    <div class="container">
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="card">
+            <div class="auth-logo">
+                <div class="logo">FacturaML</div>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab" id="loginTab">Iniciar Sesión</div>
+                <div class="auth-tab active" id="registerTab">Registrarse</div>
+            </div>
+            
+            <!-- Formulario de Registro -->
+            <div class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="email">Correo Electrónico*</label>
+                    <input type="email" id="email" placeholder="ejemplo@correo.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña*</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyName">Nombre o Razón Social*</label>
+                    <input type="text" id="companyName" placeholder="Ej: Mi Empresa, C.A." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyRif">RIF*</label>
+                    <input type="text" id="companyRif" placeholder="Ej: J-12345678-9" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Dirección Fiscal*</label>
+                    <input type="text" id="address" placeholder="Dirección completa">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Teléfono de Contacto*</label>
+                    <input type="text" id="phone" placeholder="Ej: 0414-1234567">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isSpecialTaxpayer">
+                    <label for="isSpecialTaxpayer">Soy Contribuyente Especial</label>
+                </div>
+                
+                <button class="btn" id="registerButton">Crear Cuenta</button>
+                
+                <div class="text-center mt-4">
+                    <p>¿Ya tienes cuenta? <span class="link" id="showLoginLink">Inicia Sesión</span></p>
+                </div>
+            </div>
+            
+            <!-- Formulario de Login -->
+            <div class="auth-form" id="loginForm" style="display: none;">
+                <div class="form-group">
+                    <label for="loginEmail">Correo Electrónico</label>
+                    <input type="email" id="loginEmail" placeholder="ejemplo@correo.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword">
+                </div>
+                
+                <button class="btn" id="loginButton">Iniciar Sesión</button>
+                
+                <div class="text-center mt-4">
+                    <p>¿No tienes cuenta? <span class="link" id="showRegisterLink">Regístrate</span></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Datos de la aplicación
-        const appData = {
-            currentUser: null,
-            facturas: [],
-            invoiceId: 1,
-            activeTab: 'factura',
-            availableInvoices: 67,
-            companyName: 'Electrónica XYZ, C.A.',
-            productLines: [{ description: '', quantity: 1, price: 0, total: 0, tax: 0 }],
-            authTab: 'login',
-            registeredUsers: [
-                { email: 'demo@ejemplo.com', password: 'demo123', companyName: 'Electrónica XYZ, C.A.' }
-            ]
-        };
-
-        // Navegar a página de inicio o login
-        function navigateToPage() {
-            const appElement = document.getElementById('app');
-            
-            if (appData.currentUser) {
-                // Usuario logueado, mostrar dashboard
-                appElement.innerHTML = generateDashboardHTML();
-                setupEventListeners();
+        // Almacenamiento local para usuarios (simulando una base de datos)
+        // Se accede directamente al localStorage para persistir los datos
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        
+        // Referencias a elementos del DOM
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showLoginLink = document.getElementById('showLoginLink');
+        const showRegisterLink = document.getElementById('showRegisterLink');
+        const registerButton = document.getElementById('registerButton');
+        const loginButton = document.getElementById('loginButton');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Función para cambiar entre tabs
+        function switchTab(tab) {
+            if (tab === 'login') {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
             } else {
-                // No hay usuario, mostrar login
-                appElement.innerHTML = generateAuthHTML();
-                setupAuthEventListeners();
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                registerForm.style.display = 'block';
+                loginForm.style.display = 'none';
             }
+            
+            // Ocultar mensajes al cambiar de tab
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
         }
-
-        // Generar HTML para la página de autenticación
-        function generateAuthHTML() {
-            return `
-                <div class="container auth-container card">
-                    <div class="auth-logo">
-                        <div class="logo">FacturaML</div>
-                    </div>
-                    
-                    <div class="auth-tabs">
-                        <div class="auth-tab ${appData.authTab === 'login' ? 'active' : ''}" data-tab="login">Iniciar Sesión</div>
-                        <div class="auth-tab ${appData.authTab === 'register' ? 'active' : ''}" data-tab="register">Registrarse</div>
-                    </div>
-                    
-                    ${appData.authTab === 'login' ? generateLoginForm() : generateRegisterForm()}
-                </div>
-            `;
+        
+        // Función para mostrar mensaje de éxito
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
         }
-
-        // Generar formulario de login
-        function generateLoginForm() {
-            return `
-                <div class="auth-form">
-                    <div class="form-group">
-                        <label for="loginEmail">Correo Electrónico</label>
-                        <input type="email" id="loginEmail" placeholder="ejemplo@correo.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="loginPassword">Contraseña</label>
-                        <input type="password" id="loginPassword">
-                    </div>
-                    
-                    <button class="btn-block" id="loginButton">Iniciar Sesión</button>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <p>¿No tienes cuenta? <span class="alert-link" data-tab="register">Regístrate</span></p>
-                    </div>
-                </div>
-            `;
+        
+        // Función para mostrar mensaje de error
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
         }
-
-        // Generar formulario de registro
-        function generateRegisterForm() {
-            return `
-                <div class="auth-form">
-                    <div class="form-group">
-                        <label for="registerEmail">Correo Electrónico</label>
-                        <input type="email" id="registerEmail" placeholder="ejemplo@correo.com">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="registerPassword">Contraseña</label>
-                        <input type="password" id="registerPassword">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="companyName">Nombre de la Empresa</label>
-                        <input type="text" id="companyName" placeholder="Ej: Mi Empresa, C.A.">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="companyRif">RIF de la Empresa</label>
-                        <input type="text" id="companyRif" placeholder="Ej: J-12345678-9">
-                    </div>
-                    
-                    <button class="btn-block" id="registerButton">Crear Cuenta</button>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <p>¿Ya tienes cuenta? <span class="alert-link" data-tab="login">Inicia Sesión</span></p>
-                    </div>
-                </div>
-            `;
+        
+        // Función para validar formulario de registro
+        function validateRegisterForm() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const companyName = document.getElementById('companyName').value;
+            const companyRif = document.getElementById('companyRif').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+            
+            if (!email || !password || !companyName || !companyRif || !address || !phone) {
+                showError('Por favor completa todos los campos obligatorios');
+                return false;
+            }
+            
+            // Validar formato de correo
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Por favor ingresa un correo electrónico válido');
+                return false;
+            }
+            
+            // Validar formato de RIF (J-12345678-9)
+            const rifRegex = /^[JGVE]-\d{8}-\d{1}$/;
+            if (!rifRegex.test(companyRif)) {
+                showError('El formato del RIF debe ser J-12345678-9');
+                return false;
+            }
+            
+            // Verificar si el correo ya está registrado
+            if (users.some(user => user.email === email)) {
+                showError('Este correo ya está registrado');
+                return false;
+            }
+            
+            return true;
         }
-
-        // Generar HTML para el dashboard
-        function generateDashboardHTML() {
-            const tabs = {
-                factura: generateInvoiceTab(),
-                historial: generateHistoryTab(),
-                perfil: generateProfileTab()
+        
+        // Función para registrar usuario
+        function registerUser() {
+            if (!validateRegisterForm()) return;
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const companyName = document.getElementById('companyName').value;
+            const companyRif = document.getElementById('companyRif').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
+            const isSpecialTaxpayer = document.getElementById('isSpecialTaxpayer').checked;
+            
+            // Crear objeto de usuario
+            const newUser = {
+                email,
+                password, // En una aplicación real, deberías hashear la contraseña
+                companyName,
+                companyRif,
+                address,
+                phone,
+                isSpecialTaxpayer,
+                registrationDate: new Date().toISOString()
             };
-
-            return `
-                <!-- Barra de navegación -->
-                <div class="navbar">
-                    <div class="logo">FacturaML</div>
-                    <div class="user-info">
-                        <div class="badge">Facturas disponibles: ${appData.availableInvoices}</div>
-                        <div>${appData.companyName}</div>
-                        <span class="alert-link" id="logout">Cerrar Sesión</span>
-                    </div>
-                </div>
+            
+            // Agregar a la lista de usuarios
+            users.push(newUser);
+            
+            // Guardar en localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Mostrar mensaje de éxito
+            showSuccess('¡Registro exitoso! Ahora puedes iniciar sesión');
+            
+            // Limpiar formulario
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('companyName').value = '';
+            document.getElementById('companyRif').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('isSpecialTaxpayer').checked = false;
+            
+            // Cambiar a tab de login
+            setTimeout(() => {
+                switchTab('login');
+            }, 1500);
+        }
+        
+        // Función para iniciar sesión
+        function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showError('Por favor ingresa tu correo y contraseña');
+                return;
+            }
+            
+            // Buscar usuario
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Guardar sesión
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showSuccess('¡Inicio de sesión exitoso!');
                 
-                <div class="container">
-                    <!-- Alerta de facturas restantes -->
-                    <div class="alert">
-                        Te quedan ${appData.availableInvoices} facturas disponibles. Cuando tu saldo sea menor a 10, te recomendamos comprar más.
-                        <span class="alert-link" id="buyInvoices">Comprar facturas</span>
-                    </div>
-
-                    <!-- Dashboard/Estadísticas -->
-                    <div class="dashboard">
-                        <div class="stat-card">
-                            <div>Facturas emitidas (mes)</div>
-                            <div class="stat-value">${appData.facturas.length}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div>Monto facturado (mes)</div>
-                            <div class="stat-value">Bs. ${calculateTotalInvoiced()}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div>Clientes facturados</div>
-                            <div class="stat-value">${countUniqueClients()}</div>
-                        </div>
-                    </div>
-
-                    <!-- Tabs de navegación -->
-                    <div class="tabs">
-                        <div class="tab ${appData.activeTab === 'factura' ? 'active' : ''}" data-tab="factura">Nueva Factura</div>
-                        <div class="tab ${appData.activeTab === 'historial' ? 'active' : ''}" data-tab="historial">Historial</div>
-                        <div class="tab ${appData.activeTab === 'perfil' ? 'active' : ''}" data-tab="perfil">Mi Perfil</div>
-                    </div>
-
-                    <!-- Contenido de los tabs -->
-                    ${tabs[appData.activeTab]}
-                </div>
-
-                <!-- Modal para comprar facturas -->
-                <div id="buyModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2>Comprar Paquetes de Facturas</h2>
-                        
-                        <div style="margin: 20px 0;">
-                            <div class="card" style="margin-bottom: 15px; cursor: pointer;" data-package="50">
-                                <h3>Paquete Básico</h3>
-                                <p>50 facturas - $10 USD</p>
-                                <p><small>Ideal para emprendedores</small></p>
-                            </div>
-                            
-                            <div class="card" style="margin-bottom: 15px; cursor: pointer;" data-package="150">
-                                <h3>Paquete Empresarial</h3>
-                                <p>150 facturas - $25 USD</p>
-                                <p><small>Para pequeñas empresas</small></p>
-                            </div>
-                            
-                            <div class="card" style="margin-bottom: 15px; cursor: pointer;" data-package="500">
-                                <h3>Paquete Corporativo</h3>
-                                <p>500 facturas - $75 USD</p>
-                                <p><small>Para empresas con alto volumen de facturación</small></p>
-                            </div>
-                        </div>
-                        
-                        <button id="closeModal">Cancelar</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Generar tab de factura
-        function generateInvoiceTab() {
-            return `
-                <div class="card">
-                    <h2>Emitir Nueva Factura</h2>
-                    
-                    <div class="form-grid">
-                        <!-- Datos del Cliente -->
-                        <div>
-                            <h3>Datos del Cliente</h3>
-                            
-                            <div class="form-group">
-                                <label for="clientName">Nombre o Razón Social *</label>
-                                <input type="text" id="clientName" placeholder="Ej: Juan Pérez">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="clientId">CI/RIF *</label>
-                                <input type="text" id="clientId" placeholder="Ej: V-12345678">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="clientAddress">Dirección</label>
-                                <textarea id="clientAddress" rows="3" placeholder="Dirección del cliente"></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="clientPhone">Teléfono</label>
-                                <input type="text" id="clientPhone" placeholder="Ej: 0414-1234567">
-                            </div>
-                        </div>
-                        
-                        <!-- Datos de la Venta -->
-                        <div>
-                            <h3>Datos de la Venta</h3>
-                            
-                            <div class="form-group">
-                                <label for="paymentMethod">Método de Pago *</label>
-                                <select id="paymentMethod">
-                                    <option value="">Seleccionar...</option>
-                                    <option value="bs">Bolívares</option>
-                                    <option value="usd">Dólares ($)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="saleDate">Fecha de Venta *</label>
-                                <input type="date" id="saleDate" value="${new Date().toISOString().split('T')[0]}">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="mlOrderId">ID de Orden Mercado Libre</label>
-                                <input type="text" id="mlOrderId" placeholder="Opcional: ID de la orden">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="notes">Observaciones</label>
-                                <textarea id="notes" rows="3" placeholder="Notas adicionales"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Líneas de Productos -->
-                    <h3>Productos/Servicios</h3>
-                    
-                    <table id="productTable">
-                        <thead>
-                            <tr>
-                                <th style="width: 40%">Descripción</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unitario</th>
-                                <th>IVA (16%)</th>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody">
-                            <tr>
-                                <td><input type="text" class="product-description" placeholder="Descripción del producto"></td>
-                                <td><input type="number" class="product-quantity" value="1" min="1"></td>
-                                <td><input type="number" class="product-price" placeholder="0.00"></td>
-                                <td class="product-tax">0.00</td>
-                                <td class="product-total">0.00</td>
-                                <td class="remove-product">❌</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <button id="addProductLine" style="margin-top: 15px;">+ Agregar línea</button>
-                    
-                    <!-- Resumen de la Factura -->
-                    <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
-                        <div style="width: 300px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div>Subtotal:</div>
-                                <div id="subtotal">Bs. 0.00</div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div>IVA (16%):</div>
-                                <div id="tax">Bs. 0.00</div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div>IGTF (3%):</div>
-                                <div id="igtf">Bs. 0.00</div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin-top: 15px;">
-                                <div>TOTAL:</div>
-                                <div id="invoiceTotal">Bs. 0.00</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 30px; text-align: center;">
-                        <button id="generateInvoice" style="padding: 15px 30px; font-size: 18px;">Generar Factura</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Generar tab de historial
-        function generateHistoryTab() {
-            let invoicesHTML = '';
-            
-            if (appData.facturas.length === 0) {
-                invoicesHTML = '<tr><td colspan="6" style="text-align: center;">No hay facturas emitidas</td></tr>';
+                // Redireccionar al dashboard (simular)
+                setTimeout(() => {
+                    // En una aplicación real, redireccionarías a otra página
+                    alert(`Bienvenido/a ${user.companyName}! Esta es una simulación, en la versión completa te redirigiríamos al dashboard.`);
+                }, 1500);
             } else {
-                appData.facturas.forEach(factura => {
-                    invoicesHTML += `
-                        <tr>
-                            <td>F${String(factura.id).padStart(5, '0')}</td>
-                            <td>${factura.date}</td>
-                            <td>${factura.clientName}</td>
-                            <td>${factura.currency} ${factura.total.toFixed(2)}</td>
-                            <td>Emitida</td>
-                            <td>
-                                <span class="action-icon view-invoice" data-id="${factura.id}">👁️</span>
-                                <span class="action-icon print-invoice" data-id="${factura.id}">🖨️</span>
-                                <span class="action-icon download-invoice" data-id="${factura.id}">📥</span>
-                            </td>
-                        </tr>
-                    `;
-                });
+                showError('Correo o contraseña incorrectos');
             }
-            
-            return `
-                <div class="card">
-                    <h2>Historial de Facturas</h2>
-                    
-                    <div style="display: flex; margin-bottom: 20px; gap: 10px;">
-                        <input type="text" id="searchInvoice" placeholder="Buscar..." style="flex: 1;">
-                        <button id="searchButton">Buscar</button>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nº Factura</th>
-                                <th>Fecha</th>
-                                <th>Cliente</th>
-                                <th>Monto</th>
-                                <th>Estatus</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="invoiceTableBody">
-                            ${invoicesHTML}
-                        </tbody>
-                    </table>
-                    
-                    <div style="margin-top: 20px; text-align: center;">
-                        <button id="loadMoreInvoices">Cargar más facturas</button>
-                    </div>
-                </div>
-            `;
         }
-
-        // Generar tab de perfil
-        function generateProfileTab() {
-            return `
-                <div class="card">
-                    <h2>Mi Perfil</h2>
-                    
-                    <div class="form-grid">
-                        <div>
-                            <h3>Datos de la Empresa</h3>
-                            
-                            <div class="form-group">
-                                <label for="profileCompanyName">Nombre o Razón Social</label>
-                                <input type="text" id="profileCompanyName" value="${appData.companyName}">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="profileRif">RIF</label>
-                                <input type="text" id="profileRif" value="J-12345678-9">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="profileAddress">Dirección Fiscal</label>
-                                <textarea id="profileAddress" rows="3">Av. Principal, Edif. Central, Piso 3, Ofic. 302, Caracas.</textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="profilePhone">Teléfono</label>
-                                <input type="text" id="profilePhone" value="0212-1234567">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h3>Datos de la Cuenta</h3>
-                            
-                            <div class="form-group">
-                                <label for="profileEmail">Correo Electrónico</label>
-                                <input type="email" id="profileEmail" value="${appData.currentUser ? appData.currentUser.email : ''}">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="profilePassword">Contraseña</label>
-                                <input type="password" id="profilePassword" value="********">
-                            </div>
-                            
-                            <h3>Plan Actual</h3>
-                            
-                            <div class="form-group">
-                                <p>Facturas disponibles: <strong>${appData.availableInvoices}</strong></p>
-                                <button id="buyMoreInvoices">Comprar más facturas</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 30px; text-align: center;">
-                        <button id="saveProfile" style="padding: 15px 30px; font-size: 18px;">Guardar Cambios</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Calcular el monto total facturado
-        function calculateTotalInvoiced() {
-            if (appData.facturas.length === 0) return '0.00';
-            
-            const total = appData.facturas.reduce((sum, factura) => sum + factura.total, 0);
-            return total.toFixed(2);
-        }
-
-        // Contar clientes únicos
-        function countUniqueClients() {
-            if (appData.facturas.length === 0) return 0;
-            
-            const uniqueClients = new Set(appData.facturas.map(factura => factura.clientId));
-            return uniqueClients.size;
-        }
-
-        // Configurar event listeners para la autenticación
-        function setupAuthEventListeners() {
-            // Cambiar entre tabs de login y registro
-            document.querySelectorAll('.auth-tab, [data-tab]').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    appData.authTab = this.dataset.tab;
-                    navigateToPage();
-                });
-            });
-
-            // Botón de login
-            const loginButton = document.getElementById('loginButton');
-            if (loginButton) {
-                loginButton.addEventListener('click', function() {
-                    const email = document.getElementById('loginEmail').value;
-                    const password = document.getElementById('loginPassword').value;
-                    
-                    // Validación simple
-                    if (!email || !password) {
-                        alert('Por favor completa todos los campos');
-                        return;
-                    }
-                    
-                    // Verificar credenciales
-                    const user = appData.registeredUsers.find(u => u.email === email && u.password === password);
-                    if (user) {
-                        appData.currentUser = user;
-                        appData.companyName = user.companyName;
-                        navigateToPage();
+        
+        // Eventos para cambiar entre tabs
+        loginTab.addEventListener('click', () => switchTab('login'));
+        registerTab.addEventListener('click', () => switchTab('register'));
+        showLoginLink.addEventListener('click', () => switchTab('login'));
+        showRegisterLink.addEventListener('click', () => switchTab('register'));
+        
+        // Eventos para botones de acción
+        registerButton.addEventListener('click', registerUser);
+        loginButton.addEventListener('click', loginUser);
+        
+        // Evento para permitir envío con Enter
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (loginForm.style.display === 'block') {
+                        loginUser();
                     } else {
-                        alert('Credenciales incorrectas');
+                        registerUser();
                     }
-                });
-            }
-
-            // Botón de registro
-            const registerButton = document.getElementById('registerButton');
-            if (registerButton) {
-                registerButton.addEventListener('click', function() {
-                    const email = document.getElementById('registerEmail').value;
-                    const password = document.getElementById('registerPassword').value;
-                    const companyName = document.getElementById('companyName').value;
-                    const companyRif = document.getElementById('companyRif').value;
-                    
-                    // Validación simple
-                    if (!email || !password || !companyName || !companyRif) {
-                        alert('Por favor completa todos los campos');
-                        return;
-                    }
-                    
-                    // Verificar si el correo ya existe
-                    if (appData.registeredUsers.some(u => u.email === email)) {
-                        alert('Este correo ya está registrado');
-                        return;
-                    }
-                    
-                    // Registrar nuevo usuario
-                    const newUser = { email, password, companyName };
-                    appData.registeredUsers.push(newUser);
-                    
-                    // Login automático
-                    appData.currentUser = newUser;
-                    appData.companyName = companyName;
-                    navigateToPage();
-                });
-            }
-        }
-
-        // Configurar event listeners para el dashboard
-        function setupEventListeners() {
-            // Tabs de navegación
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    appData.activeTab = this.dataset.tab;
-                    navigateToPage();
-                });
-            });
-
-            // Cerrar sesión
-            const logoutButton = document.getElementById('logout');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', function() {
-                    appData.currentUser = null;
-                    navigateToPage();
-                });
-            }
-
-            // Botón de comprar facturas
-            const buyInvoicesButton = document.getElementById('buyInvoices');
-            if (buyInvoicesButton) {
-                buyInvoicesButton.addEventListener('click', openBuyModal);
-            }
-
-            // Botón de comprar más facturas en perfil
-            const buyMoreInvoicesButton = document.getElementById('buyMoreInvoices');
-            if (buyMoreInvoicesButton) {
-                buyMoreInvoicesButton.addEventListener('click', openBuyModal);
-            }
-
-            // Modal de compra
-            const buyModal = document.getElementById('buyModal');
-            if (buyModal) {
-                // Cerrar modal
-                document.querySelector('.close').addEventListener('click', function() {
-                    buyModal.style.display = 'none';
-                });
-
-                document.getElementById('closeModal').addEventListener('click', function() {
-                    buyModal.style.display = 'none';
-                });
-
-                // Seleccionar paquete
-                document.querySelectorAll('[data-package]').forEach(packageElement => {
-                    packageElement.addEventListener('click', function() {
-                        const packSize = parseInt(this.dataset.package);
-                        appData.availableInvoices += packSize;
-                        alert(`¡Compra exitosa! Has adquirido ${packSize} facturas.`);
-                        buyModal.style.display = 'none';
-                        navigateToPage();
-                    });
-                });
-            }
-
-            // Event listeners para la pestaña de factura
-            if (appData.activeTab === 'factura') {
-                // Agregar línea de producto
-                const addProductButton = document.getElementById('addProductLine');
-                if (addProductButton) {
-                    addProductButton.addEventListener('click', addProductRow);
                 }
-
-                // Eventos para calcular totales en tiempo real
-document.querySelectorAll('.product-quantity, .product-price').forEach(input => {
-    input.addEventListener('input', calculateProductTotals);
-});
-
-// Eliminar línea de producto
-document.querySelectorAll('.remove-product').forEach(button => {
-    button.addEventListener('click', function() {
-        if (document.querySelectorAll('#productTableBody tr').length > 1) {
-            this.parentElement.parentElement.remove();
-            calculateProductTotals();
-        } else {
-            alert('Debe haber al menos una línea de producto');
-        }
-    });
-});
-
-// Generar factura
-const generateInvoiceButton = document.getElementById('generateInvoice');
-if (generateInvoiceButton) {
-    generateInvoiceButton.addEventListener('click', generateInvoice);
-}
-
-// Event listeners para la pestaña de historial
-if (appData.activeTab === 'historial') {
-    // Ver factura
-    document.querySelectorAll('.view-invoice').forEach(button => {
-        button.addEventListener('click', function() {
-            const invoiceId = this.dataset.id;
-            viewInvoice(invoiceId);
+            });
         });
-    });
-
-    // Imprimir factura
-    document.querySelectorAll('.print-invoice').forEach(button => {
-        button.addEventListener('click', function() {
-            const invoiceId = this.dataset.id;
-            printInvoice(invoiceId);
-        });
-    });
-
-    // Descargar factura
-    document.querySelectorAll('.download-invoice').forEach(button => {
-        button.addEventListener('click', function() {
-            const invoiceId = this.dataset.id;
-            downloadInvoice(invoiceId);
-        });
-    });
-
-    // Buscar facturas
-    const searchButton = document.getElementById('searchButton');
-    if (searchButton) {
-        searchButton.addEventListener('click', searchInvoices);
-    }
-
-    // Cargar más facturas
-    const loadMoreButton = document.getElementById('loadMoreInvoices');
-    if (loadMoreButton) {
-        loadMoreButton.addEventListener('click', loadMoreInvoices);
-    }
-}
-
-// Event listeners para la pestaña de perfil
-if (appData.activeTab === 'perfil') {
-    // Guardar cambios del perfil
-    const saveProfileButton = document.getElementById('saveProfile');
-    if (saveProfileButton) {
-        saveProfileButton.addEventListener('click', saveProfile);
-    }
-}
-
-// Función para abrir el modal de compra
-function openBuyModal() {
-    const buyModal = document.getElementById('buyModal');
-    if (buyModal) {
-        buyModal.style.display = 'block';
-    }
-}
-
-// Función para agregar una fila de producto
-function addProductRow() {
-    const tbody = document.getElementById('productTableBody');
-    if (tbody) {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td><input type="text" class="product-description" placeholder="Descripción del producto"></td>
-            <td><input type="number" class="product-quantity" value="1" min="1"></td>
-            <td><input type="number" class="product-price" placeholder="0.00"></td>
-            <td class="product-tax">0.00</td>
-            <td class="product-total">0.00</td>
-            <td class="remove-product">❌</td>
-        `;
-        
-        tbody.appendChild(newRow);
-        
-        // Agregar event listeners a la nueva fila
-        newRow.querySelectorAll('.product-quantity, .product-price').forEach(input => {
-            input.addEventListener('input', calculateProductTotals);
-        });
-        
-        newRow.querySelector('.remove-product').addEventListener('click', function() {
-            if (document.querySelectorAll('#productTableBody tr').length > 1) {
-                this.parentElement.parentElement.remove();
-                calculateProductTotals();
-            } else {
-                alert('Debe haber al menos una línea de producto');
-            }
-        });
-    }
-}
-
-// Calcular totales de productos
-function calculateProductTotals() {
-    const rows = document.querySelectorAll('#productTableBody tr');
-    let subtotal = 0;
-    let totalTax = 0;
-    
-    rows.forEach(row => {
-        const quantity = parseFloat(row.querySelector('.product-quantity').value) || 0;
-        const price = parseFloat(row.querySelector('.product-price').value) || 0;
-        
-        const lineTotal = quantity * price;
-        const lineTax = lineTotal * 0.16; // IVA 16%
-        
-        subtotal += lineTotal;
-        totalTax += lineTax;
-        
-        row.querySelector('.product-tax').textContent = lineTax.toFixed(2);
-        row.querySelector('.product-total').textContent = lineTotal.toFixed(2);
-    });
-    
-    // Calcular IGTF (3%) - Impuesto a las Grandes Transacciones Financieras
-    const igtf = subtotal * 0.03;
-    const total = subtotal + totalTax + igtf;
-    
-    // Actualizar resumen de la factura
-    document.getElementById('subtotal').textContent = `Bs. ${subtotal.toFixed(2)}`;
-    document.getElementById('tax').textContent = `Bs. ${totalTax.toFixed(2)}`;
-    document.getElementById('igtf').textContent = `Bs. ${igtf.toFixed(2)}`;
-    document.getElementById('invoiceTotal').textContent = `Bs. ${total.toFixed(2)}`;
-}
-
-// Generar factura
-function generateInvoice() {
-    // Validar campos obligatorios
-    const clientName = document.getElementById('clientName').value;
-    const clientId = document.getElementById('clientId').value;
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    const saleDate = document.getElementById('saleDate').value;
-    
-    if (!clientName || !clientId || !paymentMethod || !saleDate) {
-        alert('Por favor complete todos los campos obligatorios');
-        return;
-    }
-    
-    // Validar que haya al menos un producto
-    const rows = document.querySelectorAll('#productTableBody tr');
-    let hasProducts = false;
-    
-    rows.forEach(row => {
-        const description = row.querySelector('.product-description').value;
-        const price = parseFloat(row.querySelector('.product-price').value) || 0;
-        
-        if (description && price > 0) {
-            hasProducts = true;
-        }
-    });
-    
-    if (!hasProducts) {
-        alert('Por favor agregue al menos un producto con descripción y precio');
-        return;
-    }
-    
-    // Verificar facturas disponibles
-    if (appData.availableInvoices <= 0) {
-        alert('No tienes facturas disponibles. Por favor compra más facturas para continuar.');
-        openBuyModal();
-        return;
-    }
-    
-    // Recopilar datos de la factura
-    const clientAddress = document.getElementById('clientAddress').value;
-    const clientPhone = document.getElementById('clientPhone').value;
-    const mlOrderId = document.getElementById('mlOrderId').value;
-    const notes = document.getElementById('notes').value;
-    
-    // Calcular totales
-    let subtotal = 0;
-    let totalTax = 0;
-    const products = [];
-    
-    rows.forEach(row => {
-        const description = row.querySelector('.product-description').value;
-        const quantity = parseFloat(row.querySelector('.product-quantity').value) || 0;
-        const price = parseFloat(row.querySelector('.product-price').value) || 0;
-        
-        const lineTotal = quantity * price;
-        const lineTax = lineTotal * 0.16;
-        
-        subtotal += lineTotal;
-        totalTax += lineTax;
-        
-        products.push({
-            description,
-            quantity,
-            price,
-            tax: lineTax,
-            total: lineTotal
-        });
-    });
-    
-    const igtf = subtotal * 0.03;
-    const total = subtotal + totalTax + igtf;
-    
-    // Crear objeto de factura
-    const invoice = {
-        id: appData.invoiceId++,
-        date: saleDate,
-        clientName,
-        clientId,
-        clientAddress,
-        clientPhone,
-        paymentMethod,
-        currency: paymentMethod === 'bs' ? 'Bs.' : '$',
-        mlOrderId,
-        notes,
-        products,
-        subtotal,
-        tax: totalTax,
-        igtf,
-        total
-    };
-    
-    // Guardar factura
-    appData.facturas.push(invoice);
-    
-    // Restar factura disponible
-    appData.availableInvoices--;
-    
-    // Mostrar confirmación
-    alert(`¡Factura F${String(invoice.id).padStart(5, '0')} generada exitosamente!`);
-    
-    // Redireccionar a la vista de factura
-    appData.activeTab = 'historial';
-    navigateToPage();
-}
-
-// Ver factura
-function viewInvoice(invoiceId) {
-    // Buscar la factura
-    const invoice = appData.facturas.find(f => f.id == invoiceId);
-    
-    if (invoice) {
-        // Mostrar modal o redireccionar a vista de factura
-        alert(`Ver factura F${String(invoice.id).padStart(5, '0')} de ${invoice.clientName}`);
-        // Aquí se podría implementar un modal para mostrar la factura
-    }
-}
-
-// Imprimir factura
-function printInvoice(invoiceId) {
-    // Buscar la factura
-    const invoice = appData.facturas.find(f => f.id == invoiceId);
-    
-    if (invoice) {
-        // Simular impresión
-        alert(`Imprimiendo factura F${String(invoice.id).padStart(5, '0')}`);
-        // Aquí se podría generar un PDF y abrir el diálogo de impresión
-    }
-}
-
-// Descargar factura
-function downloadInvoice(invoiceId) {
-    // Buscar la factura
-    const invoice = appData.facturas.find(f => f.id == invoiceId);
-    
-    if (invoice) {
-        // Simular descarga
-        alert(`Descargando factura F${String(invoice.id).padStart(5, '0')}`);
-        // Aquí se podría generar un PDF y descargarlo
-    }
-}
-
-// Buscar facturas
-function searchInvoices() {
-    const searchTerm = document.getElementById('searchInvoice').value.toLowerCase();
-    
-    // Si no hay término de búsqueda, mostrar todas las facturas
-    if (!searchTerm) {
-        navigateToPage();
-        return;
-    }
-    
-    // Filtrar facturas
-    const filteredInvoices = appData.facturas.filter(factura => {
-        return factura.clientName.toLowerCase().includes(searchTerm) ||
-               factura.clientId.toLowerCase().includes(searchTerm) ||
-               String(factura.id).includes(searchTerm);
-    });
-    
-    // Generar HTML de facturas filtradas
-    let invoicesHTML = '';
-    
-    if (filteredInvoices.length === 0) {
-        invoicesHTML = '<tr><td colspan="6" style="text-align: center;">No se encontraron facturas</td></tr>';
-    } else {
-        filteredInvoices.forEach(factura => {
-            invoicesHTML += `
-                <tr>
-                    <td>F${String(factura.id).padStart(5, '0')}</td>
-                    <td>${factura.date}</td>
-                    <td>${factura.clientName}</td>
-                    <td>${factura.currency} ${factura.total.toFixed(2)}</td>
-                    <td>Emitida</td>
-                    <td>
-                        <span class="action-icon view-invoice" data-id="${factura.id}">👁️</span>
-                        <span class="action-icon print-invoice" data-id="${factura.id}">🖨️</span>
-                        <span class="action-icon download-invoice" data-id="${factura.id}">📥</span>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-    
-    // Actualizar tabla
-    document.getElementById('invoiceTableBody').innerHTML = invoicesHTML;
-    
-    // Reconfigurar event listeners
-    setupEventListeners();
-}
-
-// Cargar más facturas (simulado)
-function loadMoreInvoices() {
-    alert('Cargando más facturas...');
-    // Esta función podría implementar paginación si hubiera una base de datos real
-}
-
-// Guardar cambios del perfil
-function saveProfile() {
-    const companyName = document.getElementById('profileCompanyName').value;
-    const rif = document.getElementById('profileRif').value;
-    const address = document.getElementById('profileAddress').value;
-    const phone = document.getElementById('profilePhone').value;
-    const email = document.getElementById('profileEmail').value;
-    
-    // Validar campos
-    if (!companyName || !rif || !address || !phone || !email) {
-        alert('Por favor complete todos los campos');
-        return;
-    }
-    
-    // Actualizar datos
-    appData.companyName = companyName;
-    
-    if (appData.currentUser) {
-        appData.currentUser.companyName = companyName;
-        appData.currentUser.email = email;
-    }
-    
-    // Actualizar en la lista de usuarios registrados
-    const userIndex = appData.registeredUsers.findIndex(u => u.email === appData.currentUser.email);
-    if (userIndex !== -1) {
-        appData.registeredUsers[userIndex].companyName = companyName;
-        appData.registeredUsers[userIndex].email = email;
-    }
-    
-    alert('Perfil actualizado exitosamente');
-    navigateToPage();
-}
-}
-
-// Inicializar la aplicación
-document.addEventListener('DOMContentLoaded', function() {
-    // Para propósitos de demostración, crear algunas facturas de ejemplo
-    if (appData.facturas.length === 0) {
-        appData.facturas = [
-            {
-                id: 1,
-                date: '2024-03-05',
-                clientName: 'Juan Pérez',
-                clientId: 'V-12345678',
-                currency: 'Bs.',
-                total: 1520.35
-            },
-            {
-                id: 2,
-                date: '2024-03-06',
-                clientName: 'Empresas ABC, C.A.',
-                clientId: 'J-87654321-0',
-                currency: '$',
-                total: 45.99
-            }
-        ];
-        appData.invoiceId = 3;
-    }
-    
-    // Iniciar la aplicación
-    navigateToPage();
-});
+    </script>
+</body>
+</html>
