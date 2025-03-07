@@ -868,4 +868,281 @@
         });
     </script>
 </body>
+    <!-- Inicio de la extensión: Mejoras en "Nueva Factura" -->
+<script>
+    // ===========================================================================
+    // EXTENSIÓN: MEJORAS EN "NUEVA FACTURA"
+    // ===========================================================================
+    // Esta sección mejora la funcionalidad de "Nueva Factura" añadiendo un campo
+    // para correos electrónicos múltiples, ajustando la validación de cédula/RIF
+    // con mensaje más claro, mostrando un mensaje de éxito al generar, y
+    // preparando la integración futura con una API.
+    // ===========================================================================
+
+    /**
+     * Inicializa la página con mejoras.
+     */
+    function initializePage() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+        document.getElementById('userDisplayName').textContent = currentUser.companyName;
+        document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+
+        // Añadir campo de correos electrónicos dinámicamente
+        const clientInfoSection = document.querySelector('.form-section:nth-child(1) .form-row:last-child');
+        const emailGroup = document.createElement('div');
+        emailGroup.className = 'form-group';
+        emailGroup.innerHTML = `
+            <label for="clientEmails">Correo Electrónico(s) (separados por coma)</label>
+            <input type="email" id="clientEmails" placeholder="Ej: correo1@example.com, correo2@example.com">
+        `;
+        clientInfoSection.appendChild(emailGroup);
+
+        updateInvoiceTotals();
+    }
+
+    /**
+     * Valida el formulario con ajustes en la cédula/RIF.
+     * @param {Object} invoiceData - Datos a validar.
+     * @returns {boolean} - True si es válido.
+     */
+    function validateInvoiceForm(invoiceData) {
+        let isValid = true;
+        const errors = [];
+
+        if (!invoiceData.clientName) {
+            errors.push('El nombre o razón social es obligatorio.');
+            document.getElementById('clientName').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientName').classList.remove('has-error');
+        }
+
+        if (!invoiceData.clientId || !validateClientId(invoiceData.clientId)) {
+            errors.push('La cédula o RIF es obligatoria y debe seguir un formato válido (Ej: V-12345678 o J-12345678-9).');
+            document.getElementById('clientId').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientId').classList.remove('has-error');
+        }
+
+        if (!invoiceData.clientAddress) {
+            errors.push('La dirección es obligatoria.');
+            document.getElementById('clientAddress').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientAddress').classList.remove('has-error');
+        }
+
+        if (invoiceData.clientPhone && !validatePhone(invoiceData.clientPhone)) {
+            errors.push('El teléfono no es válido (dejar vacío si no aplica).');
+            document.getElementById('clientPhone').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('clientPhone').classList.remove('has-error');
+        }
+
+        if (invoiceData.clientEmails) {
+            const emails = invoiceData.clientEmails.split(',').map(email => email.trim());
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emails.every(email => emailRegex.test(email))) {
+                errors.push('Al menos un correo electrónico no es válido.');
+                document.getElementById('clientEmails').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('clientEmails').classList.remove('has-error');
+            }
+        }
+
+        if (!invoiceData.date) {
+            errors.push('La fecha de emisión es obligatoria.');
+            document.getElementById('invoiceDate').classList.add('has-error');
+            isValid = false;
+        } else {
+            const invoiceDate = new Date(invoiceData.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (invoiceDate > today) {
+                errors.push('La fecha no puede ser futura.');
+                document.getElementById('invoiceDate').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('invoiceDate').classList.remove('has-error');
+            }
+        }
+
+        if (!invoiceData.paymentMethod) {
+            errors.push('El método de pago es obligatorio.');
+            document.getElementById('paymentMethod').classList.add('has-error');
+            isValid = false;
+        } else {
+            document.getElementById('paymentMethod').classList.remove('has-error');
+        }
+
+        if (invoiceData.items.length === 0) {
+            errors.push('Debe haber al menos un artículo.');
+            isValid = false;
+        } else {
+            document.querySelectorAll('#itemsTableBody tr').forEach((row, index) => {
+                const description = row.querySelector('.item-description').value.trim();
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                if (description && (quantity <= 0 || price <= 0)) {
+                    errors.push(`Artículo ${index + 1} tiene cantidad o precio inválido.`);
+                    if (quantity <= 0) row.querySelector('.item-quantity').classList.add('has-error');
+                    if (price <= 0) row.querySelector('.item-price').classList.add('has-error');
+                    isValid = false;
+                } else {
+                    row.querySelector('.item-quantity').classList.remove('has-error');
+                    row.querySelector('.item-price').classList.remove('has-error');
+                }
+            });
+        }
+
+        if (invoiceData.total <= 0) {
+            errors.push('El total debe ser mayor a 0.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showAlert(errors.join(' '), 'warning');
+        }
+
+        return isValid;
+    }
+
+    /**
+     * Recopila los datos del formulario con correos múltiples.
+     * @returns {Object} - Datos de la factura.
+     */
+    function getInvoiceFormData() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        const clientName = document.getElementById('clientName').value.trim();
+        const clientId = document.getElementById('clientId').value.trim().toUpperCase();
+        const clientAddress = document.getElementById('clientAddress').value.trim();
+        const clientPhone = document.getElementById('clientPhone').value.trim();
+        const clientEmails = document.getElementById('clientEmails') ? document.getElementById('clientEmails').value.trim() : '';
+        const invoiceDate = document.getElementById('invoiceDate').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const invoiceNotes = document.getElementById('invoiceNotes').value.trim();
+
+        const items = [];
+        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+            const description = row.querySelector('.item-description').value.trim();
+            if (description) {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const subtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+                items.push({ description, quantity, price, subtotal });
+            }
+        });
+
+        let subtotal = 0;
+        items.forEach(item => subtotal += item.subtotal);
+
+        const ivaRate = 0.16;
+        const igtfRate = 0.03;
+        const specialTaxRate = 0.01;
+
+        const iva = subtotal * ivaRate;
+        const isUSDPayment = paymentMethod.includes('usd');
+        const igtf = isUSDPayment ? subtotal * igtfRate : 0;
+        const specialTax = currentUser.isSpecialContributor ? subtotal * specialTaxRate : 0;
+        const total = subtotal + iva + igtf - specialTax;
+
+        return {
+            id: Date.now().toString(),
+            sellerId: currentUser.email,
+            sellerName: currentUser.companyName,
+            sellerRif: currentUser.rif,
+            sellerAddress: currentUser.address,
+            sellerPhone: currentUser.phone,
+            sellerEmail: currentUser.email,
+            isSpecialContributor: currentUser.isSpecialContributor,
+            clientName,
+            clientId,
+            clientAddress,
+            clientPhone,
+            clientEmails: clientEmails ? clientEmails.split(',').map(email => email.trim()) : [],
+            date: invoiceDate,
+            paymentMethod,
+            notes: invoiceNotes,
+            items,
+            subtotal,
+            iva,
+            igtf,
+            specialTax,
+            total,
+            createdAt: new Date().toISOString(),
+            status: 'emitida'
+        };
+    }
+
+    /**
+     * Guarda la factura y muestra mensaje de éxito.
+     */
+    function saveInvoice() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser.availableInvoices <= 0) {
+            showAlert('No tienes facturas disponibles.', 'danger');
+            return;
+        }
+
+        const invoiceData = getInvoiceFormData();
+        if (!validateInvoiceForm(invoiceData)) return;
+
+        let lastControlNumber = parseInt(localStorage.getItem('lastControlNumber') || '0');
+        invoiceData.controlNumber = ++lastControlNumber;
+
+        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        invoices.push(invoiceData);
+        localStorage.setItem('invoices', JSON.stringify(invoices));
+        localStorage.setItem('lastControlNumber', lastControlNumber.toString());
+
+        currentUser.availableInvoices -= 1;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Mostrar mensaje de éxito y regresar al dashboard
+        showAlert(`Factura #${invoiceData.controlNumber} generada exitosamente. Redirigiendo...`, 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 2000);
+
+        // Guardar cliente si no existe
+        const clients = JSON.parse(localStorage.getItem('clients')) || [];
+        const clientExists = clients.some(client => client.clientId === invoiceData.clientId);
+        if (!clientExists) {
+            clients.push({
+                clientId: invoiceData.clientId,
+                clientName: invoiceData.clientName,
+                clientAddress: invoiceData.clientAddress,
+                clientPhone: invoiceData.clientPhone,
+                clientEmails: invoiceData.clientEmails
+            });
+            localStorage.setItem('clients', JSON.stringify(clients));
+        }
+    }
+
+    // Actualizar initializePage
+    document.addEventListener('DOMContentLoaded', initializePage);
+
+    // Ajustar generateInvoiceBtn para usar saveInvoice
+    document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
+        document.getElementById('previewModal').style.display = 'none';
+        saveInvoice();
+    });
+
+    // ===========================================================================
+    // NOTAS DE LA EXTENSIÓN
+    // ===========================================================================
+    // - Añadido campo para correos electrónicos múltiples (separados por coma).
+    - Ajustada validación de cédula/RIF con mensaje más claro.
+    - Al hacer "Generar", se muestra un mensaje de éxito y se guarda en localStorage.
+    - Los clientes se guardan en localStorage para reflejarlos en "Clientes".
+    - Preparado para futura integración con API por tu equipo de desarrollo.
+    // ===========================================================================
+</script>
+<!-- Fin de la extensión -->
 </html>
