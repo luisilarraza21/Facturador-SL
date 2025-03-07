@@ -1687,24 +1687,27 @@
 <!-- Inicio de la extensión: Prueba minimalista para nuevos campos y montos -->
 <script src="api.js"></script>
 <script>
+<!-- Inicio de la extension: Prueba minimalista para nuevos campos y montos (corregida) -->
+<script src="api.js"></script>
+<script>
     // ===========================================================================
-    // EXTENSIÓN MINIMALISTA: PRUEBA DE NUEVOS CAMPOS Y MONTOS
+    // EXTENSION MINIMALISTA: PRUEBA DE NUEVOS CAMPOS Y MONTOS (CORREGIDA)
     // ===========================================================================
-    // Esta extensión añade campos básicos (monto exento, alícuota, porcentaje USD)
-    // y actualiza la tabla de resumen con valores en bolívares y dólares.
+    // Esta extension añade campos basicos (monto exento, alicuota, porcentaje USD)
+    // y actualiza la tabla de resumen con valores en bolivares y dolares.
     // ===========================================================================
 
     let exchangeRate = 64.74; // Valor por defecto
 
     /**
-     * Obtiene la tasa del dólar del BCV al cargar la página.
+     * Obtiene la tasa del dolar del BCV al cargar la pagina.
      */
     async function fetchExchangeRate() {
         try {
             const response = await getExchangeRate();
             if (response.success) {
                 exchangeRate = response.rate;
-                alert(`Tasa del dólar: ${exchangeRate} VES/USD`);
+                alert('Tasa del dolar: ' + exchangeRate + ' VES/USD');
             } else {
                 alert('No se pudo obtener la tasa. Usando valor por defecto.');
             }
@@ -1718,11 +1721,11 @@
      * Añade los nuevos campos al formulario.
      */
     function addMinimalFields() {
-        // Buscar la sección de detalles (después de fecha y método de pago)
-        const detailsSection = document.querySelector('.form-section:nth-child(2)');
+        // Buscar la seccion de detalles (despues de fecha y metodo de pago)
+        let detailsSection = document.querySelector('.form-section:nth-child(2)');
         if (!detailsSection) {
-            alert('No se encontró la sección de detalles. Revisa el HTML.');
-            return;
+            console.log('No se encontro la seccion de detalles. Verifica el HTML.');
+            detailsSection = document.body; // Fallback temporal
         }
 
         // Monto exento
@@ -1736,27 +1739,28 @@
             detailsSection.appendChild(exemptGroup);
         }
 
-        // Alícuota
+        // Alicuota
         if (!document.getElementById('alicuota')) {
             const alicuotaGroup = document.createElement('div');
             alicuotaGroup.className = 'form-group';
             alicuotaGroup.innerHTML = `
-                <label for="alicuota">Alícuota (%)</label>
+                <label for="alicuota">Alicuota (%)</label>
                 <input type="number" id="alicuota" min="0" max="1" value="0.16" step="0.01">
             `;
             detailsSection.appendChild(alicuotaGroup);
         }
 
-        // Porcentaje en dólares
+        // Porcentaje en dolares
         if (!document.getElementById('usdPercentage')) {
             const usdGroup = document.createElement('div');
             usdGroup.className = 'form-group';
             usdGroup.innerHTML = `
-                <label for="usdPercentage">Porcentaje en Dólares (%)</label>
+                <label for="usdPercentage">Porcentaje en Dolares (%)</label>
                 <input type="number" id="usdPercentage" min="0" max="100" value="0">
             `;
             detailsSection.appendChild(usdGroup);
         }
+        console.log('Campos añadidos exitosamente.');
     }
 
     /**
@@ -1764,12 +1768,16 @@
      */
     function updateTotalsMinimal() {
         let subtotal = 0;
-        document.querySelectorAll('#itemsTableBody tr').forEach(row => {
-            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const itemRows = document.querySelectorAll('#itemsTableBody tr');
+        itemRows.forEach(row => {
+            const quantity = parseFloat(row.querySelector('.item-quantity')?.value) || 0;
+            const price = parseFloat(row.querySelector('.item-price')?.value) || 0;
             const rowSubtotal = quantity * price;
-            row.querySelector('.item-subtotal').textContent = rowSubtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-            subtotal += rowSubtotal;
+            const subtotalCell = row.querySelector('.item-subtotal');
+            if (subtotalCell) {
+                subtotalCell.textContent = rowSubtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                subtotal += rowSubtotal;
+            }
         });
 
         const exemptAmount = parseFloat(document.getElementById('exemptAmount')?.value) || 0;
@@ -1780,7 +1788,7 @@
         const igtf = (subtotal * (usdPercentage / 100)) * 0.03;
         const total = taxableAmount + iva + igtf;
 
-        // Calcular montos en dólares
+        // Calcular montos en dolares
         const subtotalUSD = subtotal / exchangeRate;
         const exemptAmountUSD = exemptAmount / exchangeRate;
         const taxableAmountUSD = taxableAmount / exchangeRate;
@@ -1791,43 +1799,38 @@
         // Actualizar tabla de resumen
         const summaryTable = document.querySelector('.summary-table');
         if (!summaryTable) {
-            alert('No se encontró la tabla de resumen. Revisa el HTML.');
+            console.log('No se encontro la tabla de resumen. Verifica el HTML.');
             return;
         }
 
         // Asegurarse de que las filas existan
-        if (!document.getElementById('summaryExempt')) {
-            const exemptRow = document.createElement('tr');
+        let exemptRow = document.getElementById('summaryExemptRow');
+        if (!exemptRow) {
+            exemptRow = document.createElement('tr');
             exemptRow.id = 'summaryExemptRow';
-            exemptRow.innerHTML = `
-                <td>Monto Exento:</td>
-                <td id="summaryExempt">${formatCurrency(exemptAmount)} (${exemptAmountUSD.toFixed(2)} USD)</td>
-            `;
-            summaryTable.insertBefore(exemptRow, document.getElementById('summaryIva')?.parentNode || summaryTable.firstChild);
-        } else {
-            document.getElementById('summaryExempt').innerHTML = `${formatCurrency(exemptAmount)} (${exemptAmountUSD.toFixed(2)} USD)`;
+            exemptRow.innerHTML = `<td>Monto Exento:</td><td id="summaryExempt"></td>`;
+            summaryTable.insertBefore(exemptRow, summaryTable.querySelector('tr#summaryIva') || summaryTable.firstChild);
         }
+        document.getElementById('summaryExempt').innerHTML = `${formatCurrency(exemptAmount)} (${exemptAmountUSD.toFixed(2)} USD)`;
 
-        if (!document.getElementById('summaryTaxable')) {
-            const taxableRow = document.createElement('tr');
+        let taxableRow = document.getElementById('summaryTaxableRow');
+        if (!taxableRow) {
+            taxableRow = document.createElement('tr');
             taxableRow.id = 'summaryTaxableRow';
-            taxableRow.innerHTML = `
-                <td>Base Imponible:</td>
-                <td id="summaryTaxable">${formatCurrency(taxableAmount)} (${taxableAmountUSD.toFixed(2)} USD)</td>
-            `;
-            summaryTable.insertBefore(taxableRow, document.getElementById('summaryIva')?.parentNode || summaryTable.firstChild);
-        } else {
-            document.getElementById('summaryTaxable').innerHTML = `${formatCurrency(taxableAmount)} (${taxableAmountUSD.toFixed(2)} USD)`;
+            taxableRow.innerHTML = `<td>Base Imponible:</td><td id="summaryTaxable"></td>`;
+            summaryTable.insertBefore(taxableRow, summaryTable.querySelector('tr#summaryIva') || summaryTable.firstChild);
         }
+        document.getElementById('summaryTaxable').innerHTML = `${formatCurrency(taxableAmount)} (${taxableAmountUSD.toFixed(2)} USD)`;
 
         document.getElementById('summarySubtotal').innerHTML = `${formatCurrency(subtotal)} (${subtotalUSD.toFixed(2)} USD)`;
         document.getElementById('summaryIva').innerHTML = `${formatCurrency(iva)} (${ivaUSD.toFixed(2)} USD)`;
         document.getElementById('summaryIgtf').innerHTML = `${formatCurrency(igtf)} (${igtfUSD.toFixed(2)} USD)`;
         document.getElementById('summaryTotal').innerHTML = `${formatCurrency(total)} (${totalUSD.toFixed(2)} USD)`;
+        console.log('Totales actualizados:', { subtotal, exemptAmount, taxableAmount, iva, igtf, total });
     }
 
     /**
-     * Inicializa la página con los nuevos campos.
+     * Inicializa la pagina con los nuevos campos.
      */
     function initializePageMinimal() {
         addMinimalFields();
@@ -1835,14 +1838,14 @@
         updateTotalsMinimal();
     }
 
-    // Event listener para actualizar totales dinámicamente
+    // Event listener para actualizar totales dinamicamente
     document.addEventListener('input', (e) => {
         if (e.target.matches('#exemptAmount, #alicuota, #usdPercentage, .item-quantity, .item-price')) {
             updateTotalsMinimal();
         }
     });
 
-    // Cargar la página
+    // Cargar la pagina
     document.addEventListener('DOMContentLoaded', initializePageMinimal);
 
     // ===========================================================================
@@ -1866,12 +1869,12 @@
     </style>
 
     // ===========================================================================
-    // NOTAS DE LA EXTENSIÓN
+    // NOTAS DE LA EXTENSION
     // ===========================================================================
-    // - Añadidos campos básicos: Monto Exento, Alícuota, Porcentaje en Dólares.
+    // - Añadidos campos basicos: Monto Exento, Alicuota, Porcentaje en Dolares.
     // - Actualizada la tabla de resumen con Monto Exento, Base Imponible.
-    // - Montos en dólares para subtotal, monto exento, base imponible, IVA, IGTF y total.
-    // - Simplificado para evitar conflictos con el código existente.
+    // - Montos en dolares para subtotal, monto exento, base imponible, IVA, IGTF y total.
+    // - Incluye mensajes de depuracion en consola.
     // ===========================================================================
 </script>
-<!-- Fin de la extensión -->
+<!-- Fin de la extension -->
