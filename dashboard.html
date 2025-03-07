@@ -450,31 +450,114 @@
                     </tbody>
                 </table>
             </div>
-            <div id="invoiceForm" class="hidden">
-                <div class="form-section">
-                    <h3 class="section-title">Información del Cliente</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="clientName">Nombre o Razón Social*</label>
-                            <input type="text" id="clientName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="clientId">Cédula o RIF*</label>
-                            <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="clientAddress">Dirección*</label>
-                            <input type="text" id="clientAddress" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="clientPhone">Teléfono</label>
-                            <input type="text" id="clientPhone">
-                        </div>
-                    </div>
-                </div>
-                
+            <div id="invoiceForm" class="invoice-form tab-content hidden">
+    <h2>Nueva Factura</h2>
+    <div class="form-section">
+        <h3>Información del Cliente</h3>
+        <div class="form-group">
+            <label for="clientName">Nombre o Razón Social*</label>
+            <input type="text" id="clientName" required>
+        </div>
+        <div class="form-group">
+            <label for="clientId">Cédula o RIF*</label>
+            <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
+        </div>
+        <div class="form-group">
+            <label for="clientAddress">Dirección*</label>
+            <input type="text" id="clientAddress" required>
+        </div>
+        <div class="form-group">
+            <label for="clientPhone">Teléfono</label>
+            <input type="text" id="clientPhone">
+        </div>
+        <div class="form-group">
+            <label for="clientEmails">Correos Electrónicos del Cliente (separados por comas)*</label>
+            <input type="text" id="clientEmails" placeholder="Ej: cliente1@correo.com, cliente2@correo.com" required>
+        </div>
+    </div>
+    <!-- Resto del formulario (Información de la Factura, Artículos, Resumen, etc.) sigue igual -->
+    <div class="form-section">
+        <h3>Información de la Factura</h3>
+        <div class="form-group">
+            <label for="invoiceDate">Fecha de Emisión*</label>
+            <input type="date" id="invoiceDate" required>
+        </div>
+        <div class="form-group">
+            <label for="docType">Tipo de Documento*</label>
+            <select id="docType" required>
+                <option value="">Selecciona...</option>
+                <option value="factura">Factura</option>
+                <option value="nota_credito">Nota de Crédito</option>
+                <option value="nota_debito">Nota de Débito</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="operationCode">Código de Operación</label>
+            <input type="text" id="operationCode">
+        </div>
+        <div class="form-group">
+            <label for="paymentMethod">Método de Pago*</label>
+            <select id="paymentMethod" required>
+                <option value="">Selecciona...</option>
+                <option value="efectivo_bs">Efectivo (Bs.)</option>
+                <option value="transferencia_bs">Transferencia (Bs.)</option>
+                <option value="efectivo_usd">Efectivo (USD)</option>
+                <option value="transferencia_usd">Transferencia (USD)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="invoiceNotes">Notas</label>
+            <textarea id="invoiceNotes"></textarea>
+        </div>
+    </div>
+    <!-- Resto del formulario (Artículos, Resumen, Botones) -->
+    <div class="form-section">
+        <h3>Artículos</h3>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="itemsTableBody"></tbody>
+        </table>
+        <button id="addItemBtn" class="btn">+ Agregar Artículo</button>
+    </div>
+    <div class="form-section">
+        <h3>Resumen</h3>
+        <table class="summary-table">
+            <tr>
+                <td>Subtotal</td>
+                <td id="summarySubtotal">0.00 Bs.</td>
+            </tr>
+            <tr>
+                <td>IVA (16%)</td>
+                <td id="summaryIva">0.00 Bs.</td>
+            </tr>
+            <tr id="igtfRow" style="display: none;">
+                <td>IGTF (3%)</td>
+                <td id="summaryIgtf">0.00 Bs.</td>
+            </tr>
+            <tr id="specialTaxRow" style="display: none;">
+                <td>Retención Especial</td>
+                <td id="summarySpecialTax">0.00 Bs.</td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td id="summaryTotal">0.00 Bs.</td>
+            </tr>
+        </table>
+    </div>
+    <div class="action-buttons">
+        <button id="cancelInvoiceBtn" class="btn btn-secondary">Cancelar</button>
+        <button id="previewInvoiceBtn" class="btn btn-secondary">Previsualizar</button>
+        <button id="saveInvoiceBtn" class="btn btn-success">Guardar Factura</button>
+    </div>
+</div> 
                 <div class="form-section">
                     <h3 class="section-title">Información de la Factura</h3>
                     <div class="form-row">
@@ -588,18 +671,33 @@
             </table>
         </div>
         
-        <div class="tab-content hidden" id="contentProfile">
-            <h3>Información de mi Empresa</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="profileCompanyName">Nombre o Razón Social</label>
-                    <input type="text" id="profileCompanyName" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="profileRif">RIF</label>
-                    <input type="text" id="profileRif" readonly>
-                </div>
-            </div>
+      <div id="contentProfile" class="tab-content hidden">
+    <h2>Mi Perfil</h2>
+    <div class="form-group">
+        <label for="profileCompanyName">Nombre o Razón Social</label>
+        <input type="text" id="profileCompanyName" readonly>
+    </div>
+    <div class="form-group">
+        <label for="profileRif">RIF</label>
+        <input type="text" id="profileRif" readonly>
+    </div>
+    <div class="form-group">
+        <label for="profileAddress">Dirección Fiscal</label>
+        <input type="text" id="profileAddress" readonly>
+    </div>
+    <div class="form-group">
+        <label for="profilePhone">Teléfono</label>
+        <input type="text" id="profilePhone" readonly>
+    </div>
+    <div class="form-group">
+        <label>Correos Electrónicos</label>
+        <ul id="profileEmailsList"></ul>
+    </div>
+    <div class="form-group">
+        <label for="profileTaxStatus">Estatus Fiscal</label>
+        <p id="profileTaxStatus"></p>
+    </div>
+</div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="profileAddress">Dirección Fiscal</label>
@@ -959,77 +1057,92 @@ function updateDashboardStats() {
         }
     }
 
-    /**
-     * Valida el formulario antes de guardarlo.
-     * @returns {boolean} - True si es válido, false si no.
-     */
-    function validateForm() {
-        let isValid = true;
-        document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+  /**
+ * Valida el formulario antes de guardarlo.
+ * @returns {boolean} - True si es válido, false si no.
+ */
+function validateForm() {
+    let isValid = true;
+    document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
 
-        const clientName = document.getElementById('clientName').value.trim();
-        const clientId = document.getElementById('clientId').value.trim();
-        const clientAddress = document.getElementById('clientAddress').value.trim();
-        const clientPhone = document.getElementById('clientPhone').value.trim();
-        const invoiceDate = document.getElementById('invoiceDate').value;
-        const docType = document.getElementById('docType').value;
-        const paymentMethod = document.getElementById('paymentMethod').value;
-        const rows = document.querySelectorAll('#itemsTableBody tr');
+    const clientName = document.getElementById('clientName').value.trim();
+    const clientId = document.getElementById('clientId').value.trim();
+    const clientAddress = document.getElementById('clientAddress').value.trim();
+    const clientPhone = document.getElementById('clientPhone').value.trim();
+    const clientEmails = document.getElementById('clientEmails').value.trim();
+    const invoiceDate = document.getElementById('invoiceDate').value;
+    const docType = document.getElementById('docType').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const rows = document.querySelectorAll('#itemsTableBody tr');
 
-        // Validar información del cliente
-        if (!clientName) {
-            document.getElementById('clientName').parentElement.classList.add('has-error');
-            showAlert('El nombre del cliente es obligatorio.', 'warning');
+    // Validar información del cliente
+    if (!clientName) {
+        document.getElementById('clientName').parentElement.classList.add('has-error');
+        showAlert('El nombre del cliente es obligatorio.', 'warning');
+        isValid = false;
+    }
+    if (!validateClientId(clientId)) {
+        document.getElementById('clientId').parentElement.classList.add('has-error');
+        showAlert('El RIF o cédula no tiene un formato válido (Ej: V-12345678 o J-12345678-9).', 'warning');
+        isValid = false;
+    }
+    if (!clientAddress) {
+        document.getElementById('clientAddress').parentElement.classList.add('has-error');
+        showAlert('La dirección del cliente es obligatoria.', 'warning');
+        isValid = false;
+    }
+    if (clientPhone && !validatePhone(clientPhone)) {
+        document.getElementById('clientPhone').parentElement.classList.add('has-error');
+        showAlert('El teléfono debe tener un formato válido (Ej: +584123456789).', 'warning');
+        isValid = false;
+    }
+    if (!clientEmails) {
+        document.getElementById('clientEmails').parentElement.classList.add('has-error');
+        showAlert('El correo electrónico del cliente es obligatorio.', 'warning');
+        isValid = false;
+    } else {
+        // Validar formato de los correos electrónicos
+        const emails = clientEmails.split(',').map(email => email.trim());
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const invalidEmails = emails.filter(email => !emailRegex.test(email));
+        if (invalidEmails.length > 0) {
+            document.getElementById('clientEmails').parentElement.classList.add('has-error');
+            showAlert(`Los siguientes correos no tienen un formato válido: ${invalidEmails.join(', ')}`, 'warning');
             isValid = false;
         }
-        if (!validateClientId(clientId)) {
-            document.getElementById('clientId').parentElement.classList.add('has-error');
-            showAlert('El RIF o cédula no tiene un formato válido (Ej: V-12345678 o J-12345678-9).', 'warning');
-            isValid = false;
-        }
-        if (!clientAddress) {
-            document.getElementById('clientAddress').parentElement.classList.add('has-error');
-            showAlert('La dirección del cliente es obligatoria.', 'warning');
-            isValid = false;
-        }
-        if (clientPhone && !validatePhone(clientPhone)) {
-            document.getElementById('clientPhone').parentElement.classList.add('has-error');
-            showAlert('El teléfono debe tener un formato válido (Ej: +584123456789).', 'warning');
-            isValid = false;
-        }
-
-        // Validar información de la factura
-        if (!invoiceDate) {
-            document.getElementById('invoiceDate').parentElement.classList.add('has-error');
-            showAlert('La fecha de emisión es obligatoria.', 'warning');
-            isValid = false;
-        }
-        if (!docType) {
-            document.getElementById('docType').parentElement.classList.add('has-error');
-            showAlert('Selecciona un tipo de documento.', 'warning');
-            isValid = false;
-        }
-        if (!paymentMethod) {
-            document.getElementById('paymentMethod').parentElement.classList.add('has-error');
-            showAlert('Selecciona un método de pago.', 'warning');
-            isValid = false;
-        }
-
-        // Validar ítems
-        if (rows.length === 0 || !rows[0].querySelector('.item-description').value) {
-            showAlert('Debes agregar al menos un artículo válido.', 'warning');
-            isValid = false;
-        }
-
-        try {
-            calculateItemTotals(); // Esto lanzará un error si los ítems son inválidos
-        } catch (error) {
-            isValid = false;
-        }
-
-        return isValid;
     }
 
+    // Validar información de la factura
+    if (!invoiceDate) {
+        document.getElementById('invoiceDate').parentElement.classList.add('has-error');
+        showAlert('La fecha de emisión es obligatoria.', 'warning');
+        isValid = false;
+    }
+    if (!docType) {
+        document.getElementById('docType').parentElement.classList.add('has-error');
+        showAlert('Selecciona un tipo de documento.', 'warning');
+        isValid = false;
+    }
+    if (!paymentMethod) {
+        document.getElementById('paymentMethod').parentElement.classList.add('has-error');
+        showAlert('Selecciona un método de pago.', 'warning');
+        isValid = false;
+    }
+
+    // Validar ítems
+    if (rows.length === 0 || !rows[0].querySelector('.item-description').value) {
+        showAlert('Debes agregar al menos un artículo válido.', 'warning');
+        isValid = false;
+    }
+
+    try {
+        calculateItemTotals(); // Esto lanzará un error si los ítems son inválidos
+    } catch (error) {
+        isValid = false;
+    }
+
+    return isValid;
+}
     /**
      * Agrega un nuevo ítem al formulario.
      */
@@ -1083,47 +1196,52 @@ function updateDashboardStats() {
         return `${lastNumber.toString().padStart(8, '0')}`;
     }
 
-    /**
-     * Genera un objeto con los datos de la factura para guardarla o previsualizarla.
-     * @returns {object} - Datos de la factura.
-     */
-    function getInvoiceFormData() {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        const subtotal = calculateItemTotals();
-        const { iva, igtf, specialTax, total } = calculateTaxesAndTotal(subtotal);
-
-        return {
-            id: Date.now().toString(),
-            sellerId: currentUser.email,
-            sellerName: currentUser.companyName,
-            sellerRif: currentUser.rif,
-            sellerAddress: currentUser.address,
-            sellerPhone: currentUser.phone,
-            clientName: document.getElementById('clientName').value.trim(),
-            clientId: document.getElementById('clientId').value.trim(),
-            clientAddress: document.getElementById('clientAddress').value.trim(),
-            clientPhone: document.getElementById('clientPhone').value.trim(),
-            date: document.getElementById('invoiceDate').value,
-            docType: document.getElementById('docType').value,
-            operationCode: document.getElementById('operationCode').value.trim() || 'N/A',
-            paymentMethod: document.getElementById('paymentMethod').value,
-            notes: document.getElementById('invoiceNotes').value.trim(),
-            items: Array.from(document.querySelectorAll('#itemsTableBody tr')).map(row => ({
-                description: row.querySelector('.item-description').value,
-                quantity: parseFloat(row.querySelector('.item-quantity').value),
-                price: parseFloat(row.querySelector('.item-price').value),
-                subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(' Bs.', '').replace(',', ''))
-            })),
-            subtotal: subtotal,
-            iva: iva,
-            igtf: igtf,
-            specialTax: specialTax,
-            total: total,
-            controlNumber: generateControlNumber(document.getElementById('docType').value),
-            totalUSD: (document.getElementById('paymentMethod').value.includes('usd')) ? total / 40 : 0 // Tipo de cambio 40 Bs./USD
-        };
+   /**
+ * Genera un objeto con los datos de la factura para guardarla o previsualizarla.
+ * @returns {object} - Datos de la factura.
+ */
+function getInvoiceFormData() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser || !currentUser.email) {
+        console.error('Error: No se encontró el usuario actual en localStorage.');
+        showAlert('Error: No se pudo identificar al usuario actual. Por favor, inicia sesión nuevamente.', 'danger');
+        return null;
     }
 
+    const subtotal = calculateItemTotals();
+    const { iva, igtf, specialTax, total } = calculateTaxesAndTotal(subtotal);
+
+    return {
+        id: Date.now().toString(),
+        sellerId: currentUser.email,
+        sellerName: currentUser.companyName,
+        sellerRif: currentUser.rif,
+        sellerAddress: currentUser.address,
+        sellerPhone: currentUser.phone,
+        clientName: document.getElementById('clientName').value.trim(),
+        clientId: document.getElementById('clientId').value.trim(),
+        clientAddress: document.getElementById('clientAddress').value.trim(),
+        clientPhone: document.getElementById('clientPhone').value.trim(),
+        date: document.getElementById('invoiceDate').value,
+        docType: document.getElementById('docType').value,
+        operationCode: document.getElementById('operationCode').value.trim() || 'N/A',
+        paymentMethod: document.getElementById('paymentMethod').value,
+        notes: document.getElementById('invoiceNotes').value.trim(),
+        items: Array.from(document.querySelectorAll('#itemsTableBody tr')).map(row => ({
+            description: row.querySelector('.item-description').value,
+            quantity: parseFloat(row.querySelector('.item-quantity').value),
+            price: parseFloat(row.querySelector('.item-price').value),
+            subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(' Bs.', '').replace(',', ''))
+        })),
+        subtotal: subtotal,
+        iva: iva,
+        igtf: igtf,
+        specialTax: specialTax,
+        total: total,
+        controlNumber: generateControlNumber(document.getElementById('docType').value),
+        totalUSD: (document.getElementById('paymentMethod').value.includes('usd')) ? total / 40 : 0 // Tipo de cambio 40 Bs./USD
+    };
+}
     /**
      * Muestra una previsualización de la factura desde el formulario.
      */
@@ -1191,7 +1309,7 @@ function updateDashboardStats() {
         document.body.appendChild(modal);
     }
 
-   /**
+ /**
  * Guarda la factura en localStorage.
  */
 function saveInvoice() {
@@ -1205,6 +1323,20 @@ function saveInvoice() {
         showAlert('No tienes facturas disponibles. Por favor, compra más facturas.', 'danger');
         return;
     }
+
+    const invoice = getInvoiceFormData();
+    console.log('Saving Invoice:', invoice); // Depuración
+
+    let invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    invoices.push(invoice);
+    localStorage.setItem('invoices', JSON.stringify(invoices));
+    localStorage.setItem('invoiceLimit', (invoiceLimit - 1).toString());
+
+    showAlert('Factura generada exitosamente.', 'success');
+    loadInvoices();
+    cancelInvoice();
+    updateDashboardStats();
+}
 
     const invoice = getInvoiceFormData();
 
@@ -1241,10 +1373,50 @@ function loadInvoices() {
     const tbody = document.getElementById('invoicesTableBody');
     tbody.innerHTML = '';
 
+    // Depuración: Verificar datos
+    console.log('Current User:', currentUser);
+    console.log('All Invoices:', invoices);
+    console.log('User Invoices:', userInvoices);
+
     if (userInvoices.length === 0) {
         tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">No hay facturas emitidas.</td></tr>';
         return;
     }
+
+    // Ordenar facturas por controlNumber de forma descendente
+    userInvoices.sort((a, b) => parseInt(b.controlNumber) - parseInt(a.controlNumber));
+
+    userInvoices.forEach(invoice => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${invoice.controlNumber}</td>
+            <td>${formatDate(invoice.date)}</td>
+            <td>${invoice.clientName}</td>
+            <td>${formatCurrency(invoice.subtotal)}</td>
+            <td>${formatCurrency(invoice.iva)}</td>
+            <td>${formatCurrency(invoice.igtf)}</td>
+            <td>${formatCurrency(invoice.total)}</td>
+            <td>${invoice.totalUSD > 0 ? formatCurrency(invoice.totalUSD) : 'N/A'}</td>
+            <td>${invoice.docType === 'factura' ? 'Factura' : invoice.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito'}</td>
+            <td>${invoice.operationCode || 'N/A'}</td>
+            <td>
+                <button class="btn btn-secondary view-invoice" data-id="${invoice.id}">Ver</button>
+                <button class="btn btn-secondary print-invoice" data-id="${invoice.id}">Imprimir</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    document.querySelectorAll('.view-invoice').forEach(btn => {
+        btn.addEventListener('click', viewInvoice);
+    });
+    document.querySelectorAll('.print-invoice').forEach(btn => {
+        btn.addEventListener('click', printInvoice);
+    });
+
+    // Actualizar las estadísticas después de cargar las facturas
+    updateDashboardStats();
+}
 
     // Ordenar facturas por controlNumber de forma descendente
     userInvoices.sort((a, b) => parseInt(b.controlNumber) - parseInt(a.controlNumber));
