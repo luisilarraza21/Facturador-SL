@@ -13,16 +13,21 @@
  */
 function getExchangeRate() {
     return new Promise((resolve) => {
-        // Simulación de una respuesta de API
         setTimeout(() => {
             resolve({
                 success: true,
                 date: "2025-03-07",
-                rate: 64.74, // Tasa del BCV según posts recientes en X
+                rate: 64.74,
                 currency: "VES/USD"
             });
-        }, 500); // Simula un retraso de red de 500ms
+        }, 500);
     });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { getExchangeRate };
+} else {
+    window.getExchangeRate = getExchangeRate;
 }
 
 // Exportar la función para usarla en otros archivos
