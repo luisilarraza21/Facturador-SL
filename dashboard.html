@@ -519,29 +519,32 @@
         </div>
         
         <div class="tab-content" id="contentInvoices">
-            <div id="alertContainer"></div>
-            
-            <div id="invoiceList">
-                <h3>Historial de Facturas</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Número</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Monto</th>
-                            <th>IVA</th>
-                            <th>IGTF</th>
-                            <th>Total</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invoicesTableBody">
-                        <!-- Rows will be populated dynamically -->
-                    </tbody>
-                </table>
-            </div>
-            
+    <div id="alertContainer"></div>
+    <div id="invoiceList">
+        <h3>Historial de Facturas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Monto</th>
+                    <th>IVA</th>
+                    <th>IGTF</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="invoicesTableBody">
+                <!-- Rows will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+    <div id="invoiceForm" class="hidden">
+        <!-- Formulario existente -->
+    </div>
+    <button class="btn" onclick="window.location.href='new-invoice.html'">Nueva Factura</button>
+</div>
             <div id="invoiceForm" class="hidden">
                 <div class="form-section">
                     <h3 class="section-title">Información del Cliente</h3>
@@ -647,69 +650,68 @@
             </div>
         </div>
         
-        <div class="tab-content hidden" id="contentClients">
-            <h3>Mis Clientes</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre/Razón Social</th>
-                        <th>Cédula/RIF</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Facturas Emitidas</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTableBody">
-                    <!-- Rows will be populated dynamically -->
-                </tbody>
-            </table>
-        </div>
+       <div class="tab-content" id="contentClients">
+    <h3>Mis Clientes</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre/Razón Social</th>
+                <th>Cédula/RIF</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Facturas Emitidas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="clientsTableBody">
+            <!-- Rows will be populated dynamically -->
+        </tbody>
+    </table>
+    <button class="btn" onclick="window.location.href='new-invoice.html'">Nueva Factura</button>
+</div>
         
-        <div class="tab-content hidden" id="contentProfile">
-            <h3>Información de mi Empresa</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="profileCompanyName">Nombre o Razón Social</label>
-                    <input type="text" id="profileCompanyName" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="profileRif">RIF</label>
-                    <input type="text" id="profileRif" readonly>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="profileAddress">Dirección Fiscal</label>
-                    <input type="text" id="profileAddress" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="profilePhone">Teléfono</label>
-                    <input type="text" id="profilePhone" readonly>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="profileEmail">Correo Electrónico</label>
-                <input type="email" id="profileEmail" readonly>
-            </div>
-            <div class="form-group">
-                <label>Estatus de Contribuyente</label>
-                <div id="profileTaxStatus">Normal</div>
-            </div>
-            
-            <div style="margin-top: 30px;">
-                <h3>Plan de Facturación</h3>
-                <div class="alert alert-info">
-                    Tienes activado el plan de <strong>Talonario de 100 Facturas</strong>
-                </div>
-                <div id="lowInvoicesWarning" class="alert alert-warning hidden">
-                    Te quedan menos de 10 facturas disponibles. ¡Considera comprar más pronto!
-                </div>
-                <button class="btn" id="buyMoreInvoicesBtn">Comprar más facturas</button>
-            </div>
+<div class="tab-content" id="contentProfile">
+    <h3>Información de mi Empresa</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="profileCompanyName">Nombre o Razón Social</label>
+            <input type="text" id="profileCompanyName" readonly>
+        </div>
+        <div class="form-group">
+            <label for="profileRif">RIF</label>
+            <input type="text" id="profileRif" readonly>
         </div>
     </div>
-    
+    <div class="form-row">
+        <div class="form-group">
+            <label for="profileAddress">Dirección Fiscal</label>
+            <input type="text" id="profileAddress" readonly>
+        </div>
+        <div class="form-group">
+            <label for="profilePhone">Teléfono</label>
+            <input type="text" id="profilePhone" readonly>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="profileEmail">Correo Electrónico</label>
+        <input type="email" id="profileEmail" readonly>
+    </div>
+    <div class="form-group">
+        <label>Estatus de Contribuyente</label>
+        <div id="profileTaxStatus">Normal</div>
+    </div>
+    <div style="margin-top: 30px;">
+        <h3>Plan de Facturación</h3>
+        <div class="alert alert-info">
+            Tienes activado el plan de <strong>Talonario de 100 Facturas</strong>
+        </div>
+        <div id="lowInvoicesWarning" class="alert alert-warning hidden">
+            Te quedan menos de 10 facturas disponibles. ¡Considera comprar más pronto!
+        </div>
+        <button class="btn" id="buyMoreInvoicesBtn">Comprar más facturas</button>
+    </div>
+    <button class="btn" onclick="window.location.href='new-invoice.html'" style="margin-top: 20px">Nueva Factura</button>
+</div>
     <div id="previewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
