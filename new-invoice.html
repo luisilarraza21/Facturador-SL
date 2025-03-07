@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacturaML - Nueva Factura</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .navbar {
+            background-color: #ffe600;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease;
+        }
+        .navbar:hover {
+            background-color: #e6cc00;
+        }
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info {
+            margin-right: 15px;
+            font-size: 16px;
+            color: #444;
+            font-style: italic;
+        }
+        .logout-btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            background: #1d4f9e;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #ddd;
+        }
+        .invoice-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            color: #333;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2968c8;
+            box-shadow: 0 0 5px rgba(41,104,200,0.3);
+        }
+        .has-error input, .has-error select {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        .btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #1d4f9e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .items-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .items-table button {
+            width: 100%;
+            padding: 8px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .items-table button:hover {
+            background: #c82333;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .summary-table {
+            width: 50%;
+            margin-left: auto;
+            margin-top: 20px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .summary-table td {
+            padding: 8px 15px;
+        }
+        .summary-table tr:last-child {
+            font-weight: bold;
+            font-size: 18px;
+            background: #e9ecef;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 700px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+        .close:hover {
+            color: #d33;
+        }
+        #invoicePreview {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .preview-logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffe600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .preview-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #333;
+            text-decoration: underline;
+        }
+        .preview-company-info, .preview-client-info {
+            margin-bottom: 20px;
+        }
+        .preview-company-info h3, .preview-client-info h3 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        .notes {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        @media (max-width: 768px) {
+            .invoice-form {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                flex-direction: column;
+            }
+            .action-buttons {
+                justify-content: center;
+            }
+            .summary-table {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">FacturaML</div>
+        <div class="nav-user">
+            <div class="user-info" id="userDisplayName">Cargando...</div>
+            <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2 class="section-title">Nueva Factura</h2>
+        <div class="invoice-form">
+            <div class="form-section">
+                <h3>Información del Cliente</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Nombre o Razón Social*</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientId">Cédula o RIF*</label>
+                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientAddress">Dirección*</label>
+                        <input type="text" id="clientAddress" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Teléfono</label>
+                        <input type="text" id="clientPhone">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Detalles de la Factura</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="invoiceDate">Fecha de Emisión*</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Método de Pago*</label>
+                        <select id="paymentMethod" required>
+                            <option value="transferencia_bs">Transferencia en Bs.</option>
+                            <option value="pago_movil">Pago Móvil</option>
+                            <option value="efectivo_bs">Efectivo en Bs.</option>
+                            <option value="efectivo_usd">Efectivo en USD</option>
+                            <option value="transferencia_usd">Transferencia en USD</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="invoiceNotes">Notas</label>
+                    <textarea id="invoiceNotes" rows="2"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Artículos</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="40%">Descripción</th>
+                            <th width="15%">Cantidad</th>
+                            <th width="20%">Precio Unitario</th>
+                            <th width="20%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <tr>
+                            <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                            <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                            <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                            <td class="item-subtotal">0.00</td>
+                            <td><button class="btn-secondary remove-item">X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-secondary" id="addItemBtn" style="margin-top: 10px">Agregar Artículo</button>
+                
+                <table class="summary-table">
+                    <tr>
+                        <td>Subtotal:</td>
+                        <td class="text-right" id="summarySubtotal">0.00 Bs.</td>
+                    </tr>
+                    <tr>
+                        <td>IVA (16%):</td>
+                        <td class="text-right" id="summaryIva">0.00 Bs.</td>
+                    </tr>
+                    <tr id="igtfRow" style="display: none;">
+                        <td>IGTF (3%):</td>
+                        <td class="text-right" id="summaryIgtf">0.00 Bs.</td>
+                    </tr>
+                    <tr id="specialTaxRow" style="display: none;">
+                        <td>Retención Contribuyente Especial:</td>
+                        <td class="text-right" id="summarySpecialTax">0.00 Bs.</td>
+                    </tr>
+                    <tr>
+                        <td>Total:</td>
+                        <td class="text-right" id="summaryTotal">0.00 Bs.</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
+                <button class="btn btn-success" id="previewInvoiceBtn">Vista Previa</button>
+                <button class="btn" id="saveInvoiceBtn">Generar Factura</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="previewModal" class="modal">
+        <div class="modal-content">
+            <div class="preview-header">
+                <div class="modal-title">Vista Previa de Factura</div>
+                <span class="close" id="closePreviewModal">×</span>
+            </div>
+            <div id="invoicePreview">
+                <!-- Contenido de la vista previa generado dinámicamente -->
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="editInvoiceBtn">Editar</button>
+                <button class="btn" id="generateInvoiceBtn">Generar Factura</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===========================================================================
+        // FUNCIONALIDAD DE "NUEVA FACTURA" EN new-invoice.html
+        // ===========================================================================
+        // Este script gestiona el formulario de "Nueva Factura", incluyendo la
+        // calculadora de IVA (16%), IGTF (3% para pagos en USD), retenciones (1%
+        // para contribuyentes especiales), validaciones, vista previa y guardado
+        // en localStorage. Se conecta con dashboard.html a través de localStorage.
+        // ===========================================================================
+
+        /**
+         * Formatea un número como moneda venezolana.
+         * @param {number} amount - El monto a formatear.
+         * @returns {string} - Monto formateado con "Bs.".
+         */
+        function formatCurrency(amount) {
+            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' Bs.';
+        }
+
+        /**
+         * Formatea una fecha al estilo venezolano.
+         * @param {string} dateString - Fecha en formato ISO.
+         * @returns {string} - Fecha formateada (dd/mm/yyyy).
+         */
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-VE');
+        }
+
+        /**
+         * Muestra una alerta temporal.
+         * @param {string} message - Mensaje a mostrar.
+         * @param {string} type - Tipo de alerta (success, warning, danger, info).
+         */
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        /**
+         * Valida un RIF o cédula venezolana.
+         * @param {string} clientId - RIF o cédula a validar.
+         * @returns {boolean} - True si es válido.
+         */
+        function validateClientId(clientId) {
+            const rifRegex = /^[VEJPG]-[0-9]{8}-[0-9]$/;
+            const cedulaRegex = /^[VE]-[0-9]{1,8}$/;
+            return rifRegex.test(clientId) || cedulaRegex.test(clientId);
+        }
+
+        /**
+         * Valida un teléfono venezolano.
+         * @param {string} phone - Teléfono a validar.
+         * @returns {boolean} - True si es válido o vacío.
+         */
+        function validatePhone(phone) {
+            if (!phone) return true;
+            const phoneRegex = /^(\+58|0)[0-9]{10}$/;
+            return phoneRegex.test(phone);
+        }
+
+        /**
+         * Inicializa la aplicación y verifica al usuario.
+         */
+        function initializePage() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('userDisplayName').textContent = currentUser.companyName;
+            document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+            updateInvoiceTotals();
+        }
+
+        /**
+         * Agrega un nuevo ítem a la tabla.
+         */
+        function addInvoiceItem() {
+            const itemsTableBody = document.getElementById('itemsTableBody');
+            const lastRow = itemsTableBody.lastElementChild;
+            const lastDescription = lastRow.querySelector('.item-description').value.trim();
+            if (!lastDescription) {
+                showAlert('Completa la descripción antes de agregar otro artículo.', 'warning');
+                lastRow.querySelector('.item-description').focus();
+                return;
+            }
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                <td class="item-subtotal">0.00</td>
+                <td><button class="btn-secondary remove-item">X</button></td>
+            `;
+            itemsTableBody.appendChild(newRow);
+            updateInvoiceTotals();
+            newRow.querySelector('.item-description').focus();
+        }
+
+        /**
+         * Actualiza el subtotal de una fila.
+         * @param {HTMLElement} row - Fila a actualizar.
+         */
+        function updateRowSubtotal(row) {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const subtotal = quantity * price;
+            row.querySelector('.item-subtotal').textContent = subtotal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        /**
+         * Actualiza los totales de la factura.
+         */
+        function updateInvoiceTotals() {
+            let subtotal = 0;
+            document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+                const rowSubtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+                subtotal += rowSubtotal;
+            });
+
+            const ivaRate = 0.16;
+            const igtfRate = 0.03;
+            const specialTaxRate = 0.01;
+
+            const iva = subtotal * ivaRate;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const isUSDPayment = paymentMethod.includes('usd');
+            const igtf = isUSDPayment ? subtotal * igtfRate : 0;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const specialTax = currentUser.isSpecialContributor ? subtotal * specialTaxRate : 0;
+            const total = subtotal + iva + igtf - specialTax;
+
+            document.getElementById('igtfRow').style.display = isUSDPayment ? '' : 'none';
+            document.getElementById('specialTaxRow').style.display = currentUser.isSpecialContributor ? '' : 'none';
+
+            document.getElementById('summarySubtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('summaryIva').textContent = formatCurrency(iva);
+            document.getElementById('summaryIgtf').textContent = formatCurrency(igtf);
+            document.getElementById('summarySpecialTax').textContent = formatCurrency(specialTax);
+            document.getElementById('summaryTotal').textContent = formatCurrency(total);
+        }
+
+        /**
+         * Recopila los datos del formulario.
+         * @returns {Object} - Datos de la factura.
+         */
+        function getInvoiceFormData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            const clientName = document.getElementById('clientName').value.trim();
+            const clientId = document.getElementById('clientId').value.trim().toUpperCase();
+            const clientAddress = document.getElementById('clientAddress').value.trim();
+            const clientPhone = document.getElementById('clientPhone').value.trim();
+            const invoiceDate = document.getElementById('invoiceDate').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const invoiceNotes = document.getElementById('invoiceNotes').value.trim();
+
+            const items = [];
+            document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+                const description = row.querySelector('.item-description').value.trim();
+                if (description) {
+                    const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                    const subtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+                    items.push({ description, quantity, price, subtotal });
+                }
+            });
+
+            let subtotal = 0;
+            items.forEach(item => subtotal += item.subtotal);
+
+            const ivaRate = 0.16;
+            const igtfRate = 0.03;
+            const specialTaxRate = 0.01;
+
+            const iva = subtotal * ivaRate;
+            const isUSDPayment = paymentMethod.includes('usd');
+            const igtf = isUSDPayment ? subtotal * igtfRate : 0;
+            const specialTax = currentUser.isSpecialContributor ? subtotal * specialTaxRate : 0;
+            const total = subtotal + iva + igtf - specialTax;
+
+            return {
+                id: Date.now().toString(),
+                sellerId: currentUser.email,
+                sellerName: currentUser.companyName,
+                sellerRif: currentUser.rif,
+                sellerAddress: currentUser.address,
+                sellerPhone: currentUser.phone,
+                sellerEmail: currentUser.email,
+                isSpecialContributor: currentUser.isSpecialContributor,
+                clientName,
+                clientId,
+                clientAddress,
+                clientPhone,
+                date: invoiceDate,
+                paymentMethod,
+                notes: invoiceNotes,
+                items,
+                subtotal,
+                iva,
+                igtf,
+                specialTax,
+                total,
+                createdAt: new Date().toISOString(),
+                status: 'emitida'
+            };
+        }
+
+        /**
+         * Valida el formulario.
+         * @param {Object} invoiceData - Datos a validar.
+         * @returns {boolean} - True si es válido.
+         */
+        function validateInvoiceForm(invoiceData) {
+            let isValid = true;
+            const errors = [];
+
+            if (!invoiceData.clientName) {
+                errors.push('El nombre o razón social es obligatorio.');
+                document.getElementById('clientName').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('clientName').classList.remove('has-error');
+            }
+
+            if (!invoiceData.clientId || !validateClientId(invoiceData.clientId)) {
+                errors.push('La cédula o RIF es obligatorio y debe ser válida.');
+                document.getElementById('clientId').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('clientId').classList.remove('has-error');
+            }
+
+            if (!invoiceData.clientAddress) {
+                errors.push('La dirección es obligatoria.');
+                document.getElementById('clientAddress').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('clientAddress').classList.remove('has-error');
+            }
+
+            if (invoiceData.clientPhone && !validatePhone(invoiceData.clientPhone)) {
+                errors.push('El teléfono no es válido.');
+                document.getElementById('clientPhone').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('clientPhone').classList.remove('has-error');
+            }
+
+            if (!invoiceData.date) {
+                errors.push('La fecha de emisión es obligatoria.');
+                document.getElementById('invoiceDate').classList.add('has-error');
+                isValid = false;
+            } else {
+                const invoiceDate = new Date(invoiceData.date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (invoiceDate > today) {
+                    errors.push('La fecha no puede ser futura.');
+                    document.getElementById('invoiceDate').classList.add('has-error');
+                    isValid = false;
+                } else {
+                    document.getElementById('invoiceDate').classList.remove('has-error');
+                }
+            }
+
+            if (!invoiceData.paymentMethod) {
+                errors.push('El método de pago es obligatorio.');
+                document.getElementById('paymentMethod').classList.add('has-error');
+                isValid = false;
+            } else {
+                document.getElementById('paymentMethod').classList.remove('has-error');
+            }
+
+            if (invoiceData.items.length === 0) {
+                errors.push('Debe haber al menos un artículo.');
+                isValid = false;
+            } else {
+                document.querySelectorAll('#itemsTableBody tr').forEach((row, index) => {
+                    const description = row.querySelector('.item-description').value.trim();
+                    const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                    const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                    if (description && (quantity <= 0 || price <= 0)) {
+                        errors.push(`Artículo ${index + 1} tiene cantidad o precio inválido.`);
+                        if (quantity <= 0) row.querySelector('.item-quantity').classList.add('has-error');
+                        if (price <= 0) row.querySelector('.item-price').classList.add('has-error');
+                        isValid = false;
+                    } else {
+                        row.querySelector('.item-quantity').classList.remove('has-error');
+                        row.querySelector('.item-price').classList.remove('has-error');
+                    }
+                });
+            }
+
+            if (invoiceData.total <= 0) {
+                errors.push('El total debe ser mayor a 0.');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showAlert(errors.join(' '), 'warning');
+            }
+
+            return isValid;
+        }
+
+        /**
+         * Muestra la vista previa de la factura.
+         */
+        function previewInvoice() {
+            const invoiceData = getInvoiceFormData();
+            if (!validateInvoiceForm(invoiceData)) return;
+
+            const invoicePreview = document.getElementById('invoicePreview');
+            invoicePreview.innerHTML = `
+                <div class="preview-header">
+                    <div class="preview-logo">FacturaML</div>
+                    <div><strong>Factura #: (pendiente)</strong><br>Fecha: ${formatDate(invoiceData.date)}</div>
+                </div>
+                <div class="preview-title">FACTURA</div>
+                <div class="preview-company-info">
+                    <h3>Datos del Emisor</h3>
+                    <p><strong>${invoiceData.sellerName}</strong><br>RIF: ${invoiceData.sellerRif}<br>Dirección: ${invoiceData.sellerAddress}<br>Teléfono: ${invoiceData.sellerPhone}<br>Email: ${invoiceData.sellerEmail}</p>
+                </div>
+                <div class="preview-client-info">
+                    <h3>Datos del Cliente</h3>
+                    <p><strong>${invoiceData.clientName}</strong><br>RIF/CI: ${invoiceData.clientId}<br>Dirección: ${invoiceData.clientAddress}<br>${invoiceData.clientPhone ? `Teléfono: ${invoiceData.clientPhone}<br>` : ''}</p>
+                </div>
+                <table>
+                    <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
+                    <tbody>${invoiceData.items.map(item => `<tr><td>${item.description}</td><td>${item.quantity}</td><td>${formatCurrency(item.price)}</td><td>${formatCurrency(item.subtotal)}</td></tr>`).join('')}</tbody>
+                    <tfoot>
+                        <tr><td colspan="3" style="text-align: right;">Subtotal:</td><td>${formatCurrency(invoiceData.subtotal)}</td></tr>
+                        <tr><td colspan="3" style="text-align: right;">IVA (16%):</td><td>${formatCurrency(invoiceData.iva)}</td></tr>
+                        ${invoiceData.igtf > 0 ? `<tr><td colspan="3" style="text-align: right;">IGTF (3%):</td><td>${formatCurrency(invoiceData.igtf)}</td></tr>` : ''}
+                        ${invoiceData.specialTax > 0 ? `<tr><td colspan="3" style="text-align: right;">Retención Contribuyente Especial:</td><td>${formatCurrency(invoiceData.specialTax)}</td></tr>` : ''}
+                        <tr class="total-row"><td colspan="3" style="text-align: right;">Total:</td><td>${formatCurrency(invoiceData.total)}</td></tr>
+                    </tfoot>
+                </table>
+                ${invoiceData.notes ? `<div class="notes"><h3>Notas</h3><p>${invoiceData.notes}</p></div>` : ''}
+                <div class="footer"><p>Gracias por su compra.</p></div>
+            `;
+            document.getElementById('previewModal').style.display = 'block';
+        }
+
+        /**
+         * Guarda la factura y regresa al dashboard.
+         */
+        function saveInvoice() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser.availableInvoices <= 0) {
+                showAlert('No tienes facturas disponibles.', 'danger');
+                return;
+            }
+
+            const invoiceData = getInvoiceFormData();
+            if (!validateInvoiceForm(invoiceData)) return;
+
+            let lastControlNumber = parseInt(localStorage.getItem('lastControlNumber') || '0');
+            invoiceData.controlNumber = ++lastControlNumber;
+
+            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+            invoices.push(invoiceData);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            localStorage.setItem('lastControlNumber', lastControlNumber.toString());
+
+            currentUser.availableInvoices -= 1;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            showAlert(`Factura #${invoiceData.controlNumber} generada exitosamente.`, 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 2000);
+        }
+
+        /**
+         * Cancela y regresa al dashboard.
+         */
+        function cancelInvoice() {
+            if (confirm('¿Estás seguro de que deseas cancelar? Los datos no guardados se perderán.')) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        // Configurar event listeners
+        document.addEventListener('DOMContentLoaded', initializePage);
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+        document.getElementById('addItemBtn').addEventListener('click', addInvoiceItem);
+        document.getElementById('previewInvoiceBtn').addEventListener('click', previewInvoice);
+        document.getElementById('saveInvoiceBtn').addEventListener('click', saveInvoice);
+        document.getElementById('cancelInvoiceBtn').addEventListener('click', cancelInvoice);
+        document.getElementById('closePreviewModal').addEventListener('click', () => {
+            document.getElementById('previewModal').style.display = 'none';
+        });
+        document.getElementById('editInvoiceBtn').addEventListener('click', () => {
+            document.getElementById('previewModal').style.display = 'none';
+        });
+        document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
+            document.getElementById('previewModal').style.display = 'none';
+            saveInvoice();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-item')) {
+                const row = e.target.closest('tr');
+                if (document.getElementById('itemsTableBody').children.length > 1) {
+                    row.remove();
+                    updateInvoiceTotals();
+                } else {
+                    showAlert('Debe haber al menos un artículo.', 'warning');
+                }
+            }
+        });
+
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('item-quantity') || e.target.classList.contains('item-price')) {
+                const row = e.target.closest('tr');
+                updateRowSubtotal(row);
+                updateInvoiceTotals();
+            }
+        });
+
+        document.getElementById('paymentMethod').addEventListener('change', updateInvoiceTotals);
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('previewModal')) {
+                document.getElementById('previewModal').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
