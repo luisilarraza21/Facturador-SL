@@ -457,6 +457,12 @@
                                 <td class="item-subtotal">0.00</td>
                                 <td><button class="btn-secondary remove-item">X</button></td>
                             </tr>
+                            <script src="js/auth.js"></script>
+<script src="js/clients.js"></script>
+<script src="js/invoices.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/main.js"></script> <!-- Para inicializar y conectar los módulos -->
                         </tbody>
                     </table>
                     <button class="btn btn-secondary" id="addItemBtn" style="margin-top: 10px">Agregar Artículo</button>
@@ -1501,6 +1507,478 @@ function saveInvoice() {
         return;
     }
     
+    // Generar número de control secuencial
+    let lastControlNumber = parseInt(localStorage.getItem('lastControlNumber') || '0');
+    const newControlNumber = lastControlNumber + 1;
+    
+   // Continúa la función saveInvoice()
+function saveInvoice() {
+    // Validar que todos los campos requeridos estén completos
+    const requiredFields = document.querySelectorAll('#invoiceForm input[required], #invoiceForm select[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.style.borderColor = 'red';
+            isValid = false;
+        } else {
+            field.style.borderColor = '';
+        }
+    });
+    
+    // Validar que haya al menos un item con descripción
+    const items = document.querySelectorAll('.item-description');
+    let hasItems = false;
+    
+    items.forEach(item => {
+        if (item.value.trim()) {
+            hasItems = true;
+        }
+    });
+    
+    if (!hasItems) {
+        showAlert('Debe agregar al menos un artículo a la factura', 'warning');
+        return;
+    }
+    
+    if (!isValid) {
+        showAlert('Por favor complete todos los campos requeridos', 'warning');
+        return;
+    }
+    
+    // Verificar que haya facturas disponibles
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser.availableInvoices <= 0) {
+        showAlert('No tienes facturas disponibles. Por favor, compra más facturas para continuar.', 'danger');
+        return;
+    }
+    
+    // Generar número de control secuencial
+    let lastControlNumber = parseInt(localStorage.getItem('lastControlNumber') || '0');
+    const newControlNumber = lastControlNumber + 1;
+    
+    // Recopilar datos de la factura
+    const invoiceData = getInvoiceFormData();
+    
+    // Añadir número de control y fecha de creación
+    invoiceData.controlNumber = newControlNumber;
+    invoiceData.createdAt = new Date().toISOString();
+    invoiceData.status = 'emitida';
+    
+    // Guardar la factura
+    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+    invoices.push(invoiceData);
+    localStorage.setItem('invoices', JSON.stringify(invoices));
+    
+    // Actualizar número de control
+    localStorage.setItem('lastControlNumber', newControlNumber.toString());
+    
+    // Reducir el número de facturas disponibles
+    currentUser.availableInvoices -= 1;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    // Actualizar la interfaz de usuario
+    showAlert('Factura generada exitosamente', 'success');
+    cancelInvoiceForm();
+    loadInvoices();
+    
+    // Cerrar modal si está abierto
+    const previewModal = document.getElementById('previewModal');
+    if (previewModal.style.display === 'block') {
+        previewModal.style.display = 'none';
+    }
+}
+
+// Cargar facturas existentes
+function loadInvoices() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+    
+    // Filtrar facturas del usuario actual
+    const userInvoices = invoices.filter(invoice => invoice.sellerId === currentUser.email);
+    
+    const tableBody = document.getElementById('invoiceTableBody');
+    tableBody.innerHTML = '';
+    
+    if (userInvoices.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center">No hay facturas registradas</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Ordenar facturas por fecha (más recientes primero)
+    userInvoices.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    userInvoices.forEach(invoice => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${invoice.controlNumber}</td>
+            <td>${formatDate(invoice.date)}</td>
+            <td>${invoice.clientName}</td>
+            <td>${formatCurrency(invoice.total)}</td>
+            <td>
+                <button class="btn btn-secondary view-invoice" data-control="${invoice.controlNumber}">Ver</button>
+                <button class="btn btn-secondary download-invoice" data-control="${invoice.controlNumber}">Descargar</button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+    
+    // Agregar event listeners a los botones
+    document.querySelectorAll('.view-invoice').forEach(button => {
+        button.addEventListener('click', function() {
+            const controlNumber = this.getAttribute('data-control');
+            viewInvoice(controlNumber);
+        });
+    });
+    
+    document.querySelectorAll('.download-invoice').forEach(button => {
+        button.addEventListener('click', function() {
+            const controlNumber = this.getAttribute('data-control');
+            downloadInvoice(controlNumber);
+        });
+    });
+    
+    // Actualizar contador de facturas disponibles
+    document.getElementById('availableInvoicesCount').textContent = currentUser.availableInvoices;
+}
+
+// Ver una factura
+function viewInvoice(controlNumber) {
+    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+    const invoice = invoices.find(inv => inv.controlNumber === parseInt(controlNumber));
+    
+    if (!invoice) {
+        showAlert('Factura no encontrada', 'danger');
+        return;
+    }
+    
+    const previewModal = document.getElementById('previewModal');
+    const invoicePreview = document.getElementById('invoicePreview');
+    
+    // Generar HTML de la factura
+    invoicePreview.innerHTML = `
+        <div class="preview-header">
+            <div class="preview-logo">FacturaML</div>
+            <div>
+                <strong>Factura #: ${invoice.controlNumber}</strong><br>
+                Fecha: ${formatDate(invoice.date)}
+            </div>
+        </div>
+        
+        <div class="preview-title">FACTURA</div>
+        
+        <div class="preview-company-info">
+            <h3>Datos del Emisor</h3>
+            <p>
+                <strong>${invoice.sellerName}</strong><br>
+                RIF: ${invoice.sellerRif}<br>
+                Dirección: ${invoice.sellerAddress}<br>
+                Teléfono: ${invoice.sellerPhone}<br>
+                Email: ${invoice.sellerEmail}
+            </p>
+        </div>
+        
+        <div class="preview-client-info">
+            <h3>Datos del Cliente</h3>
+            <p>
+                <strong>${invoice.clientName}</strong><br>
+                RIF/CI: ${invoice.clientId}<br>
+                Dirección: ${invoice.clientAddress}<br>
+                ${invoice.clientPhone ? `Teléfono: ${invoice.clientPhone}<br>` : ''}
+            </p>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${invoice.items.map(item => `
+                    <tr>
+                        <td>${item.description}</td>
+                        <td>${item.quantity}</td>
+                        <td>${formatCurrency(item.price)}</td>
+                        <td>${formatCurrency(item.subtotal)}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right;">Subtotal:</td>
+                    <td>${formatCurrency(invoice.subtotal)}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: right;">IVA (16%):</td>
+                    <td>${formatCurrency(invoice.iva)}</td>
+                </tr>
+                ${invoice.igtf > 0 ? `
+                <tr>
+                    <td colspan="3" style="text-align: right;">IGTF (3%):</td>
+                    <td>${formatCurrency(invoice.igtf)}</td>
+                </tr>
+                ` : ''}
+                ${invoice.specialTax > 0 ? `
+                <tr>
+                    <td colspan="3" style="text-align: right;">Retención Contribuyente Especial:</td>
+                    <td>${formatCurrency(invoice.specialTax)}</td>
+                </tr>
+                ` : ''}
+                <tr class="total-row">
+                    <td colspan="3" style="text-align: right;">Total:</td>
+                    <td>${formatCurrency(invoice.total)}</td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        ${invoice.notes ? `
+        <div class="notes">
+            <h3>Notas</h3>
+            <p>${invoice.notes}</p>
+        </div>
+        ` : ''}
+        
+        <div class="footer">
+            <p>Gracias por su compra. Este documento es una factura legal.</p>
+            <p>Método de pago: ${getPaymentMethodText(invoice.paymentMethod)}</p>
+        </div>
+    `;
+    
+    // Ocultar botones de edición y generación
+    document.getElementById('editInvoiceFromPreview').style.display = 'none';
+    document.getElementById('generateInvoiceFromPreview').style.display = 'none';
+    
+    // Mostrar modal
+    previewModal.style.display = 'block';
+}
+
+// Obtener texto descriptivo del método de pago
+function getPaymentMethodText(paymentMethod) {
+    switch (paymentMethod) {
+        case 'transfer_bs':
+            return 'Transferencia Bancaria (Bs)';
+        case 'transfer_usd':
+            return 'Transferencia Bancaria (USD)';
+        case 'cash_bs':
+            return 'Efectivo (Bs)';
+        case 'cash_usd':
+            return 'Efectivo (USD)';
+        case 'card':
+            return 'Tarjeta de Débito/Crédito';
+        case 'movil_payment':
+            return 'Pago Móvil';
+        default:
+            return paymentMethod;
+    }
+}
+
+// Descargar factura como PDF (implementación simplificada)
+function downloadInvoice(controlNumber) {
+    // Mostrar la factura en la vista previa
+    viewInvoice(controlNumber);
+    
+    // Mostrar mensaje de aviso (en una implementación real, aquí generaríamos el PDF)
+    showAlert('La funcionalidad de descarga está en desarrollo. Pronto podrás descargar tus facturas en formato PDF.', 'info');
+}
+
+// ===== FUNCIONES PARA LA COMPRA DE FACTURAS =====
+
+// Cargar la página de compra de facturas
+function loadPurchasePage() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    document.getElementById('availableInvoicesDisplay').textContent = currentUser.availableInvoices;
+    
+    // Establecer valor por defecto del selector
+    document.getElementById('invoicePackageSelect').value = 'basic';
+    
+    // Actualizar precio al cargar
+    updatePackagePrice();
+}
+
+// Event listener para el selector de paquetes
+document.getElementById('invoicePackageSelect').addEventListener('change', updatePackagePrice);
+
+// Actualizar precio según el paquete seleccionado
+function updatePackagePrice() {
+    const packageType = document.getElementById('invoicePackageSelect').value;
+    const priceDisplay = document.getElementById('packagePrice');
+    
+    switch (packageType) {
+        case 'basic':
+            priceDisplay.textContent = '$5.00';
+            break;
+        case 'standard':
+            priceDisplay.textContent = '$9.00';
+            break;
+        case 'premium':
+            priceDisplay.textContent = '$15.00';
+            break;
+        default:
+            priceDisplay.textContent = '$5.00';
+    }
+}
+
+// Procesamiento del pago
+document.getElementById('purchaseButton').addEventListener('click', function() {
+    const packageType = document.getElementById('invoicePackageSelect').value;
+    let invoicesToAdd = 0;
+    
+    switch (packageType) {
+        case 'basic':
+            invoicesToAdd = 100;  // 100 facturas para pruebas
+            break;
+        case 'standard':
+            invoicesToAdd = 200;
+            break;
+        case 'premium':
+            invoicesToAdd = 350;
+            break;
+        default:
+            invoicesToAdd = 100;
+    }
+    
+    // Simulación de procesamiento de pago
+    showAlert('Procesando pago...', 'info');
+    
+    // Simulamos una espera para el procesamiento
+    setTimeout(function() {
+        // Añadir facturas al usuario
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        currentUser.availableInvoices += invoicesToAdd;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        // Actualizar interfaz
+        document.getElementById('availableInvoicesDisplay').textContent = currentUser.availableInvoices;
+        document.getElementById('availableInvoicesCount').textContent = currentUser.availableInvoices;
+        
+        // Confirmar la compra
+        showAlert(`¡Compra exitosa! Se han añadido ${invoicesToAdd} facturas a tu cuenta.`, 'success');
+    }, 2000);
+});
+
+// ===== INICIALIZACIÓN DEL SISTEMA =====
+
+// Event listener para el evento de carga del DOM
+document.addEventListener('DOMContentLoaded', function() {
+    // Comprobar si hay un usuario logueado
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        // Redirigir al login si no hay usuario logueado
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    // Mostrar nombre de la empresa en el encabezado
+    document.getElementById('companyNameHeader').textContent = currentUser.companyName;
+    
+    // Cargar pantalla inicial (Dashboard)
+    switchTab('Dashboard');
+    loadDashboard();
+    
+    // Inicializar contador de facturas disponibles
+    document.getElementById('availableInvoicesCount').textContent = currentUser.availableInvoices || 0;
+    
+    // Iniciar con 100 facturas disponibles para pruebas si no tiene
+    if (!currentUser.availableInvoices || currentUser.availableInvoices === 0) {
+        currentUser.availableInvoices = 100;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        document.getElementById('availableInvoicesCount').textContent = 100;
+    }
+});
+
+// Cerrar sesión
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';
+});
+
+// Función para formatear moneda
+function formatCurrency(amount) {
+    return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' Bs.';
+}
+
+// Función para formatear fecha
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-VE');
+}
+
+// Función para mostrar alertas
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = '';
+    alertContainer.appendChild(alertDiv);
+    
+    // Auto-cerrar la alerta después de 5 segundos
+    setTimeout(function() {
+        alertDiv.remove();
+    }, 5000);
+}
+
+// Cargar dashboard
+function loadDashboard() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+    
+    // Filtrar facturas del usuario actual
+    const userInvoices = invoices.filter(invoice => invoice.sellerId === currentUser.email);
+    
+    // Calcular estadísticas
+    const totalInvoices = userInvoices.length;
+    let totalAmount = 0;
+    
+    userInvoices.forEach(invoice => {
+        totalAmount += invoice.total;
+    });
+    
+    // Mostrar estadísticas
+    document.getElementById('totalInvoicesCount').textContent = totalInvoices;
+    document.getElementById('totalAmountBilled').textContent = formatCurrency(totalAmount);
+    document.getElementById('availableInvoicesOnDashboard').textContent = currentUser.availableInvoices;
+    
+    // Si hay más funcionalidades del dashboard, añadirlas aquí
+}
+
+// Inicializar aplicación
+function initializeApp() {
+    // Si es la primera vez que se carga la aplicación, crear datos de ejemplo
+    if (!localStorage.getItem('initialized')) {
+        // Crear usuario de ejemplo si no existe
+        if (!localStorage.getItem('users')) {
+            const users = [
+                {
+                    email: 'ejemplo@empresa.com',
+                    password: 'password123',
+                    companyName: 'Empresa Ejemplo',
+                    rif: 'J-12345678-9',
+                    address: 'Caracas, Venezuela',
+                    phone: '0212-1234567',
+                    isSpecialContributor: true,
+                    availableInvoices: 100
+                }
+            ];
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        // Marcar como inicializado
+        localStorage.setItem('initialized', 'true');
+    }
+}
+
+// Llamar a la inicialización al cargar
+initializeApp();
     // Generar número de control secuencial
     let lastControlNumber = parseInt(localStorage.getItem('lastControlNumber') || '0');
     const newControlNumber = lastControlNumber + 1;
