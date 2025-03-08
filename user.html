@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Perfil de Usuario</title>
+    <title>Wakal Blitz - Perfil de Usuario</title>
     <style>
         * {
             margin: 0;
@@ -22,20 +22,27 @@
             color: #f5f5f5;
         }
         .navbar {
-            background-color: #ffe600;
+            background-color: #2968c8;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .dark-theme .navbar {
+            background-color: #1d4f9e;
         }
         .navbar:hover {
-            background-color: #e6cc00;
+            background-color: #1d4f9e;
+        }
+        .dark-theme .navbar:hover {
+            background-color: #153e7e;
         }
         .logo {
             font-weight: bold;
             font-size: 24px;
-            color: #333;
+            color: #fff;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -82,6 +89,7 @@
             border-radius: 4px;
             font-size: 16px;
             box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .dark-theme input, .dark-theme textarea {
             background: #555;
@@ -112,6 +120,9 @@
         }
         .btn-back {
             background: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         .btn-back:hover {
             background: #5a6268;
@@ -132,6 +143,7 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ddd;
+            transition: border-color 0.3s ease;
         }
         .dark-theme .profile-pic {
             border-color: #666;
@@ -151,10 +163,18 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        .dark-theme .alert-success {
+            background: #28a745;
+            color: #fff;
+        }
         .alert-error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+        .dark-theme .alert-error {
+            background: #dc3545;
+            color: #fff;
         }
         .button-group {
             display: flex;
@@ -182,21 +202,70 @@
         .dark-theme .history-log li {
             border-bottom-color: #666;
         }
-        .checkbox-group {
+        .toggle-group {
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        .toggle-btn {
+            background: #ccc;
+            border: none;
+            border-radius: 20px;
+            width: 50px;
+            height: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .toggle-btn.active {
+            background: #2968c8;
+        }
+        .dark-theme .toggle-btn.active {
+            background: #4a90e2;
+        }
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .toggle-btn.active::after {
+            transform: translateX(25px);
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            .profile-pic {
+                width: 120px;
+                height: 120px;
+            }
+            .button-group {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">FacturaML</div>
+        <div class="logo">Wakal Blitz</div>
     </div>
 
     <div class="container">
         <h2 class="section-title">Perfil de Usuario</h2>
         
+        <div style="margin-bottom: 20px;">
+            <button class="btn btn-back" id="topBackButton">
+                <span>←</span> Regresar al Dashboard
+            </button>
+        </div>
+
         <div class="profile-pic-container">
             <img src="" alt="Foto de perfil" class="profile-pic" id="profilePic">
             <input type="file" id="profilePicInput" accept="image/*" style="display: none;">
@@ -210,7 +279,7 @@
 
         <div class="form-group">
             <label for="rif">RIF</label>
-            <input type="text" id="rif" required>
+            <input type="text" id="rif" required placeholder="Ejemplo: 123456789 (solo números)">
         </div>
 
         <div class="form-group">
@@ -229,24 +298,20 @@
         </div>
 
         <div class="form-group">
-            <label for="password">Nueva Contraseña (dejar en blanco para no cambiar)</label>
-            <input type="password" id="password">
+            <label for="password">Nueva Contraseña (opcional)</label>
+            <input type="password" id="password" placeholder="Dejar en blanco para no cambiar">
         </div>
 
         <div class="form-group">
             <label for="confirmPassword">Confirmar Nueva Contraseña</label>
-            <input type="password" id="confirmPassword">
+            <input type="password" id="confirmPassword" placeholder="Dejar en blanco para no cambiar">
         </div>
 
         <div class="form-group">
             <h3 class="section-title">Configuración</h3>
-            <div class="checkbox-group">
-                <input type="checkbox" id="emailNotifications">
-                <label for="emailNotifications">Recibir notificaciones por correo</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="darkTheme">
-                <label for="darkTheme">Activar tema oscuro</label>
+            <div class="toggle-group">
+                <button class="toggle-btn" id="darkThemeToggle"></button>
+                <label for="darkThemeToggle">Activar tema oscuro</label>
             </div>
         </div>
 
@@ -257,7 +322,9 @@
 
         <div class="button-group">
             <button class="btn btn-danger" id="deleteAccountButton">Eliminar Cuenta</button>
-            <button class="btn btn-back" id="backButton">Atrás</button>
+            <button class="btn btn-back" id="backButton">
+                <span>←</span> Regresar al Dashboard
+            </button>
             <button class="btn" id="saveButton">Guardar Cambios</button>
         </div>
     </div>
@@ -272,15 +339,32 @@
             setTimeout(() => alertDiv.remove(), 3000);
         }
 
+        // Transformar RIF al formato J-12345678-9
+        function formatRif(rif, prefix = 'J') {
+            // Si ya tiene el formato correcto, devolverlo tal cual
+            if (/^[VEPGJ]-[0-9]{7,8}-[0-9]$/.test(rif)) {
+                return rif;
+            }
+            // Si es solo números, transformarlo
+            const digits = rif.replace(/\D/g, ''); // Solo números
+            if (digits.length < 7 || digits.length > 9) return rif;
+            const mainPart = digits.slice(0, -1); // Todos menos el último dígito
+            const lastDigit = digits.slice(-1); // Último dígito
+            return `${prefix}-${mainPart}-${lastDigit}`;
+        }
+
+        // Extraer solo los números del RIF para validación y edición
+        function extractRifNumbers(rif) {
+            return rif.replace(/\D/g, '');
+        }
+
         // Sincronizar currentUser con la lista de usuarios
         function syncCurrentUserWithUsers(currentUser) {
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const userIndex = users.findIndex(u => u.email === currentUser.email);
             if (userIndex !== -1) {
-                // Actualizar el usuario en la lista de usuarios
                 users[userIndex] = { ...users[userIndex], ...currentUser };
                 localStorage.setItem('users', JSON.stringify(users));
-                // Actualizar currentUser en localStorage
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
             }
         }
@@ -302,12 +386,13 @@
             }
 
             document.getElementById('companyName').value = currentUser.companyName || '';
+            // Mostrar el RIF en formato J-12345678-9
             document.getElementById('rif').value = currentUser.rif || '';
             document.getElementById('phone').value = currentUser.phone || '';
             document.getElementById('email').value = currentUser.email || '';
             document.getElementById('address').value = currentUser.address || '';
-            document.getElementById('emailNotifications').checked = currentUser.emailNotifications || false;
-            document.getElementById('darkTheme').checked = currentUser.darkTheme || false;
+            const darkThemeToggle = document.getElementById('darkThemeToggle');
+            darkThemeToggle.classList.toggle('active', currentUser.darkTheme || false);
             const profilePic = document.getElementById('profilePic');
             profilePic.src = currentUser.profilePic || 'https://via.placeholder.com/150';
 
@@ -342,7 +427,7 @@
         function validateForm() {
             const email = document.getElementById('email').value.trim();
             const companyName = document.getElementById('companyName').value.trim();
-            const rif = document.getElementById('rif').value.trim().toUpperCase();
+            const rif = extractRifNumbers(document.getElementById('rif').value.trim());
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
             const password = document.getElementById('password').value;
@@ -359,9 +444,10 @@
                 return false;
             }
 
-            const rifRegex = /^[VEJPG]-[0-9]{8}-[0-9]$/;
+            // Validar formato de RIF (solo números, longitud entre 7 y 9)
+            const rifRegex = /^[0-9]{7,9}$/;
             if (!rifRegex.test(rif)) {
-                showAlert('El formato del RIF debe ser J-12345678-9 (o V/E/P/G seguido de 8 dígitos y 1 dígito).', 'error');
+                showAlert('El RIF debe contener solo números y tener entre 7 y 9 dígitos.', 'error');
                 return false;
             }
 
@@ -402,16 +488,18 @@
             if (!validateForm()) return;
 
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const rawRif = extractRifNumbers(document.getElementById('rif').value.trim());
+            const formattedRif = formatRif(rawRif, 'J'); // Siempre usar 'J' como prefijo por ahora
+
             const updatedUser = {
                 ...currentUser,
                 companyName: document.getElementById('companyName').value.trim(),
-                rif: document.getElementById('rif').value.trim().toUpperCase(),
+                rif: formattedRif,
                 phone: document.getElementById('phone').value.trim(),
                 email: document.getElementById('email').value.trim(),
                 address: document.getElementById('address').value.trim(),
                 profilePic: document.getElementById('profilePic').src,
-                emailNotifications: document.getElementById('emailNotifications').checked,
-                darkTheme: document.getElementById('darkTheme').checked,
+                darkTheme: document.getElementById('darkThemeToggle').classList.contains('active'),
                 ...(document.getElementById('password').value && { password: document.getElementById('password').value })
             };
 
@@ -420,6 +508,9 @@
 
             // Actualizar el currentUser local para reflejar los cambios
             currentUser = updatedUser;
+
+            // Actualizar el campo de RIF para mostrar el formato correcto
+            document.getElementById('rif').value = formattedRif;
 
             addActivityEntry(currentUser, 'Perfil actualizado');
             showAlert('Cambios guardados exitosamente.', 'success');
@@ -447,7 +538,6 @@
             document.getElementById('profilePicInput').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    // Validar la imagen
                     if (!validateImage(file)) {
                         e.target.value = ''; // Limpiar el input si la imagen no es válida
                         return;
@@ -458,7 +548,6 @@
                         const base64Image = reader.result;
                         document.getElementById('profilePic').src = base64Image;
 
-                        // Actualizar currentUser.profilePic
                         currentUser.profilePic = base64Image;
                         syncCurrentUserWithUsers(currentUser);
 
@@ -474,17 +563,18 @@
                 window.location.href = 'dashboard.html';
             });
 
-            document.getElementById('deleteAccountButton').addEventListener('click', deleteAccount);
-
-            document.getElementById('darkTheme').addEventListener('change', (e) => {
-                const isDarkTheme = e.target.checked;
-                document.body.classList.toggle('dark-theme', isDarkTheme);
-                currentUser.darkTheme = isDarkTheme;
-                syncCurrentUserWithUsers(currentUser);
+            document.getElementById('topBackButton').addEventListener('click', () => {
+                window.location.href = 'dashboard.html';
             });
 
-            document.getElementById('emailNotifications').addEventListener('change', (e) => {
-                currentUser.emailNotifications = e.target.checked;
+            document.getElementById('deleteAccountButton').addEventListener('click', deleteAccount);
+
+            document.getElementById('darkThemeToggle').addEventListener('click', (e) => {
+                const toggle = e.target;
+                toggle.classList.toggle('active');
+                const isDarkTheme = toggle.classList.contains('active');
+                document.body.classList.toggle('dark-theme', isDarkTheme);
+                currentUser.darkTheme = isDarkTheme;
                 syncCurrentUserWithUsers(currentUser);
             });
         });
