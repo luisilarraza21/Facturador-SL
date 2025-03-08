@@ -297,6 +297,7 @@
         <table class="invoices-table">
             <thead>
                 <tr>
+                    <th>Tipo de Documento</th>
                     <th>Nº Documento</th>
                     <th>Nº Control</th>
                     <th>Cliente</th>
@@ -376,6 +377,24 @@
             return availableInvoices;
         }
 
+        // Mapear tipo de documento a texto legible
+        function getDocTypeText(docType) {
+            switch (docType) {
+                case 'factura': return 'Factura';
+                case 'nota-credito': return 'Nota de Crédito';
+                case 'nota-debito': return 'Nota de Débito';
+                default: return docType;
+            }
+        }
+
+        // Extraer número de documento sin prefijo y sin ceros a la izquierda
+        function extractDocNumber(docNumber, docType) {
+            const prefix = docType === 'factura' ? 'FAC-' : docType === 'nota-credito' ? 'NC-' : 'ND-';
+            const parts = docNumber.replace(prefix, '').split('-');
+            const numberPart = parseInt(parts[1], 10); // Obtener el número y convertir a entero para eliminar ceros a la izquierda
+            return `${parts[0]}-${numberPart}`;
+        }
+
         // Cargar tabla de facturas con paginación
         function loadInvoicesTable(userInvoices) {
             const tbody = document.getElementById('invoicesTableBody');
@@ -389,7 +408,8 @@
                 const globalIndex = start + index;
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${invoice.docNumber}</td>
+                    <td>${getDocTypeText(invoice.docType)}</td>
+                    <td>${extractDocNumber(invoice.docNumber, invoice.docType)}</td>
                     <td>${invoice.controlNumber}</td>
                     <td>${invoice.clientName}</td>
                     <td>${invoice.date}</td>
@@ -415,11 +435,15 @@
         function showInvoiceDetails(index) {
             const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
             const invoice = userInvoices[index];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const details = document.getElementById('invoiceDetails');
 
             details.innerHTML = `
-                <h3>${invoice.docType.charAt(0).toUpperCase() + invoice.docType.slice(1)}</h3>
-                <p>Nº Documento: ${invoice.docNumber}</p>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${currentUser.profilePic || 'https://via.placeholder.com/100'}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
+                </div>
+                <h3>${getDocTypeText(invoice.docType)}</h3>
+                <p>Nº Documento: ${extractDocNumber(invoice.docNumber, invoice.docType)}</p>
                 <p>Nº Control: ${invoice.controlNumber}</p>
                 <p>Fecha: ${invoice.date}</p>
                 <p>Cliente: ${invoice.clientName}</p>
@@ -465,6 +489,7 @@
                     </tbody>
                 </table>
                 <p>Tasa de cambio: ${invoice.exchangeRate} Bs/USD</p>
+                ${invoice.footerText ? `<p><strong>Coletilla:</strong> ${invoice.footerText}</p>` : ''}
             `;
             document.getElementById('detailsModal').style.display = 'flex';
         }
