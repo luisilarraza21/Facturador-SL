@@ -16,6 +16,11 @@
             color: #333;
             line-height: 1.6;
             overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #333;
+            color: #f5f5f5;
         }
         .navbar {
             background-color: #ffe600;
@@ -67,6 +72,9 @@
             align-items: center;
             gap: 10px;
         }
+        .dark-theme .user-info {
+            color: #ddd;
+        }
         .user-pic {
             width: 30px;
             height: 30px;
@@ -74,7 +82,10 @@
             object-fit: cover;
             border: 1px solid #ddd;
         }
-        .logout-btn, .user-btn {
+        .dark-theme .user-pic {
+            border-color: #666;
+        }
+        .logout-btn, .user-btn, .digital-btn {
             background: #2968c8;
             color: white;
             border: none;
@@ -83,7 +94,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .logout-btn:hover, .user-btn:hover {
+        .logout-btn:hover, .user-btn:hover, .digital-btn:hover {
             background: #1d4f9e;
             transform: scale(1.05);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -97,12 +108,20 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid #ddd;
         }
+        .dark-theme .container {
+            background: #444;
+            border-color: #555;
+        }
         .section-title {
             font-size: 18px;
             margin-bottom: 15px;
             border-bottom: 1px solid #eee;
             padding-bottom: 8px;
             color: #333;
+        }
+        .dark-theme .section-title {
+            color: #f5f5f5;
+            border-bottom-color: #555;
         }
         .stats-bar {
             display: flex;
@@ -118,15 +137,24 @@
             min-width: 200px;
             text-align: center;
         }
+        .dark-theme .stat-card {
+            background: #555;
+        }
         .stat-card h4 {
             font-size: 16px;
             color: #555;
             margin-bottom: 10px;
         }
+        .dark-theme .stat-card h4 {
+            color: #ddd;
+        }
         .stat-card p {
             font-size: 20px;
             font-weight: bold;
             color: #2968c8;
+        }
+        .dark-theme .stat-card p {
+            color: #4a90e2;
         }
         .invoices-table {
             width: 100%;
@@ -138,13 +166,22 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+        .dark-theme .invoices-table th, .dark-theme .invoices-table td {
+            border-bottom-color: #666;
+        }
         .invoices-table th {
             background: #f8f9fa;
             font-weight: 600;
         }
+        .dark-theme .invoices-table th {
+            background: #555;
+        }
         .invoices-table tr:hover {
             background-color: #f1f3f5;
             cursor: pointer;
+        }
+        .dark-theme .invoices-table tr:hover {
+            background-color: #444;
         }
         .btn {
             background: #2968c8;
@@ -183,6 +220,8 @@
             display: flex;
             justify-content: flex-end;
             margin-bottom: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         .pagination {
             display: flex;
@@ -212,6 +251,9 @@
             overflow-y: auto;
             position: relative;
         }
+        .dark-theme .modal-content {
+            background: #444;
+        }
         .modal-close {
             position: fixed;
             top: 10px;
@@ -236,6 +278,10 @@
         }
         .invoice-details h3 {
             margin-bottom: 10px;
+            color: #333;
+        }
+        .dark-theme .invoice-details h3 {
+            color: #f5f5f5;
         }
         .invoice-details table {
             width: 100%;
@@ -247,6 +293,9 @@
             border: 1px solid #ddd;
             text-align: left;
         }
+        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
+            border-color: #666;
+        }
         .two-column-table {
             width: 50%;
             margin-left: auto;
@@ -256,6 +305,9 @@
             padding: 8px;
             border: 1px solid #ddd;
             text-align: right;
+        }
+        .dark-theme .two-column-table th, .dark-theme .two-column-table td {
+            border-color: #666;
         }
         .invoice-header {
             display: flex;
@@ -269,6 +321,10 @@
             text-align: center;
             border-top: 1px solid #ddd;
             padding-top: 10px;
+        }
+        .dark-theme .invoice-footer {
+            color: #ddd;
+            border-top-color: #666;
         }
         .alert {
             position: fixed;
@@ -321,6 +377,7 @@
                 <img src="https://via.placeholder.com/30" alt="Foto de perfil" class="user-pic" id="userPic">
                 <span id="userDisplayName">Cargando...</span>
             </div>
+            <button class="digital-btn" id="digitalButton">Mi Factura Digital</button>
             <button class="user-btn" id="userButton">Usuario</button>
             <button class="logout-btn" id="logoutButton">Cerrar sesión</button>
         </div>
@@ -477,7 +534,9 @@
             document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
         }
 
-        function showInvoiceDetails(index) {
+        function showInvoiceDetails(indexуйте
+
+) {
             const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
             const invoice = userInvoices[index];
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -588,6 +647,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const currentUser = loadUserData();
             if (!currentUser) return;
+
+            // Aplicar modo oscuro si está activado
+            if (currentUser.darkTheme) {
+                document.body.classList.add('dark-theme');
+            }
+
             const userInvoices = getUserInvoices(currentUser);
             const availableInvoices = loadStats(userInvoices, currentUser);
 
@@ -598,6 +663,10 @@
 
             document.getElementById('userButton').addEventListener('click', () => {
                 window.location.href = 'user.html';
+            });
+
+            document.getElementById('digitalButton').addEventListener('click', () => {
+                window.location.href = 'mi-factura-digital.html';
             });
 
             document.getElementById('prevPage').addEventListener('click', () => {
