@@ -110,14 +110,14 @@
             font-weight: 500;
             color: #555;
         }
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
         }
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
@@ -184,12 +184,6 @@
         .summary-table th {
             font-weight: 600;
             background: #e9ecef;
-        }
-        .coletilla {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
-            text-align: right;
         }
         .btn {
             background: #2968c8;
@@ -467,10 +461,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="form-group">
-                    <label for="footerText">Coletilla</label>
-                    <textarea id="footerText" rows="3" placeholder="Añade una coletilla aquí..."></textarea>
-                </div>
             </div>
 
             <div class="action-buttons">
@@ -648,18 +638,10 @@
             document.getElementById('taxUsd').textContent = formatCurrency(taxUsd);
             document.getElementById('igtfUsd').textContent = formatCurrency(igtfUsd);
             document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
-
-            updateColetilla();
         }
 
-        function updateColetilla() {
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const controlNumberIndex = invoices.length + 1;
-            const controlNumber = formatControlNumber(controlNumberIndex);
-            const invoiceDate = document.getElementById('invoiceDate').value || new Date().toISOString().split('T')[0];
-            const defaultColetilla = `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${invoiceDate}`;
-            const customColetilla = document.getElementById('footerText').value.trim() || defaultColetilla;
-            document.getElementById('coletillaText').textContent = customColetilla;
+        function getDefaultFooterText(controlNumber, invoiceDate) {
+            return `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${invoiceDate}`;
         }
 
         function getInvoiceFormData() {
@@ -694,8 +676,7 @@
                 igtfBs: parseFloat(document.getElementById('igtfBs').textContent.replace(/,/g, '')) || 0,
                 igtfUsd: parseFloat(document.getElementById('igtfUsd').textContent.replace(/,/g, '')) || 0,
                 totalBs: parseFloat(document.getElementById('totalBs').textContent.replace(/,/g, '')) || 0,
-                totalUsd: parseFloat(document.getElementById('totalUsd').textContent.replace(/,/g, '')) || 0,
-                footerText: document.getElementById('footerText').value.trim() || ''
+                totalUsd: parseFloat(document.getElementById('totalUsd').textContent.replace(/,/g, '')) || 0
             };
         }
 
@@ -754,6 +735,8 @@
             const docNumberDisplay = extractDocNumberForDisplay(docNumber);
             const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
+
+            const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
 
             const preview = document.getElementById('invoicePreview');
             preview.innerHTML = `
@@ -821,7 +804,7 @@
                     </tbody>
                 </table>
                 <div class="invoice-footer">
-                    <p>${data.footerText || 'Sin coletilla'}</p>
+                    <p>${footerText}</p>
                 </div>
             `;
             document.getElementById('previewModal').style.display = 'flex';
@@ -844,6 +827,7 @@
             const docNumber = generateDocNumber(data.docType);
             const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
+            const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
 
             const invoiceData = {
                 sellerRif: currentUser.rif,
@@ -872,7 +856,7 @@
                 totalBs: data.totalBs,
                 totalUsd: data.totalUsd,
                 exchangeRate: exchangeRate,
-                footerText: data.footerText
+                footerText: footerText
             };
 
             // Validar que el docNumber sea único para el tipo de documento
@@ -926,8 +910,6 @@
 
             document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
             document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
-            document.getElementById('invoiceDate').addEventListener('change', updateColetilla);
-            document.getElementById('footerText').addEventListener('input', updateColetilla);
 
             document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
             updateInvoiceTotals();
