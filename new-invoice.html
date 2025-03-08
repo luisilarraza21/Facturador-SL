@@ -1291,10 +1291,15 @@
             if (!validateForm()) return null;
         
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const docType = document.getElementById('docType').value;
-            let lastDocNumbers = JSON.parse(localStorage.getItem('lastDocNumbers')) || { factura: 0, nota_credito: 0, nota_debito: 0 };
-            const docNumber = ++lastDocNumbers[docType];
-            localStorage.setItem('lastDocNumbers', JSON.stringify(lastDocNumbers));
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+const docType = document.getElementById('docType').value;
+// Almacenar numeración por usuario usando su RIF como clave
+let userDocNumbers = JSON.parse(localStorage.getItem(`docNumbers_${currentUser.rif}`)) || { factura: 0, nota_credito: 0, nota_debito: 0 };
+let userControlNumbers = JSON.parse(localStorage.getItem(`controlNumbers_${currentUser.rif}`)) || 0;
+const docNumber = ++userDocNumbers[docType];
+const controlNumber = String(++userControlNumbers).padStart(8, '0'); // Ejemplo: 00000001
+localStorage.setItem(`docNumbers_${currentUser.rif}`, JSON.stringify(userDocNumbers));
+localStorage.setItem(`controlNumbers_${currentUser.rif}`, JSON.stringify(userControlNumbers));
         
             const items = [];
             document.querySelectorAll('#itemsTableBody tr').forEach(row => {
@@ -1322,7 +1327,7 @@
                 id: Date.now().toString(),
                 docType,
                 docNumber,
-                controlNumber: 'PENDIENTE_API',
+                controlNumber: `00-${controlNumber}`,
                 sellerName: currentUser.companyName,
                 sellerRif: currentUser.rif,
                 sellerAddress: currentUser.address,
