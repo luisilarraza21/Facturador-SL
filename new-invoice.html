@@ -24,6 +24,24 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background: #5a6268;
+        }
         .logo {
             font-weight: bold;
             font-size: 24px;
@@ -92,14 +110,14 @@
             font-weight: 500;
             color: #555;
         }
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
         }
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
@@ -296,7 +314,10 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">FacturaML</div>
+        <div class="logo-section">
+            <button class="back-btn" id="backButton">←</button>
+            <div class="logo">FacturaML</div>
+        </div>
         <div class="nav-user">
             <div class="user-info" id="userDisplayName">Cargando...</div>
             <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
@@ -344,8 +365,8 @@
                         <label for="docType">Tipo de Documento*</label>
                         <select id="docType" required>
                             <option value="factura">Factura</option>
-                            <option value="nota_credito">Nota de Crédito</option>
-                            <option value="nota_debito">Nota de Débito</option>
+                            <option value="nota-credito">Nota de Crédito</option>
+                            <option value="nota-debito">Nota de Débito</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -446,7 +467,10 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="coletilla" id="coletillaText"></div>
+                <div class="form-group">
+                    <label for="footerText">Coletilla</label>
+                    <textarea id="footerText" rows="3" placeholder="Añade una coletilla aquí..."></textarea>
+                </div>
             </div>
 
             <div class="action-buttons">
@@ -514,6 +538,24 @@
                 showAlert('Error al cargar tasa del dólar. Usando valor por defecto: 64.74.', 'warning');
             }
             updateInvoiceTotals();
+        }
+
+        // Generar número de documento único y consecutivo de 8 dígitos (solo el número)
+        function generateDocNumber(docType) {
+            const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const invoicesOfType = allInvoices.filter(invoice => invoice.docType === docType);
+            
+            const lastNumber = invoicesOfType.length > 0 
+                ? Math.max(...invoicesOfType.map(invoice => parseInt(invoice.docNumber, 10) || 0))
+                : 0;
+
+            const nextNumber = (lastNumber + 1).toString().padStart(8, '0'); // 8 dígitos con ceros a la izquierda
+            return nextNumber;
+        }
+
+        // Extraer número de documento sin ceros a la izquierda para visualización
+        function extractDocNumberForDisplay(docNumber) {
+            return parseInt(docNumber, 10).toString(); // Eliminar ceros a la izquierda
         }
 
         function addEmailField() {
@@ -615,8 +657,9 @@
             const controlNumberIndex = invoices.length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
             const invoiceDate = document.getElementById('invoiceDate').value || new Date().toISOString().split('T')[0];
-            const coletilla = `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${invoiceDate}`;
-            document.getElementById('coletillaText').textContent = coletilla;
+            const defaultColetilla = `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${invoiceDate}`;
+            const customColetilla = document.getElementById('footerText').value.trim() || defaultColetilla;
+            document.getElementById('coletillaText').textContent = customColetilla;
         }
 
         function getInvoiceFormData() {
@@ -651,7 +694,8 @@
                 igtfBs: parseFloat(document.getElementById('igtfBs').textContent.replace(/,/g, '')) || 0,
                 igtfUsd: parseFloat(document.getElementById('igtfUsd').textContent.replace(/,/g, '')) || 0,
                 totalBs: parseFloat(document.getElementById('totalBs').textContent.replace(/,/g, '')) || 0,
-                totalUsd: parseFloat(document.getElementById('totalUsd').textContent.replace(/,/g, '')) || 0
+                totalUsd: parseFloat(document.getElementById('totalUsd').textContent.replace(/,/g, '')) || 0,
+                footerText: document.getElementById('footerText').value.trim() || ''
             };
         }
 
@@ -706,23 +750,25 @@
             if (!validateForm(data)) return;
 
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const docPrefix = data.docType === 'factura' ? 'FAC' : data.docType === 'nota_credito' ? 'NC' : 'ND';
-            const docNumber = `${docPrefix}-${currentUser.rif}-${invoices.length + 1}`;
-            const controlNumberIndex = invoices.length + 1;
+            const docNumber = generateDocNumber(data.docType);
+            const docNumberDisplay = extractDocNumberForDisplay(docNumber);
+            const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
-            const coletilla = `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${data.invoiceDate}`;
 
             const preview = document.getElementById('invoicePreview');
             preview.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${currentUser.profilePic || 'https://via.placeholder.com/100'}" alt="Foto de perfil" style="width: 100px; height: 100px; border-radius: 50%;">
+                </div>
                 <div class="invoice-header">
                     <div>
                         <h2>${currentUser.companyName}</h2>
                         <p>RIF: ${currentUser.rif}</p>
                     </div>
                     <div>
-                        <h3>${data.docType.charAt(0).toUpperCase() + data.docType.slice(1)}</h3>
-                        <p>Nº Documento: ${docNumber}</p>
+                        <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
+                        <p>Tipo de Documento: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
+                        <p>Nº Documento: ${docNumberDisplay}</p>
                         <p>Nº Control: ${controlNumber}</p>
                         <p>Fecha: ${data.invoiceDate}</p>
                     </div>
@@ -775,7 +821,7 @@
                     </tbody>
                 </table>
                 <div class="invoice-footer">
-                    <p>${coletilla}</p>
+                    <p>${data.footerText || 'Sin coletilla'}</p>
                 </div>
             `;
             document.getElementById('previewModal').style.display = 'flex';
@@ -795,10 +841,8 @@
             if (!validateForm(data)) return;
 
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const docPrefix = data.docType === 'factura' ? 'FAC' : data.docType === 'nota_credito' ? 'NC' : 'ND';
-            const docNumber = `${docPrefix}-${currentUser.rif}-${invoices.length + 1}`;
-            const controlNumberIndex = invoices.length + 1;
+            const docNumber = generateDocNumber(data.docType);
+            const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
 
             const invoiceData = {
@@ -827,11 +871,19 @@
                 igtfUsd: data.igtfUsd,
                 totalBs: data.totalBs,
                 totalUsd: data.totalUsd,
-                exchangeRate: exchangeRate
+                exchangeRate: exchangeRate,
+                footerText: data.footerText
             };
 
-            invoices.push(invoiceData);
-            localStorage.setItem('invoices', JSON.stringify(invoices));
+            // Validar que el docNumber sea único para el tipo de documento
+            const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            if (allInvoices.some(invoice => invoice.docType === data.docType && invoice.docNumber === docNumber)) {
+                showAlert('Error: El número de documento ya existe para este tipo.', 'error');
+                return;
+            }
+
+            allInvoices.push(invoiceData);
+            localStorage.setItem('invoices', JSON.stringify(allInvoices));
             showAlert('Documento generado exitosamente.', 'success');
             setTimeout(() => window.location.href = 'dashboard.html', 1500);
         }
@@ -846,6 +898,10 @@
             document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
 
             fetchExchangeRate();
+
+            document.getElementById('backButton').addEventListener('click', () => {
+                window.location.href = 'dashboard.html';
+            });
 
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
@@ -871,6 +927,7 @@
             document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
             document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
             document.getElementById('invoiceDate').addEventListener('change', updateColetilla);
+            document.getElementById('footerText').addEventListener('input', updateColetilla);
 
             document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
             updateInvoiceTotals();
