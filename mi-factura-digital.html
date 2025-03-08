@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacturaML - Mi Factura Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #333;
+            color: #f5f5f5;
+        }
+        .navbar {
+            background-color: #ffe600;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar:hover {
+            background-color: #e6cc00;
+        }
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ddd;
+        }
+        .dark-theme .container {
+            background: #444;
+            border-color: #555;
+        }
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            color: #333;
+        }
+        .dark-theme .section-title {
+            color: #f5f5f5;
+            border-bottom-color: #555;
+        }
+        .template-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .template-card {
+            flex: 1;
+            min-width: 250px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dark-theme .template-card {
+            background: #555;
+        }
+        .template-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .template-card img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .dark-theme .template-card img {
+            border-color: #666;
+        }
+        .template-card h4 {
+            font-size: 16px;
+            color: #555;
+        }
+        .dark-theme .template-card h4 {
+            color: #ddd;
+        }
+        .btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #1d4f9e;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-primary {
+            background: #28a745;
+        }
+        .btn-primary:hover {
+            background: #218838;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .dark-theme .modal-content {
+            background: #444;
+        }
+        .modal-close {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        .modal-close:hover {
+            background: #c82333;
+        }
+        .invoice-preview {
+            font-size: 14px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .dark-theme .invoice-preview {
+            border-color: #666;
+        }
+        .invoice-header {
+            margin-bottom: 20px;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
+            border-color: #666;
+        }
+        .two-column-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        .two-column-table th, .two-column-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+        .dark-theme .two-column-table th, .dark-theme .two-column-table td {
+            border-color: #666;
+        }
+        .invoice-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .dark-theme .invoice-footer {
+            color: #ddd;
+            border-top-color: #666;
+        }
+        .template-1 .invoice-header {
+            text-align: center;
+        }
+        .template-2 .invoice-header {
+            display: flex;
+            justify-content: space-between;
+        }
+        .template-3 .invoice-header {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .dark-theme .template-3 .invoice-header {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">FacturaML</div>
+    </div>
+    <div class="container">
+        <h2 class="section-title">Mi Factura Digital - Selección de Plantilla</h2>
+        <div class="template-options">
+            <div class="template-card" onclick="previewTemplate(1)">
+                <img src="https://via.placeholder.com/200x100?text=Plantilla+1" alt="Plantilla 1" id="template1Img">
+                <h4>Plantilla 1 - Clásica</h4>
+            </div>
+            <div class="template-card" onclick="previewTemplate(2)">
+                <img src="https://via.placeholder.com/200x100?text=Plantilla+2" alt="Plantilla 2" id="template2Img">
+                <h4>Plantilla 2 - Moderna</h4>
+            </div>
+            <div class="template-card" onclick="previewTemplate(3)">
+                <img src="https://via.placeholder.com/200x100?text=Plantilla+3" alt="Plantilla 3" id="template3Img">
+                <h4>Plantilla 3 - Elegante</h4>
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" id="backToDashboard">Regresar al Tablero</button>
+            <button class="btn btn-primary" id="goToInvoice">Ir al Facturador</button>
+        </div>
+    </div>
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">×</span>
+            <div class="invoice-preview" id="invoicePreview"></div>
+        </div>
+    </div>
+
+    <script>
+        // Funciones de utilidad
+        function formatCurrency(amount) {
+            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function loadUserData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return null;
+            }
+            return currentUser;
+        }
+
+        function updateTemplateImages() {
+            const currentUser = loadUserData();
+            if (!currentUser) return;
+            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
+            document.getElementById('template1Img').src = logo;
+            document.getElementById('template2Img').src = logo;
+            document.getElementById('template3Img').src = logo;
+        }
+
+        function previewTemplate(templateId) {
+            const currentUser = loadUserData();
+            if (!currentUser) return;
+            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
+            const preview = document.getElementById('invoicePreview');
+            let templateHtml = '';
+
+            // Datos de ejemplo
+            const sampleData = {
+                companyName: currentUser.companyName,
+                rif: currentUser.rif,
+                address: currentUser.address || '-',
+                phone: currentUser.phone || '-',
+                docType: 'factura',
+                docNumber: '00000001',
+                controlNumber: '00-00000001',
+                date: '2025-03-08',
+                clientName: 'Cliente Ejemplo',
+                clientId: 'V-12345678',
+                items: [
+                    { code: '001', description: 'Producto Ejemplo', quantity: 2, price: 500, subtotal: 1000 }
+                ],
+                subtotalBs: 1000,
+                subtotalUsd: 15.45,
+                exemptAmountBs: 0,
+                exemptAmountUsd: 0,
+                taxableBaseBs: 1000,
+                taxableBaseUsd: 15.45,
+                taxBs: 160,
+                taxUsd: 2.47,
+                igtfBs: 0,
+                igtfUsd: 0,
+                totalBs: 1160,
+                totalUsd: 17.92,
+                alicuota: 16,
+                paymentMethod: 'Bolívares Efectivo',
+                exchangeRate: 64.74,
+                footerText: `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162.`
+            };
+
+            if (templateId === 1) {
+                // Plantilla 1: Clásica (logo centrado arriba)
+                templateHtml = `
+                    <div class="template-1">
+                        <div class="invoice-header">
+                            <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
+                            <h2>${sampleData.companyName}</h2>
+                            <p>RIF: ${sampleData.rif}</p>
+                            <p>Dirección: ${sampleData.address}</p>
+                            <p>Teléfono: ${sampleData.phone}</p>
+                        </div>
+                        <h3>Factura</h3>
+                        <p>Nº Documento: ${sampleData.docNumber}</p>
+                        <p>Nº Control: ${sampleData.controlNumber}</p>
+                        <p>Fecha: ${sampleData.date}</p>
+                        <p>Cliente: ${sampleData.clientName}</p>
+                        <p>RIF/Cédula: ${sampleData.clientId}</p>
+                        <table class="invoice-details">
+                            <thead>
+                                <tr><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Precio (Bs)</th><th>Subtotal (Bs)</th></tr>
+                            </thead>
+                            <tbody>
+                                ${sampleData.items.map(item => `
+                                    <tr>
+                                        <td>${item.code}</td>
+                                        <td>${item.description}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${formatCurrency(item.price)}</td>
+                                        <td>${formatCurrency(item.subtotal)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <table class="two-column-table">
+                            <thead><tr><th></th><th>Bs</th><th>USD</th></tr></thead>
+                            <tbody>
+                                <tr><th>Total</th><td>${formatCurrency(sampleData.totalBs)}</td><td>${formatCurrency(sampleData.totalUsd)}</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="invoice-footer"><p>${sampleData.footerText}</p></div>
+                    </div>
+                `;
+            } else if (templateId === 2) {
+                // Plantilla 2: Moderna (logo a la izquierda)
+                templateHtml = `
+                    <div class="template-2">
+                        <div class="invoice-header">
+                            <div>
+                                <img src="${logo}" alt="Logo" style="width: 80px; height: 80px; float: left; margin-right: 15px;">
+                                <h2>${sampleData.companyName}</h2>
+                                <p>RIF: ${sampleData.rif}</p>
+                            </div>
+                            <div>
+                                <h3>Factura</h3>
+                                <p>Nº Documento: ${sampleData.docNumber}</p>
+                                <p>Nº Control: ${sampleData.controlNumber}</p>
+                                <p>Fecha: ${sampleData.date}</p>
+                            </div>
+                        </div>
+                        <p>Cliente: ${sampleData.clientName}</p>
+                        <p>RIF/Cédula: ${sampleData.clientId}</p>
+                        <table class="invoice-details">
+                            <thead>
+                                <tr><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Precio (Bs)</th><th>Subtotal (Bs)</th></tr>
+                            </thead>
+                            <tbody>
+                                ${sampleData.items.map(item => `
+                                    <tr>
+                                        <td>${item.code}</td>
+                                        <td>${item.description}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${formatCurrency(item.price)}</td>
+                                        <td>${formatCurrency(item.subtotal)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <table class="two-column-table">
+                            <thead><tr><th></th><th>Bs</th><th>USD</th></tr></thead>
+                            <tbody>
+                                <tr><th>Total</th><td>${formatCurrency(sampleData.totalBs)}</td><td>${formatCurrency(sampleData.totalUsd)}</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="invoice-footer"><p>${sampleData.footerText}</p></div>
+                    </div>
+                `;
+            } else if (templateId === 3) {
+                // Plantilla 3: Elegante (logo con fondo)
+                templateHtml = `
+                    <div class="template-3">
+                        <div class="invoice-header">
+                            <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
+                            <h2>${sampleData.companyName}</h2>
+                            <p>RIF: ${sampleData.rif}</p>
+                            <p>Dirección: ${sampleData.address}</p>
+                            <p>Teléfono: ${sampleData.phone}</p>
+                        </div>
+                        <h3>Factura</h3>
+                        <p>Nº Documento: ${sampleData.docNumber}</p>
+                        <p>Nº Control: ${sampleData.controlNumber}</p>
+                        <p>Fecha: ${sampleData.date}</p>
+                        <p>Cliente: ${sampleData.clientName}</p>
+                        <p>RIF/Cédula: ${sampleData.clientId}</p>
+                        <table class="invoice-details">
+                            <thead>
+                                <tr><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Precio (Bs)</th><th>Subtotal (Bs)</th></tr>
+                            </thead>
+                            <tbody>
+                                ${sampleData.items.map(item => `
+                                    <tr>
+                                        <td>${item.code}</td>
+                                        <td>${item.description}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${formatCurrency(item.price)}</td>
+                                        <td>${formatCurrency(item.subtotal)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <table class="two-column-table">
+                            <thead><tr><th></th><th>Bs</th><th>USD</th></tr></thead>
+                            <tbody>
+                                <tr><th>Total</th><td>${formatCurrency(sampleData.totalBs)}</td><td>${formatCurrency(sampleData.totalUsd)}</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="invoice-footer"><p>${sampleData.footerText}</p></div>
+                    </div>
+                `;
+            }
+
+            preview.innerHTML = templateHtml;
+            document.getElementById('previewModal').style.display = 'flex';
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = loadUserData();
+            if (!currentUser) return;
+
+            // Aplicar modo oscuro si está activado
+            if (currentUser.darkTheme) {
+                document.body.classList.add('dark-theme');
+            }
+
+            updateTemplateImages();
+
+            document.getElementById('backToDashboard').addEventListener('click', () => {
+                window.location.href = 'dashboard.html';
+            });
+
+            document.getElementById('goToInvoice').addEventListener('click', () => {
+                window.location.href = 'new-invoice.html';
+            });
+
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('previewModal').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
