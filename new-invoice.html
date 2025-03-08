@@ -219,7 +219,16 @@
             font-size: 18px;
             background: #e9ecef;
         }
-
+.summary-table th, .summary-table td {
+    padding: 8px;
+    text-align: right;
+}
+.summary-table th:first-child, .summary-table td:first-child {
+    text-align: left;
+}
+.summary-table thead {
+    background: #e9ecef;
+}
         .alert {
             position: fixed;
             top: 20px;
@@ -280,6 +289,14 @@
                 font-size: 16px;
             }
         }
+        .printer-note {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #555;
+}
+.printer-note p {
+    margin: 5px 0;
+}
     </style>
 </head>
 <body>
@@ -390,36 +407,57 @@
                 </table>
                 <button class="btn btn-secondary" id="addItemBtn" style="margin-top: 10px">Agregar Artículo</button>
                 
-                <table class="summary-table">
-                    <tr>
-                        <td>Subtotal:</td>
-                        <td class="text-right" id="summarySubtotal">0.00 Bs.</td>
-                    </tr>
-                    <tr id="exemptRow">
-                        <td>Monto Exento:</td>
-                        <td class="text-right" id="summaryExempt">0.00 Bs.</td>
-                    </tr>
-                    <tr>
-                        <td>Base Imponible:</td>
-                        <td class="text-right" id="summaryTaxable">0.00 Bs.</td>
-                    </tr>
-                    <tr>
-                        <td>IVA:</td>
-                        <td class="text-right" id="summaryIva">0.00 Bs.</td>
-                    </tr>
-                    <tr id="igtfRow" style="display: none;">
-                        <td>IGTF (3%):</td>
-                        <td class="text-right" id="summaryIgtf">0.00 Bs.</td>
-                    </tr>
-                    <tr id="specialTaxRow" style="display: none;">
-                        <td>Retención Contribuyente Especial:</td>
-                        <td class="text-right" id="summarySpecialTax">0.00 Bs.</td>
-                    </tr>
-                    <tr>
-                        <td>Total:</td>
-                        <td class="text-right" id="summaryTotal">0.00 Bs.</td>
-                    </tr>
+<table class="summary-table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Bs</th>
+            <th>USD</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>SUBTOTAL:</td>
+            <td id="summarySubtotalBs">0,00</td>
+            <td id="summarySubtotalUsd">0,00</td>
+        </tr>
+        <tr id="exemptRow">
+            <td>TOTAL EXENTO (E):</td>
+            <td id="summaryExemptBs">0,00</td>
+            <td id="summaryExemptUsd">0,00</td>
+        </tr>
+        <tr>
+            <td>BASE IMPONIBLE:</td>
+            <td id="summaryTaxableBs">0,00</td>
+            <td id="summaryTaxableUsd">0,00</td>
+        </tr>
+        <tr>
+            <td id="ivaLabel">I.V.A. (0,00):</td>
+            <td id="summaryIvaBs">0,00</td>
+            <td id="summaryIvaUsd">0,00</td>
+        </tr>
+        <tr id="igtfRow" style="display: none;">
+            <td>IGTF (3%):</td>
+            <td id="summaryIgtfBs">0,00</td>
+            <td id="summaryIgtfUsd">0,00</td>
+        </tr>
+        <tr id="specialTaxRow" style="display: none;">
+            <td>RETENCIÓN CONTRIBUYENTE ESPECIAL:</td>
+            <td id="summarySpecialTaxBs">0,00</td>
+            <td id="summarySpecialTaxUsd">0,00</td>
+        </tr>
+        <tr>
+            <td>TOTAL:</td>
+            <td id="summaryTotalBs">0,00</td>
+            <td id="summaryTotalUsd">0,00</td>
+        </tr>
+    </tbody>
+</table>
                 </table>
+<div class="printer-note">
+    <p>Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J- 003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021</p>
+    <p>N° de control desde 00-09355964 hasta N° de Control <span id="dynamicControlNumber"></span> de fecha 07/03/2025</p>
+</div>
             </div>
             
             <div class="action-buttons">
@@ -1168,7 +1206,7 @@
         /**
          * Actualiza los totales de la factura (subtotal, IVA, IGTF, etc.).
          */
-        function updateInvoiceTotals() {
+        function updateInvoiceTotals(controlNumber) {
             let subtotal = 0;
             document.querySelectorAll('#itemsTableBody tr').forEach(row => {
                 const rowSubtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
@@ -2187,22 +2225,56 @@ localStorage.setItem(`controlNumbers_${currentUser.rif}`, JSON.stringify(userCon
         /**
          * Actualiza los totales de la factura (subtotal, IVA, IGTF, etc.).
          */
-        function updateInvoiceTotals() {
-            let subtotal = 0;
-            document.querySelectorAll('#itemsTableBody tr').forEach(row => {
-                const rowSubtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
-                subtotal += rowSubtotal;
-            });
-        
-            const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
-            const taxableAmount = subtotal - exemptAmount;
-            const alicuota = (parseFloat(document.getElementById('alicuota').value) || 16) / 100;
-            const iva = taxableAmount * alicuota;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const igtf = paymentMethod.includes('usd') ? subtotal * 0.03 : 0;
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const specialTax = currentUser.isSpecialContributor ? subtotal * 0.01 : 0;
-            const total = taxableAmount + iva + igtf - specialTax;
+       function updateInvoiceTotals() {
+    let subtotal = 0;
+    document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+        const rowSubtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+        subtotal += rowSubtotal;
+    });
+
+    const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
+    const taxableAmount = subtotal - exemptAmount;
+    const alicuota = (parseFloat(document.getElementById('alicuota').value) || 16) / 100;
+    const iva = taxableAmount * alicuota;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const igtf = paymentMethod.includes('usd') ? subtotal * 0.03 : 0;
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const specialTax = currentUser.isSpecialContributor ? subtotal * 0.01 : 0;
+    const total = taxableAmount + iva + igtf - specialTax;
+
+    // Formatear valores para Bs (con comas y 2 decimales)
+    const formatBs = (amount) => amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    const formatUsd = (amount) => (amount / exchangeRate).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+
+    // Mostrar u ocultar filas según corresponda
+    document.getElementById('igtfRow').style.display = paymentMethod.includes('usd') ? '' : 'none';
+    document.getElementById('specialTaxRow').style.display = currentUser.isSpecialContributor ? '' : 'none';
+
+    // Actualizar etiqueta de IVA con la alícuota
+    document.getElementById('ivaLabel').textContent = `I.V.A. (${(alicuota * 100).toFixed(2).replace('.00', ',00')}):`;
+
+    // Actualizar los valores en la tabla de resumen
+    document.getElementById('summarySubtotalBs').textContent = formatBs(subtotal);
+    document.getElementById('summarySubtotalUsd').textContent = formatUsd(subtotal);
+    document.getElementById('summaryExemptBs').textContent = formatBs(exemptAmount);
+    document.getElementById('summaryExemptUsd').textContent = formatUsd(exemptAmount);
+    document.getElementById('summaryTaxableBs').textContent = formatBs(taxableAmount);
+    document.getElementById('summaryTaxableUsd').textContent = formatUsd(taxableAmount);
+    document.getElementById('summaryIvaBs').textContent = formatBs(iva);
+    document.getElementById('summaryIvaUsd').textContent = formatUsd(iva);
+    document.getElementById('summaryIgtfBs').textContent = formatBs(igtf);
+    document.getElementById('summaryIgtfUsd').textContent = formatUsd(igtf);
+    document.getElementById('summarySpecialTaxBs').textContent = formatBs(specialTax);
+    document.getElementById('summarySpecialTaxUsd').textContent = formatUsd(specialTax);
+    document.getElementById('summaryTotalBs').textContent = formatBs(total);
+document.getElementById('summaryTotalUsd').textContent = formatUsd(total);
+// Actualizar el número de control dinámico
+const dynamicControlNumber = document.getElementById('dynamicControlNumber');
+if (dynamicControlNumber) dynamicControlNumber.textContent = controlNumber || 'PENDIENTE';
+// Actualizar el número de control dinámico
+const controlNumber = document.getElementById('dynamicControlNumber');
+if (controlNumber) controlNumber.textContent = controlNumber.dataset.value || 'PENDIENTE';
+}
         
             // Mostrar u ocultar filas según corresponda
             document.getElementById('igtfRow').style.display = paymentMethod.includes('usd') ? '' : 'none';
@@ -2306,150 +2378,212 @@ localStorage.setItem(`controlNumbers_${currentUser.rif}`, JSON.stringify(userCon
          * Obtiene los datos del formulario y genera un objeto de factura.
          * @returns {Object|null} - Los datos de la factura o null si no pasa la validación.
          */
-        function getInvoiceFormData() {
-            if (!validateForm()) return null;
-        
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const docType = document.getElementById('docType').value;
-            let lastDocNumbers = JSON.parse(localStorage.getItem('lastDocNumbers')) || { factura: 0, nota_credito: 0, nota_debito: 0 };
-            const docNumber = ++lastDocNumbers[docType];
-            localStorage.setItem('lastDocNumbers', JSON.stringify(lastDocNumbers));
-        
-            const items = [];
-            document.querySelectorAll('#itemsTableBody tr').forEach(row => {
-                const code = row.querySelector('.item-code').value.trim();
-                const description = row.querySelector('.item-description').value.trim();
-                if (description) {
-                    const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-                    const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                    const subtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
-                    items.push({ code, description, quantity, price, subtotal });
-                }
-            });
-        
-            let subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
-            const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
-            const taxableAmount = subtotal - exemptAmount;
-            const alicuota = (parseFloat(document.getElementById('alicuota').value) || 16) / 100;
-            const iva = taxableAmount * alicuota;
-            const paymentMethod = document.getElementById('paymentMethod').value;
-            const igtf = paymentMethod.includes('usd') ? subtotal * 0.03 : 0;
-            const specialTax = currentUser.isSpecialContributor ? subtotal * 0.01 : 0;
-            const total = taxableAmount + iva + igtf - specialTax;
-        
-            return {
-                id: Date.now().toString(),
-                docType,
-                docNumber,
-                controlNumber: 'PENDIENTE_API',
-                sellerName: currentUser.companyName,
-                sellerRif: currentUser.rif,
-                sellerAddress: currentUser.address,
-                clientName: document.getElementById('clientName').value.trim(),
-                clientId: document.getElementById('clientId').value.trim().toUpperCase(),
-                clientAddress: document.getElementInvoiceData('clientAddress').value.trim(),
-                clientPhone: document.getElementById('clientPhone').value.trim(),
-                clientEmails: document.getElementById('clientEmails').value.trim().split(',').map(e => e.trim()).filter(e => e),
-                date: document.getElementById('invoiceDate').value,
-                paymentMethod,
-                exemptAmount,
-                alicuota: alicuota * 100,
-                notes: document.getElementById('invoiceNotes').value.trim(),
-                items,
-                subtotal,
-                taxableAmount,
-                iva,
-                igtf,
-                specialTax,
-                total,
-                createdAt: new Date().toISOString(),
-                status: 'emitida'
-            };
+function getInvoiceFormData() {
+    if (!validateForm()) return null;
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const docType = document.getElementById('docType').value;
+
+    // Usar el RIF del usuario como clave para las numeraciones
+    let userDocNumbers = JSON.parse(localStorage.getItem(`docNumbers_${currentUser.rif}`)) || { factura: 0, nota_credito: 0, nota_debito: 0 };
+    let userControlNumbers = JSON.parse(localStorage.getItem(`controlNumbers_${currentUser.rif}`)) || 0;
+
+    // Incrementar el número de documento por tipo
+    const docNumber = ++userDocNumbers[docType];
+    // Incrementar y formatear el número de control (ej. 00-00000001)
+    const controlNumber = `00-${String(++userControlNumbers).padStart(8, '0')}`;
+    // Almacenar las nuevas numeraciones en localStorage
+    localStorage.setItem(`docNumbers_${currentUser.rif}`, JSON.stringify(userDocNumbers));
+    localStorage.setItem(`controlNumbers_${currentUser.rif}`, JSON.stringify(userControlNumbers));
+
+    const items = [];
+    document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+        const code = row.querySelector('.item-code').value.trim();
+        const description = row.querySelector('.item-description').value.trim();
+        if (description) {
+            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const subtotal = parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0;
+            items.push({ code, description, quantity, price, subtotal });
         }
-        
+    });
+
+    let subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
+    const taxableAmount = subtotal - exemptAmount;
+    const alicuota = (parseFloat(document.getElementById('alicuota').value) || 16) / 100;
+    const iva = taxableAmount * alicuota;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const igtf = paymentMethod.includes('usd') ? subtotal * 0.03 : 0;
+    const specialTax = currentUser.isSpecialContributor ? subtotal * 0.01 : 0;
+    const total = taxableAmount + iva + igtf - specialTax;
+
+    return {
+        id: Date.now().toString(),
+        docType,
+        docNumber,
+        controlNumber,
+        sellerName: currentUser.companyName,
+        sellerRif: currentUser.rif,
+        sellerAddress: currentUser.address,
+        clientName: document.getElementById('clientName').value.trim(),
+        clientId: document.getElementById('clientId').value.trim().toUpperCase(),
+        clientAddress: document.getElementById('clientAddress').value.trim(),
+        clientPhone: document.getElementById('clientPhone').value.trim(),
+        clientEmails: document.getElementById('clientEmails').value.trim().split(',').map(e => e.trim()).filter(e => e),
+        date: document.getElementById('invoiceDate').value,
+        paymentMethod,
+        exemptAmount,
+        alicuota: alicuota * 100,
+        notes: document.getElementById('invoiceNotes').value.trim(),
+        items,
+        subtotal,
+        taxableAmount,
+        iva,
+        igtf,
+        specialTax,
+        total,
+        createdAt: new Date().toISOString(),
+        status: 'emitida'
+    };
+}
         /**
          * Genera el HTML para la previsualización de la factura.
          * @param {Object} invoiceData - Los datos de la factura.
          * @returns {string} - HTML de la previsualización.
          */
         function generatePreviewHtml(invoiceData) {
-            const docTypeLabel = invoiceData.docType === 'factura' ? 'Factura' : invoiceData.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito';
-            const itemsRows = invoiceData.items.map(item => `
+    const docTypeLabel = invoiceData.docType === 'factura' ? 'Factura' : invoiceData.docType === 'nota_credito' ? 'Nota de Crédito' : 'Nota de Débito';
+    const itemsRows = invoiceData.items.map(item => `
+        <tr>
+            <td>${item.code || '-'}</td>
+            <td>${item.description}</td>
+            <td>${item.quantity}</td>
+            <td>${formatCurrency(item.price)}</td>
+            <td>${formatCurrency(item.subtotal)}</td>
+        </tr>
+    `).join('');
+
+    // Formatear valores para Bs y USD
+    const formatBs = (amount) => amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    const formatUsd = (amount) => (amount / exchangeRate).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+
+    const summaryRows = `
+        <thead>
+            <tr>
+                <th></th>
+                <th>Bs</th>
+                <th>USD</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SUBTOTAL:</td>
+                <td>${formatBs(invoiceData.subtotal)}</td>
+                <td>${formatUsd(invoiceData.subtotal)}</td>
+            </tr>
+            <tr>
+                <td>TOTAL EXENTO (E):</td>
+                <td>${formatBs(invoiceData.exemptAmount)}</td>
+                <td>${formatUsd(invoiceData.exemptAmount)}</td>
+            </tr>
+            <tr>
+                <td>BASE IMPONIBLE:</td>
+                <td>${formatBs(invoiceData.taxableAmount)}</td>
+                <td>${formatUsd(invoiceData.taxableAmount)}</td>
+            </tr>
+            <tr>
+                <td>I.V.A. (${invoiceData.alicuota.toFixed(2).replace('.00', ',00')}):</td>
+                <td>${formatBs(invoiceData.iva)}</td>
+                <td>${formatUsd(invoiceData.iva)}</td>
+            </tr>
+            ${invoiceData.igtf > 0 ? `
                 <tr>
-                    <td>${item.code || '-'}</td>
-                    <td>${item.description}</td>
-                    <td>${item.quantity}</td>
-                    <td>${formatCurrency(item.price)}</td>
-                    <td>${formatCurrency(item.subtotal)}</td>
+                    <td>IGTF (3%):</td>
+                    <td>${formatBs(invoiceData.igtf)}</td>
+                    <td>${formatUsd(invoiceData.igtf)}</td>
                 </tr>
-            `).join('');
-        
-            const summaryRows = `
-                <tr><td>Subtotal:</td><td class="text-right">${formatCurrency(invoiceData.subtotal)} (${(invoiceData.subtotal / exchangeRate).toFixed(2)} USD)</td></tr>
-                <tr><td>Monto Exento:</td><td class="text-right">${formatCurrency(invoiceData.exemptAmount)}</td></tr>
-                <tr><td>Base Imponible:</td><td class="text-right">${formatCurrency(invoiceData.taxableAmount)}</td></tr>
-                <tr><td>IVA (${invoiceData.alicuota}%):</td><td class="text-right">${formatCurrency(invoiceData.iva)}</td></tr>
-                ${invoiceData.igtf > 0 ? `<tr><td>IGTF (3%):</td><td class="text-right">${formatCurrency(invoiceData.igtf)}</td></tr>` : ''}
-                ${invoiceData.specialTax > 0 ? `<tr><td>Retención Contribuyente Especial:</td><td class="text-right">${formatCurrency(invoiceData.specialTax)}</td></tr>` : ''}
-                <tr><td><strong>Total:</strong></td><td class="text-right"><strong>${formatCurrency(invoiceData.total)} (${(invoiceData.total / exchangeRate).toFixed(2)} USD)</strong></td></tr>
-            `;
-        
-            return `
-                <h1>${docTypeLabel} #${invoiceData.docNumber}</h1>
-                <div class="preview-section">
-                    <h2>Emisor</h2>
-                    <p><strong>${invoiceData.sellerName}</strong></p>
-                    <p>RIF: ${invoiceData.sellerRif}</p>
-                    <p>Dirección: ${invoiceData.sellerAddress}</p>
-                </div>
-                <div class="preview-section">
-                    <h2>Cliente</h2>
-                    <p><strong>${invoiceData.clientName}</strong></p>
-                    <p>Cédula/RIF: ${invoiceData.clientId}</p>
-                    <p>Dirección: ${invoiceData.clientAddress}</p>
-                    ${invoiceData.clientPhone ? `<p>Teléfono: ${invoiceData.clientPhone}</p>` : ''}
-                    ${invoiceData.clientEmails.length ? `<p>Correo(s): ${invoiceData.clientEmails.join(', ')}</p>` : ''}
-                </div>
-                <div class="preview-section">
-                    <h2>Detalles del Documento</h2>
-                    <p>Fecha de Emisión: ${formatDate(invoiceData.date)}</p>
-                    <p>Método de Pago: ${invoiceData.paymentMethod.replace(/_/g, ' ').toUpperCase()}</p>
-                    ${invoiceData.notes ? `<p>Notas: ${invoiceData.notes}</p>` : ''}
-                </div>
-                <div class="preview-section">
-                    <h2>Artículos</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Código</th>
-                                <th>Descripción</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unitario</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>${itemsRows}</tbody>
-                    </table>
-                </div>
-                <div class="preview-section">
-                    <h2>Resumen</h2>
-                    <table class="summary-table">
-                        ${summaryRows}
-                    </table>
-                </div>
-            `;
-        }
+            ` : ''}
+            ${invoiceData.specialTax > 0 ? `
+                <tr>
+                    <td>RETENCIÓN CONTRIBUYENTE ESPECIAL:</td>
+                    <td>${formatBs(invoiceData.specialTax)}</td>
+                    <td>${formatUsd(invoiceData.specialTax)}</td>
+                </tr>
+            ` : ''}
+            <tr>
+                <td><strong>TOTAL:</strong></td>
+                <td><strong>${formatBs(invoiceData.total)}</strong></td>
+                <td><strong>${formatUsd(invoiceData.total)}</strong></td>
+            </tr>
+        </tbody>
+    `;
+
+    return `
+        <h1>${docTypeLabel} #${invoiceData.docNumber}</h1>
+        <div class="preview-section">
+            <h2>Emisor</h2>
+            <p><strong>${invoiceData.sellerName}</strong></p>
+            <p>RIF: ${invoiceData.sellerRif}</p>
+            <p>Dirección: ${invoiceData.sellerAddress}</p>
+        </div>
+        <div class="preview-section">
+            <h2>Cliente</h2>
+            <p><strong>${invoiceData.clientName}</strong></p>
+            <p>Cédula/RIF: ${invoiceData.clientId}</p>
+            <p>Dirección: ${invoiceData.clientAddress}</p>
+            ${invoiceData.clientPhone ? `<p>Teléfono: ${invoiceData.clientPhone}</p>` : ''}
+            ${invoiceData.clientEmails.length ? `<p>Correo(s): ${invoiceData.clientEmails.join(', ')}</p>` : ''}
+        </div>
+        <div class="preview-section">
+            <h2>Detalles del Documento</h2>
+            <p>Fecha de Emisión: ${formatDate(invoiceData.date)}</p>
+            <p>Método de Pago: ${invoiceData.paymentMethod.replace(/_/g, ' ').toUpperCase()}</p>
+            ${invoiceData.notes ? `<p>Notas: ${invoiceData.notes}</p>` : ''}
+        </div>
+        <div class="preview-section">
+            <h2>Artículos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>${itemsRows}</tbody>
+            </table>
+        </div>
+        <div class="preview-section">
+            <h2>Resumen</h2>
+            <table class="summary-table">
+                ${summaryRows}
+            </table>
+        </div>
+    <div class="preview-section">
+        <h2>Nota de Imprenta</h2>
+        <p>Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J- 003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021</p>
+        <p>N° de control desde 00-09355964 hasta N° de Control ${invoiceData.controlNumber} de fecha 07/03/2025</p>
+    </div>
+</div>
+    `;
+}
+    `;
+}
         
         /**
          * Muestra el modal de previsualización con los datos de la factura.
          */
         function showPreviewModal() {
-            const invoiceData = getInvoiceFormData();
-            if (!invoiceData) return;
-        
-            const previewContent = document.getElementById('previewContent');
-            previewContent.innerHTML = generatePreviewHtml(invoiceData);
-            document.getElementById('previewModal').style.display = 'flex';
+            document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
+    const invoiceData = getInvoiceFormData();
+    if (invoiceData) {
+        updateInvoiceTotals(invoiceData.controlNumber); // Pasar controlNumber
+        showPreviewModal(invoiceData);
+    }
+});
         }
         
         /**
