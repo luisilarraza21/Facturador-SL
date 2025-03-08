@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facturador ML Venezuela - Registro</title>
+    <title>FacturaML - Registro e Inicio de Sesión</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,6 +24,8 @@
             font-weight: bold;
             font-size: 24px;
             color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .container {
             max-width: 500px;
@@ -67,6 +69,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
+            color: #555;
         }
         input, select {
             width: 100%;
@@ -79,6 +82,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: #2968c8;
+            box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
         }
         .btn {
             background: #2968c8;
@@ -174,23 +178,23 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="companyRif">RIF*</label>
-                    <input type="text" id="companyRif" placeholder="Ej: J-12345678-9" required>
+                    <label for="rif">RIF*</label>
+                    <input type="text" id="rif" placeholder="Ej: J-12345678-9" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="address">Dirección Fiscal*</label>
-                    <input type="text" id="address" placeholder="Dirección completa">
+                    <input type="text" id="address" placeholder="Dirección completa" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="phone">Teléfono de Contacto*</label>
-                    <input type="text" id="phone" placeholder="Ej: 0414-1234567">
+                    <input type="text" id="phone" placeholder="Ej: +584121234567" required>
                 </div>
                 
                 <div class="checkbox-group">
-                    <input type="checkbox" id="isSpecialTaxpayer">
-                    <label for="isSpecialTaxpayer">Soy Contribuyente Especial</label>
+                    <input type="checkbox" id="isSpecialContributor">
+                    <label for="isSpecialContributor">Soy Contribuyente Especial</label>
                 </div>
                 
                 <button class="btn" id="registerButton">Crear Cuenta</button>
@@ -203,13 +207,13 @@
             <!-- Formulario de Login -->
             <div class="auth-form" id="loginForm" style="display: none;">
                 <div class="form-group">
-                    <label for="loginEmail">Correo Electrónico</label>
-                    <input type="email" id="loginEmail" placeholder="ejemplo@correo.com">
+                    <label for="loginEmail">Correo Electrónico*</label>
+                    <input type="email" id="loginEmail" placeholder="ejemplo@correo.com" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="loginPassword">Contraseña</label>
-                    <input type="password" id="loginPassword">
+                    <label for="loginPassword">Contraseña*</label>
+                    <input type="password" id="loginPassword" required>
                 </div>
                 
                 <button class="btn" id="loginButton">Iniciar Sesión</button>
@@ -222,10 +226,12 @@
     </div>
 
     <script>
-        // Almacenamiento local para usuarios (simulando una base de datos)
-        // Se accede directamente al localStorage para persistir los datos
+        // Reiniciar localStorage (eliminar usuarios y facturas)
+        localStorage.clear(); // Esto elimina todo, incluyendo users e invoices
+
+        // Almacenamiento local para usuarios
         let users = JSON.parse(localStorage.getItem('users')) || [];
-        
+
         // Referencias a elementos del DOM
         const loginTab = document.getElementById('loginTab');
         const registerTab = document.getElementById('registerTab');
@@ -237,7 +243,7 @@
         const loginButton = document.getElementById('loginButton');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
-        
+
         // Función para cambiar entre tabs
         function switchTab(tab) {
             if (tab === 'login') {
@@ -251,158 +257,157 @@
                 registerForm.style.display = 'block';
                 loginForm.style.display = 'none';
             }
-            
-            // Ocultar mensajes al cambiar de tab
             successMessage.style.display = 'none';
             errorMessage.style.display = 'none';
         }
-        
+
         // Función para mostrar mensaje de éxito
         function showSuccess(message) {
             successMessage.textContent = message;
             successMessage.style.display = 'block';
             errorMessage.style.display = 'none';
-            
-            // Ocultar después de 3 segundos
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-            }, 3000);
+            setTimeout(() => successMessage.style.display = 'none', 3000);
         }
-        
+
         // Función para mostrar mensaje de error
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.style.display = 'block';
             successMessage.style.display = 'none';
-            
-            // Ocultar después de 3 segundos
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-            }, 3000);
+            setTimeout(() => errorMessage.style.display = 'none', 3000);
         }
-        
+
         // Función para validar formulario de registro
         function validateRegisterForm() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const companyName = document.getElementById('companyName').value;
-            const companyRif = document.getElementById('companyRif').value;
-            const address = document.getElementById('address').value;
-            const phone = document.getElementById('phone').value;
-            
-            if (!email || !password || !companyName || !companyRif || !address || !phone) {
-                showError('Por favor completa todos los campos obligatorios');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const companyName = document.getElementById('companyName').value.trim();
+            const rif = document.getElementById('rif').value.trim().toUpperCase();
+            const address = document.getElementById('address').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!email || !password || !companyName || !rif || !address || !phone) {
+                showError('Por favor completa todos los campos obligatorios.');
                 return false;
             }
-            
+
             // Validar formato de correo
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                showError('Por favor ingresa un correo electrónico válido');
+                showError('Por favor ingresa un correo electrónico válido.');
                 return false;
             }
-            
-            // Validar formato de RIF (J-12345678-9)
-            const rifRegex = /^[JGVE]-\d{8}-\d{1}$/;
-            if (!rifRegex.test(companyRif)) {
-                showError('El formato del RIF debe ser J-12345678-9');
+
+            // Validar formato de RIF (J-12345678-9, V-12345678, etc.)
+            const rifRegex = /^[VEJPG]-[0-9]{8}-[0-9]$/;
+            if (!rifRegex.test(rif)) {
+                showError('El formato del RIF debe ser J-12345678-9 (o V/E/P/G seguido de 8 dígitos y 1 dígito).');
                 return false;
             }
-            
+
+            // Validar formato de teléfono (ej. +584121234567)
+            const phoneRegex = /^(\+58|0)[0-9]{10}$/;
+            if (!phoneRegex.test(phone)) {
+                showError('El teléfono debe tener un formato válido, ej. +584121234567.');
+                return false;
+            }
+
             // Verificar si el correo ya está registrado
             if (users.some(user => user.email === email)) {
-                showError('Este correo ya está registrado');
+                showError('Este correo ya está registrado.');
                 return false;
             }
-            
+
             return true;
         }
-        
+
         // Función para registrar usuario
         function registerUser() {
             if (!validateRegisterForm()) return;
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const companyName = document.getElementById('companyName').value;
-            const companyRif = document.getElementById('companyRif').value;
-            const address = document.getElementById('address').value;
-            const phone = document.getElementById('phone').value;
-            const isSpecialTaxpayer = document.getElementById('isSpecialTaxpayer').checked;
-            
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const companyName = document.getElementById('companyName').value.trim();
+            const rif = document.getElementById('rif').value.trim().toUpperCase();
+            const address = document.getElementById('address').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const isSpecialContributor = document.getElementById('isSpecialContributor').checked;
+
             // Crear objeto de usuario
             const newUser = {
                 email,
-                password, // En una aplicación real, deberías hashear la contraseña
+                password, // Nota: En producción, hashea la contraseña
                 companyName,
-                companyRif,
+                rif,
                 address,
                 phone,
-                isSpecialTaxpayer,
+                isSpecialContributor,
                 registrationDate: new Date().toISOString()
             };
-            
+
             // Agregar a la lista de usuarios
             users.push(newUser);
-            
-            // Guardar en localStorage
             localStorage.setItem('users', JSON.stringify(users));
-            
+
             // Mostrar mensaje de éxito
-            showSuccess('¡Registro exitoso! Ahora puedes iniciar sesión');
+            showSuccess('¡Registro exitoso! Ahora puedes iniciar sesión.');
             
             // Limpiar formulario
             document.getElementById('email').value = '';
             document.getElementById('password').value = '';
             document.getElementById('companyName').value = '';
-            document.getElementById('companyRif').value = '';
+            document.getElementById('rif').value = '';
             document.getElementById('address').value = '';
             document.getElementById('phone').value = '';
-            document.getElementById('isSpecialTaxpayer').checked = false;
-            
+            document.getElementById('isSpecialContributor').checked = false;
+
             // Cambiar a tab de login
-            setTimeout(() => {
-                switchTab('login');
-            }, 1500);
+            setTimeout(() => switchTab('login'), 1500);
         }
-        
-       // Función para iniciar sesión
-function loginUser() {
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        showError('Por favor ingresa tu correo y contraseña');
-        return;
-    }
-    
-    // Buscar usuario
-    const user = users.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-        // Guardar sesión
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        showSuccess('¡Inicio de sesión exitoso!');
-        
-        // Redireccionar al dashboard
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 1500);
-    } else {
-        showError('Correo o contraseña incorrectos');
-    }
-}
-        
+
+        // Función para iniciar sesión
+        function loginUser() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!email || !password) {
+                showError('Por favor ingresa tu correo y contraseña.');
+                return;
+            }
+
+            // Buscar usuario
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                // Guardar sesión con estructura consistente
+                const currentUser = {
+                    email: user.email,
+                    companyName: user.companyName,
+                    rif: user.rif,
+                    address: user.address,
+                    phone: user.phone,
+                    isSpecialContributor: user.isSpecialContributor
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showSuccess('¡Inicio de sesión exitoso! Redirigiendo...');
+
+                // Redireccionar al dashboard
+                setTimeout(() => window.location.href = 'dashboard.html', 1500);
+            } else {
+                showError('Correo o contraseña incorrectos.');
+            }
+        }
+
         // Eventos para cambiar entre tabs
         loginTab.addEventListener('click', () => switchTab('login'));
         registerTab.addEventListener('click', () => switchTab('register'));
         showLoginLink.addEventListener('click', () => switchTab('login'));
         showRegisterLink.addEventListener('click', () => switchTab('register'));
-        
+
         // Eventos para botones de acción
         registerButton.addEventListener('click', registerUser);
         loginButton.addEventListener('click', loginUser);
-        
+
         // Evento para permitir envío con Enter
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('keypress', function(e) {
@@ -418,9 +423,3 @@ function loginUser() {
     </script>
 </body>
 </html>
-    registerUser,
-    logoutUser,
-    checkAuthentication,
-    getCurrentUser,
-    updateUserProfile
-};
