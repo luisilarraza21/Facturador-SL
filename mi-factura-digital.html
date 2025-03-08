@@ -76,7 +76,6 @@
             padding: 15px;
             border-radius: 8px;
             text-align: center;
-            cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .dark-theme .template-card {
@@ -100,6 +99,7 @@
         .template-card h4 {
             font-size: 16px;
             color: #555;
+            margin-bottom: 10px;
         }
         .dark-theme .template-card h4 {
             color: #ddd;
@@ -129,6 +129,13 @@
         }
         .btn-primary:hover {
             background: #218838;
+        }
+        .btn-choose {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-choose:hover {
+            background: #e0a800;
         }
         .action-buttons {
             display: flex;
@@ -254,17 +261,23 @@
     <div class="container">
         <h2 class="section-title">Mi Factura Digital - Selección de Plantilla</h2>
         <div class="template-options">
-            <div class="template-card" onclick="previewTemplate(1)">
+            <div class="template-card">
                 <img src="https://via.placeholder.com/200x100?text=Plantilla+1" alt="Plantilla 1" id="template1Img">
                 <h4>Plantilla 1 - Clásica</h4>
+                <button class="btn btn-choose" onclick="chooseTemplate(1)">Elegir</button>
+                <button class="btn" onclick="previewTemplate(1)">Previsualizar</button>
             </div>
-            <div class="template-card" onclick="previewTemplate(2)">
+            <div class="template-card">
                 <img src="https://via.placeholder.com/200x100?text=Plantilla+2" alt="Plantilla 2" id="template2Img">
                 <h4>Plantilla 2 - Moderna</h4>
+                <button class="btn btn-choose" onclick="chooseTemplate(2)">Elegir</button>
+                <button class="btn" onclick="previewTemplate(2)">Previsualizar</button>
             </div>
-            <div class="template-card" onclick="previewTemplate(3)">
+            <div class="template-card">
                 <img src="https://via.placeholder.com/200x100?text=Plantilla+3" alt="Plantilla 3" id="template3Img">
                 <h4>Plantilla 3 - Elegante</h4>
+                <button class="btn btn-choose" onclick="chooseTemplate(3)">Elegir</button>
+                <button class="btn" onclick="previewTemplate(3)">Previsualizar</button>
             </div>
         </div>
         <div class="action-buttons">
@@ -298,9 +311,18 @@
             const currentUser = loadUserData();
             if (!currentUser) return;
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
-            document.getElementById('template1Img').src = logo;
-            document.getElementById('template2Img').src = logo;
-            document.getElementById('template3Img').src = logo;
+
+            // Plantilla 1: Clásica
+            document.getElementById('template1Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Clásica`)}`;
+            // Plantilla 2: Moderna
+            document.getElementById('template2Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Moderna`)}`;
+            // Plantilla 3: Elegante
+            document.getElementById('template3Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Elegante`)}`;
+        }
+
+        function chooseTemplate(templateId) {
+            localStorage.setItem('selectedTemplate', templateId);
+            alert(`Plantilla ${templateId} seleccionada. Se aplicará en tus facturas.`);
         }
 
         function previewTemplate(templateId) {
