@@ -15,6 +15,11 @@
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #333;
+            color: #f5f5f5;
         }
         .navbar {
             background-color: #ffe600;
@@ -83,11 +88,19 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
+        .dark-theme .container {
+            background: #444;
+            border-color: #555;
+        }
         .section-title {
             font-size: 18px;
             margin-bottom: 15px;
             border-bottom: 1px solid #eee;
             padding-bottom: 8px;
+        }
+        .dark-theme .section-title {
+            color: #f5f5f5;
+            border-bottom-color: #555;
         }
         .form-section {
             margin-bottom: 30px;
@@ -96,6 +109,9 @@
             font-size: 16px;
             margin-bottom: 15px;
             color: #555;
+        }
+        .dark-theme h3 {
+            color: #ddd;
         }
         .form-row {
             display: flex;
@@ -113,12 +129,20 @@
             font-weight: 500;
             color: #555;
         }
+        .dark-theme label {
+            color: #ddd;
+        }
         input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
+        }
+        .dark-theme input, .dark-theme select {
+            background: #555;
+            border-color: #666;
+            color: #f5f5f5;
         }
         input:focus, select:focus {
             outline: none;
@@ -165,9 +189,15 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+        .dark-theme .items-table th, .dark-theme .items-table td {
+            border-bottom-color: #666;
+        }
         .items-table th {
             background: #f8f9fa;
             font-weight: 600;
+        }
+        .dark-theme .items-table th {
+            background: #555;
         }
         .items-table input {
             width: 100%;
@@ -179,14 +209,23 @@
             border-collapse: collapse;
             background: #f8f9fa;
         }
+        .dark-theme .summary-table {
+            background: #555;
+        }
         .summary-table th, .summary-table td {
             padding: 10px 15px;
             text-align: right;
             border-bottom: 1px solid #ddd;
         }
+        .dark-theme .summary-table th, .dark-theme .summary-table td {
+            border-bottom-color: #666;
+        }
         .summary-table th {
             font-weight: 600;
             background: #e9ecef;
+        }
+        .dark-theme .summary-table th {
+            background: #666;
         }
         .btn {
             background: #2968c8;
@@ -238,6 +277,9 @@
             max-height: 80vh;
             overflow-y: auto;
         }
+        .dark-theme .modal-content {
+            background: #444;
+        }
         .modal-close {
             position: absolute;
             top: 10px;
@@ -246,10 +288,16 @@
             cursor: pointer;
             color: #333;
         }
+        .dark-theme .modal-close {
+            color: #f5f5f5;
+        }
         .invoice-preview {
             font-size: 14px;
             padding: 20px;
             border: 1px solid #ddd;
+        }
+        .dark-theme .invoice-preview {
+            border-color: #666;
         }
         .invoice-header {
             display: flex;
@@ -266,6 +314,9 @@
             border: 1px solid #ddd;
             text-align: left;
         }
+        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
+            border-color: #666;
+        }
         .two-column-table {
             width: 50%;
             margin-left: auto;
@@ -276,6 +327,9 @@
             border: 1px solid #ddd;
             text-align: right;
         }
+        .dark-theme .two-column-table th, .dark-theme .two-column-table td {
+            border-color: #666;
+        }
         .invoice-footer {
             margin-top: 20px;
             font-size: 12px;
@@ -283,6 +337,10 @@
             text-align: center;
             border-top: 1px solid #ddd;
             padding-top: 10px;
+        }
+        .dark-theme .invoice-footer {
+            color: #ddd;
+            border-top-color: #666;
         }
         .alert {
             position: fixed;
@@ -371,10 +429,11 @@
                     <div class="form-group">
                         <label for="paymentMethod">Método de pago*</label>
                         <select id="paymentMethod" required>
-                            <option value="efectivo">Efectivo</option>
-                            <option value="transferencia">Transferencia</option>
-                            <option value="pago_movil">Pago Móvil</option>
-                            <option value="zelle">Zelle</option>
+                            <option value="bolivares-efectivo">Bolívares Efectivo</option>
+                            <option value="pago-movil">Pago Móvil</option>
+                            <option value="transferencia-bancaria">Transferencia Bancaria</option>
+                            <option value="dolares-efectivo">Dólares Efectivo</option>
+                            <option value="dolares-transferencia">Dólares Transferencia</option>
                         </select>
                     </div>
                 </div>
@@ -508,14 +567,13 @@
         }
 
         function validateEmail(email) {
-            if (!email) return true; // Opcional
+            if (!email) return true;
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
         }
 
         async function fetchExchangeRate() {
             try {
-                // Simulación de API (reemplazar con fetch real si es necesario)
                 const response = { Success: true, rate: 64.74, date: '2025-03-07' };
                 if (response.Success) {
                     exchangeRate = response.rate;
@@ -527,34 +585,28 @@
             updateInvoiceTotals();
         }
 
-        // Generar número de documento único y consecutivo de 8 dígitos (solo el número)
         function generateDocNumber(docType) {
             const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
             const invoicesOfType = allInvoices.filter(invoice => invoice.docType === docType);
             const lastNumber = invoicesOfType.length > 0 ? Math.max(...invoicesOfType.map(invoice => parseInt(invoice.docNumber, 10) || 0)) : 0;
-            return (lastNumber + 1).toString().padStart(8, '0'); // 8 dígitos con ceros a la izquierda
+            return (lastNumber + 1).toString().padStart(8, '0');
         }
 
-        // Eliminar número de documento sin ceros a la izquierda para visualización
         function extractDocNumberForDisplay(docNumber) {
-            return parseInt(docNumber, 10).toString(); // Eliminar ceros a la izquierda
+            return parseInt(docNumber, 10).toString();
         }
 
-        // Validar la imagen seleccionada
         function validateImage(file) {
-            const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+            const maxSizeInBytes = 2 * 1024 * 1024;
             const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-
             if (!validTypes.includes(file.type)) {
                 showAlert('Por favor selecciona una imagen válida (JPEG, PNG o GIF).', 'warning');
                 return false;
             }
-
             if (file.size > maxSizeInBytes) {
                 showAlert('La imagen no debe exceder los 2MB.', 'warning');
                 return false;
             }
-
             return true;
         }
 
@@ -621,9 +673,10 @@
             });
             const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
             const alicuota = parseFloat(document.getElementById('alicuota').value) || 0;
+            const paymentMethod = document.getElementById('paymentMethod').value;
             const taxableBase = subtotal - exemptAmount;
             const tax = taxableBase * (alicuota / 100);
-            const igtf = subtotal * 0.03;
+            const igtf = (paymentMethod === 'dolares-efectivo' || paymentMethod === 'dolares-transferencia') ? subtotal * 0.03 : 0;
             const total = subtotal + tax + igtf;
 
             const subtotalUsd = subtotal / exchangeRate;
@@ -745,6 +798,8 @@
                     <div>
                         <h2>${currentUser.companyName}</h2>
                         <p>RIF: ${currentUser.rif}</p>
+                        <p>Dirección: ${currentUser.address || '-'}</p>
+                        <p>Teléfono: ${currentUser.phone || '-'}</p>
                     </div>
                     <div>
                         <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
@@ -801,6 +856,7 @@
                         <tr><th>Total</th><td>${formatCurrency(data.totalBs)}</td><td>${formatCurrency(data.totalUsd)}</td></tr>
                     </tbody>
                 </table>
+                <p>Método de Pago: ${data.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
                 <div class="invoice-footer">
                     <p>${footerText}</p>
                 </div>
@@ -854,7 +910,6 @@
                 exchangeRate: exchangeRate,
                 footerText: footerText
             };
-            // Validar que el docNumber sea único para el tipo de documento
             const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
             if (allInvoices.some(invoice => invoice.docType === data.docType && invoice.docNumber === docNumber)) {
                 showAlert('Error: El número de documento ya existe para este tipo.', 'error');
@@ -875,6 +930,11 @@
             }
             document.getElementById('userDisplayName').textContent = currentUser.companyName;
             document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+
+            // Aplicar modo oscuro si está activado
+            if (currentUser.darkTheme) {
+                document.body.classList.add('dark-theme');
+            }
 
             fetchExchangeRate();
 
@@ -902,6 +962,7 @@
             document.getElementById('downloadPreviewBtn').addEventListener('click', downloadPreview);
             document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
             document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
+            document.getElementById('paymentMethod').addEventListener('change', updateInvoiceTotals);
             document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
             updateInvoiceTotals();
         });
