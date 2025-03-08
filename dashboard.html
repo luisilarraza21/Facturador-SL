@@ -717,19 +717,37 @@
             const invoice = userInvoices[index];
             showInvoiceDetails(index); // Generar contenido con la plantilla seleccionada
             const element = document.getElementById('invoiceDetails');
+
+            // Crear un contenedor temporal para forzar fondo blanco y texto negro
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = element.innerHTML;
+            tempContainer.style.backgroundColor = '#ffffff';
+            tempContainer.style.color = '#000000';
+            tempContainer.querySelectorAll('*').forEach(el => {
+                el.style.backgroundColor = '';
+                el.style.color = '';
+            });
+
             const opt = {
                 margin: [0.5, 0.5, 0.5, 0.5], // Márgenes en pulgadas [arriba, derecha, abajo, izquierda]
                 filename: `Factura_${invoice.docNumber}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff', // Forzar fondo blanco
+                    allowTaint: true
+                },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                 pagebreak: { mode: ['css', 'legacy'], avoid: ['table', '.invoice-footer'] } // Evitar cortes en tablas y footer
             };
-            html2pdf().set(opt).from(element).toPdf().get('pdf').then((pdf) => {
+
+            html2pdf().set(opt).from(tempContainer).toPdf().get('pdf').then((pdf) => {
                 const totalPages = pdf.internal.getNumberOfPages();
                 for (let i = 1; i <= totalPages; i++) {
                     pdf.setPage(i);
                     pdf.setFontSize(10);
+                    pdf.setTextColor(0, 0, 0); // Forzar texto negro
                     pdf.text('Página ' + i + ' de ' + totalPages, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 0.3, { align: 'center' });
                 }
             }).save();
