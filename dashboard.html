@@ -45,8 +45,18 @@
             font-size: 16px;
             color: #444;
             font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .logout-btn {
+        .user-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+        .logout-btn, .user-btn {
             background: #2968c8;
             color: white;
             border: none;
@@ -55,7 +65,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .logout-btn:hover {
+        .logout-btn:hover, .user-btn:hover {
             background: #1d4f9e;
             transform: scale(1.05);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -243,6 +253,10 @@
             .action-bar {
                 justify-content: center;
             }
+            .nav-user {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -250,7 +264,11 @@
     <div class="navbar">
         <div class="logo">FacturaML</div>
         <div class="nav-user">
-            <div class="user-info" id="userDisplayName">Cargando...</div>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/30" alt="Foto de perfil" class="user-pic" id="userPic">
+                <span id="userDisplayName">Cargando...</span>
+            </div>
+            <button class="user-btn" id="userButton">Usuario</button>
             <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
         </div>
     </div>
@@ -332,6 +350,7 @@
                 return null;
             }
             document.getElementById('userDisplayName').textContent = currentUser.companyName;
+            document.getElementById('userPic').src = currentUser.profilePic || 'https://via.placeholder.com/30';
             return currentUser;
         }
 
@@ -461,6 +480,10 @@
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
                 window.location.href = 'index.html';
+            });
+
+            document.getElementById('userButton').addEventListener('click', () => {
+                window.location.href = 'user.html';
             });
 
             document.getElementById('prevPage').addEventListener('click', () => {
