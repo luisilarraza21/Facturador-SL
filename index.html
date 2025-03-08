@@ -226,10 +226,7 @@
     </div>
 
     <script>
-        // Reiniciar localStorage (eliminar usuarios y facturas)
-        localStorage.clear(); // Esto elimina todo, incluyendo users e invoices
-
-        // Almacenamiento local para usuarios
+        // Almacenamiento local para usuarios (sin reiniciar)
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
         // Referencias a elementos del DOM
@@ -312,9 +309,13 @@
                 return false;
             }
 
-            // Verificar si el correo ya está registrado
+            // Verificar si el correo o RIF ya están registrados
             if (users.some(user => user.email === email)) {
                 showError('Este correo ya está registrado.');
+                return false;
+            }
+            if (users.some(user => user.rif === rif)) {
+                showError('Este RIF ya está registrado.');
                 return false;
             }
 
