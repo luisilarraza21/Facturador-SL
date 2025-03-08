@@ -15,6 +15,11 @@
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #333;
+            color: #f5f5f5;
         }
         .navbar {
             background-color: #ffe600;
@@ -35,7 +40,7 @@
             letter-spacing: 1px;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 20px auto;
             padding: 20px;
             background: #fff;
@@ -43,12 +48,20 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid #ddd;
         }
+        .dark-theme .container {
+            background: #444;
+            border-color: #555;
+        }
         .section-title {
             font-size: 18px;
             margin-bottom: 15px;
             border-bottom: 1px solid #eee;
             padding-bottom: 8px;
             color: #333;
+        }
+        .dark-theme .section-title {
+            color: #f5f5f5;
+            border-bottom-color: #555;
         }
         .form-group {
             margin-bottom: 20px;
@@ -59,7 +72,10 @@
             font-weight: 500;
             color: #555;
         }
-        input {
+        .dark-theme label {
+            color: #ddd;
+        }
+        input, textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -67,10 +83,19 @@
             font-size: 16px;
             box-sizing: border-box;
         }
-        input:focus {
+        .dark-theme input, .dark-theme textarea {
+            background: #555;
+            border-color: #666;
+            color: #f5f5f5;
+        }
+        input:focus, textarea:focus {
             outline: none;
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
         }
         .btn {
             background: #2968c8;
@@ -91,6 +116,12 @@
         .btn-back:hover {
             background: #5a6268;
         }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
         .profile-pic-container {
             text-align: center;
             margin-bottom: 20px;
@@ -101,6 +132,9 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ddd;
+        }
+        .dark-theme .profile-pic {
+            border-color: #666;
         }
         .alert {
             position: fixed;
@@ -126,6 +160,32 @@
             display: flex;
             gap: 10px;
             justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .history-log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .dark-theme .history-log {
+            background: #555;
+        }
+        .history-log ul {
+            list-style: none;
+            padding: 0;
+        }
+        .history-log li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .dark-theme .history-log li {
+            border-bottom-color: #666;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
     </style>
 </head>
@@ -163,7 +223,40 @@
             <input type="email" id="email" required>
         </div>
 
+        <div class="form-group">
+            <label for="address">Dirección Fiscal</label>
+            <textarea id="address" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Nueva Contraseña (dejar en blanco para no cambiar)</label>
+            <input type="password" id="password">
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+            <input type="password" id="confirmPassword">
+        </div>
+
+        <div class="form-group">
+            <h3 class="section-title">Configuración</h3>
+            <div class="checkbox-group">
+                <input type="checkbox" id="emailNotifications">
+                <label for="emailNotifications">Recibir notificaciones por correo</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="darkTheme">
+                <label for="darkTheme">Activar tema oscuro</label>
+            </div>
+        </div>
+
+        <div class="history-log">
+            <h3 class="section-title">Historial de Actividad</h3>
+            <ul id="activityLog"></ul>
+        </div>
+
         <div class="button-group">
+            <button class="btn btn-danger" id="deleteAccountButton">Eliminar Cuenta</button>
             <button class="btn btn-back" id="backButton">Atrás</button>
             <button class="btn" id="saveButton">Guardar Cambios</button>
         </div>
@@ -188,12 +281,40 @@
             }
 
             document.getElementById('companyName').value = currentUser.companyName;
-            document.getElementById('rif').value =odor currentUser.rif;
+            document.getElementById('rif').value = currentUser.rif;
             document.getElementById('phone').value = currentUser.phone;
             document.getElementById('email').value = currentUser.email;
+            document.getElementById('address').value = currentUser.address || '';
+            document.getElementById('emailNotifications').checked = currentUser.emailNotifications || false;
+            document.getElementById('darkTheme').checked = currentUser.darkTheme || false;
             const profilePic = document.getElementById('profilePic');
-            profilePic.src = currentUser.profilePic || 'https://via.placeholder.com/150'; // Imagen por defecto si no hay foto
+            profilePic.src = currentUser.profilePic || 'https://via.placeholder.com/150';
+
+            // Aplicar tema oscuro si está activado
+            if (currentUser.darkTheme) {
+                document.body.classList.add('dark-theme');
+            }
+
+            // Cargar historial de actividad
+            loadActivityLog(currentUser);
             return currentUser;
+        }
+
+        // Cargar historial de actividad
+        function loadActivityLog(currentUser) {
+            const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
+            const logList = document.getElementById('activityLog');
+            logList.innerHTML = activityLog.length > 0 ? activityLog.map(entry => `<li>${entry}</li>`).join('') : '<li>No hay actividad reciente.</li>';
+        }
+
+        // Agregar entrada al historial
+        function addActivityEntry(currentUser, message) {
+            const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
+            const timestamp = new Date().toLocaleString('es-ES');
+            activityLog.unshift(`${timestamp}: ${message}`);
+            if (activityLog.length > 10) activityLog.pop(); // Limitar a 10 entradas
+            localStorage.setItem(`activity_${currentUser.rif}`, JSON.stringify(activityLog));
+            loadActivityLog(currentUser);
         }
 
         // Validar formulario
@@ -202,9 +323,12 @@
             const companyName = document.getElementById('companyName').value.trim();
             const rif = document.getElementById('rif').value.trim().toUpperCase();
             const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (!email || !companyName || !rif || !phone) {
-                showAlert('Por favor completa todos los campos.', 'error');
+            if (!email || !companyName || !rif || !phone || !address) {
+                showAlert('Por favor completa todos los campos obligatorios.', 'error');
                 return false;
             }
 
@@ -226,6 +350,11 @@
                 return false;
             }
 
+            if (password && password !== confirmPassword) {
+                showAlert('Las contraseñas no coinciden.', 'error');
+                return false;
+            }
+
             return true;
         }
 
@@ -242,7 +371,11 @@
                 rif: document.getElementById('rif').value.trim().toUpperCase(),
                 phone: document.getElementById('phone').value.trim(),
                 email: document.getElementById('email').value.trim(),
-                profilePic: document.getElementById('profilePic').src
+                address: document.getElementById('address').value.trim(),
+                profilePic: document.getElementById('profilePic').src,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                darkTheme: document.getElementById('darkTheme').checked,
+                ...(document.getElementById('password').value && { password: document.getElementById('password').value })
             };
 
             // Actualizar currentUser
@@ -255,7 +388,22 @@
                 localStorage.setItem('users', JSON.stringify(users));
             }
 
+            addActivityEntry(currentUser, 'Perfil actualizado');
             showAlert('Cambios guardados exitosamente.', 'success');
+        }
+
+        // Eliminar cuenta
+        function deleteAccount() {
+            if (!confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users = users.filter(u => u.email !== currentUser.email);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem(`activity_${currentUser.rif}`);
+            showAlert('Cuenta eliminada. Redirigiendo al inicio...', 'success');
+            setTimeout(() => window.location.href = 'index.html', 2000);
         }
 
         // Inicialización
@@ -278,6 +426,12 @@
 
             document.getElementById('backButton').addEventListener('click', () => {
                 window.location.href = 'dashboard.html';
+            });
+
+            document.getElementById('deleteAccountButton').addEventListener('click', deleteAccount);
+
+            document.getElementById('darkTheme').addEventListener('change', (e) => {
+                document.body.classList.toggle('dark-theme', e.target.checked);
             });
         });
     </script>
