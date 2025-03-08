@@ -293,7 +293,7 @@
             background: #c82333;
         }
         .invoice-details {
-            font-size: 14px;
+            font-size: 10px; /* Reducir tamaño de fuente para más espacio */
         }
         .invoice-details h3 {
             margin-bottom: 10px;
@@ -306,9 +306,10 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            font-size: 10px; /* Reducir tamaño de fuente en tablas */
         }
         .invoice-details th, .invoice-details td {
-            padding: 8px;
+            padding: 6px; /* Reducir padding para ahorrar espacio */
             border: 1px solid #ddd;
             text-align: left;
         }
@@ -319,9 +320,10 @@
             width: 50%;
             margin-left: auto;
             border-collapse: collapse;
+            font-size: 10px; /* Reducir tamaño de fuente */
         }
         .two-column-table th, .two-column-table td {
-            padding: 8px;
+            padding: 6px; /* Reducir padding */
             border: 1px solid #ddd;
             text-align: right;
         }
@@ -349,12 +351,12 @@
         }
         .invoice-footer {
             margin-top: 20px;
-            font-size: 12px;
+            font-size: 8px; /* Reducir tamaño de fuente del footer */
             color: #666;
             text-align: center;
             border-top: 1px solid #ddd;
             padding-top: 10px;
-            page-break-after: always; /* Forzar salto de página después del footer */
+            page-break-after: always;
         }
         .dark-theme .invoice-footer {
             color: #ddd;
@@ -477,8 +479,8 @@
         </div>
     </div>
 
-    <!-- Incluir html2pdf.js para descargar PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Incluir jsPDF para una mejor generación de PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
         // Variables globales
@@ -511,8 +513,8 @@
         }
 
         function getUserInvoices(currentUser) {
-            const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            return allInvoices.filter(invoice => invoice.sellerRif === currentUser.rif);
+            const userInvoicesKey = `invoices_${currentUser.rif}`;
+            return JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
         }
 
         function loadStats(userInvoices, currentUser) {
@@ -592,7 +594,7 @@
                     <div class="template-1">
                         <div class="invoice-header">
                             <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
-                            <h2>${currentUser.companyName}</h2>
+                            <h3>${currentUser.companyName}</h3>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Dirección: ${currentUser.address || '-'}</p>
                             <p>Teléfono: ${currentUser.phone || '-'}</p>
@@ -617,7 +619,7 @@
                         <div class="invoice-header">
                             <div>
                                 <img src="${logo}" alt="Logo" style="width: 80px; height: 80px; float: left; margin-right: 15px;">
-                                <h2>${currentUser.companyName}</h2>
+                                <h3>${currentUser.companyName}</h3>
                                 <p>RIF: ${currentUser.rif}</p>
                             </div>
                             <div>
@@ -642,7 +644,7 @@
                     <div class="template-3">
                         <div class="invoice-header">
                             <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
-                            <h2>${currentUser.companyName}</h2>
+                            <h3>${currentUser.companyName}</h3>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Dirección: ${currentUser.address || '-'}</p>
                             <p>Teléfono: ${currentUser.phone || '-'}</p>
@@ -718,39 +720,81 @@
             showInvoiceDetails(index); // Generar contenido con la plantilla seleccionada
             const element = document.getElementById('invoiceDetails');
 
-            // Crear un contenedor temporal para forzar fondo blanco y texto negro
+            // Crear un contenedor temporal con estilo ajustado
             const tempContainer = document.createElement('div');
             tempContainer.innerHTML = element.innerHTML;
+            tempContainer.style.fontSize = '10px'; // Fuente más pequeña
+            tempContainer.style.padding = '10px';
             tempContainer.style.backgroundColor = '#ffffff';
             tempContainer.style.color = '#000000';
-            tempContainer.querySelectorAll('*').forEach(el => {
-                el.style.backgroundColor = '';
-                el.style.color = '';
+            tempContainer.querySelectorAll('table').forEach(table => {
+                table.style.fontSize = '10px';
+                table.style.width = '100%';
+            });
+            tempContainer.querySelectorAll('th, td').forEach(cell => {
+                cell.style.padding = '4px'; // Reducir padding
             });
 
-            const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5], // Márgenes en pulgadas [arriba, derecha, abajo, izquierda]
-                filename: `Factura_${invoice.docNumber}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: '#ffffff', // Forzar fondo blanco
-                    allowTaint: true
-                },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: ['table', '.invoice-footer'] } // Evitar cortes en tablas y footer
-            };
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                putOnlyUsedFonts: true,
+                floatPrecision: 16 // Precisión para evitar problemas de renderizado
+            });
 
-            html2pdf().set(opt).from(tempContainer).toPdf().get('pdf').then((pdf) => {
-                const totalPages = pdf.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    pdf.setFontSize(10);
-                    pdf.setTextColor(0, 0, 0); // Forzar texto negro
-                    pdf.text('Página ' + i + ' de ' + totalPages, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 0.3, { align: 'center' });
+            // Añadir contenido con control de paginación
+            const margin = 10;
+            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            const pageHeight = doc.internal.pageSize.getHeight() - 2 * margin;
+            let y = margin;
+
+            // Función para agregar texto o elementos
+            function addContent(htmlElement, yPos) {
+                const splitText = doc.splitTextToSize(htmlElement.outerHTML, pageWidth - 20); // Ajustar ancho
+                splitText.forEach((text, index) => {
+                    if (y + 10 > pageHeight) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    doc.text(text, margin, y);
+                    y += 10; // Incremento ajustado para fuente pequeña
+                });
+            }
+
+            // Convertir el HTML a elementos y agregar manualmente
+            const elements = tempContainer.children;
+            for (let elem of elements) {
+                if (elem.tagName === 'TABLE') {
+                    doc.autoTable({
+                        html: elem,
+                        startY: y,
+                        theme: 'striped',
+                        styles: { fontSize: 8, cellPadding: 2 },
+                        columnStyles: { 0: { cellWidth: 'auto' }, 1: { cellWidth: 'auto' } }, // Ajustar ancho de columnas
+                        margin: { top: margin },
+                        avoidPageSplit: true // Intentar evitar división de tablas
+                    });
+                    y = doc.lastAutoTable.finalY + 10;
+                } else {
+                    addContent(elem, y);
                 }
-            }).save();
+                if (y + 20 > pageHeight) {
+                    doc.addPage();
+                    y = margin;
+                }
+            }
+
+            // Añadir numeración de páginas
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Página ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+            }
+
+            doc.save(`Factura_${invoice.docNumber}.pdf`);
         }
 
         function sendInvoiceByEmail(index) {
