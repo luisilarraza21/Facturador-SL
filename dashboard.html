@@ -224,6 +224,36 @@
         .form-row .form-group {
             flex: 1;
         }
+        #profileForm {
+    max-width: 600px;
+    margin: 0 auto;
+}
+#profileForm .form-group {
+    margin-bottom: 15px;
+}
+#profileForm input, #profileForm textarea, #profileForm select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+#profileForm textarea {
+    height: 80px;
+    resize: none;
+}
+#editProfileBtn, #saveProfileBtn, #cancelProfileBtn {
+    background: #2968c8;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+#cancelProfileBtn {
+    background: #6c757d;
+}
         label {
             display: block;
             margin-bottom: 8px;
@@ -406,7 +436,41 @@
             <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
         </div>
     </div>
-    
+    <div id="profileTab" class="tab-content" style="display: none;">
+    <h2>Mi Perfil</h2>
+    <form id="profileForm">
+        <div class="form-group">
+            <label for="profileCompanyName">Nombre de la Empresa:</label>
+            <input type="text" id="profileCompanyName" name="companyName" readonly>
+        </div>
+        <div class="form-group">
+            <label for="profileRif">RIF:</label>
+            <input type="text" id="profileRif" name="rif" readonly>
+        </div>
+        <div class="form-group">
+            <label for="profileAddress">Dirección:</label>
+            <textarea id="profileAddress" name="address" readonly></textarea>
+        </div>
+        <div class="form-group">
+            <label for="profilePhone">Teléfono:</label>
+            <input type="text" id="profilePhone" name="phone" readonly>
+        </div>
+        <div class="form-group">
+            <label for="profileEmail">Correo Electrónico:</label>
+            <input type="email" id="profileEmail" name="email" readonly>
+        </div>
+        <div class="form-group">
+            <label for="profileSpecialContributor">Contribuyente Especial:</label>
+            <select id="profileSpecialContributor" name="isSpecialContributor" disabled>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <button type="button" id="editProfileBtn">Editar Perfil</button>
+        <button type="submit" id="saveProfileBtn" style="display: none;">Guardar Cambios</button>
+        <button type="button" id="cancelProfileBtn" style="display: none;">Cancelar</button>
+    </form>
+</div>
     <div class="container">
         <div class="dashboard-header">
             <div class="dashboard-title">Panel de Control</div>
@@ -823,7 +887,16 @@
                 lowInvoicesWarning.classList.add('hidden');
             }
         }
-
+        function initializePage() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+    }
+    setupTabs();
+    setupProfileForm(); // Agregar la inicialización del formulario de perfil
+    // ... otras inicializaciones
+}
         /**
          * Muestra el formulario de nueva factura y lo inicializa.
          */
@@ -1045,7 +1118,98 @@
         });
         document.getElementById('paymentMethod').addEventListener('change', updateSummary);
     }
+function setupProfileForm() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        showAlert('No se encontró información del usuario. Por favor, inicia sesión nuevamente.', 'error');
+        return;
+    }
 
+    // Cargar datos iniciales
+    document.getElementById('profileCompanyName').value = currentUser.companyName || '';
+    document.getElementById('profileRif').value = currentUser.rif || '';
+    document.getElementById('profileAddress').value = currentUser.address || '';
+    document.getElementById('profilePhone').value = currentUser.phone || '';
+    document.getElementById('profileEmail').value = currentUser.email || '';
+    document.getElementById('profileSpecialContributor').value = currentUser.isSpecialContributor ? 'true' : 'false';
+
+    const editBtn = document.getElementById('editProfileBtn');
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const cancelBtn = document.getElementById('cancelProfileBtn');
+    const form = document.getElementById('profileForm');
+
+    editBtn.addEventListener('click', () => {
+        // Habilitar campos para edición
+        document.getElementById('profileCompanyName').removeAttribute('readonly');
+        document.getElementById('profileRif').removeAttribute('readonly');
+        document.getElementById('profileAddress').removeAttribute('readonly');
+        document.getElementById('profilePhone').removeAttribute('readonly');
+        document.getElementById('profileEmail').removeAttribute('readonly');
+        document.getElementById('profileSpecialContributor').removeAttribute('disabled');
+
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'inline-block';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        // Restaurar valores originales
+        document.getElementById('profileCompanyName').value = currentUser.companyName || '';
+        document.getElementById('profileRif').value = currentUser.rif || '';
+        document.getElementById('profileAddress').value = currentUser.address || '';
+        document.getElementById('profilePhone').value = currentUser.phone || '';
+        document.getElementById('profileEmail').value = currentUser.email || '';
+        document.getElementById('profileSpecialContributor').value = currentUser.isSpecialContributor ? 'true' : 'false';
+
+        // Deshabilitar campos
+        document.getElementById('profileCompanyName').setAttribute('readonly', true);
+        document.getElementById('profileRif').setAttribute('readonly', true);
+        document.getElementById('profileAddress').setAttribute('readonly', true);
+        document.getElementById('profilePhone').setAttribute('readonly', true);
+        document.getElementById('profileEmail').setAttribute('readonly', true);
+        document.getElementById('profileSpecialContributor').setAttribute('disabled', true);
+
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Obtener nuevos valores
+        const updatedUser = {
+            companyName: document.getElementById('profileCompanyName').value.trim(),
+            rif: document.getElementById('profileRif').value.trim().toUpperCase(),
+            address: document.getElementById('profileAddress').value.trim(),
+            phone: document.getElementById('profilePhone').value.trim(),
+            email: document.getElementById('profileEmail').value.trim(),
+            isSpecialContributor: document.getElementById('profileSpecialContributor').value === 'true'
+        };
+
+        // Validar datos
+        if (!updatedUser.companyName || !updatedUser.rif || !updatedUser.address) {
+            showAlert('Por favor, completa todos los campos obligatorios (Nombre, RIF, Dirección).', 'error');
+            return;
+        }
+
+        // Actualizar en localStorage
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        showAlert('Perfil actualizado correctamente.', 'success');
+
+        // Deshabilitar campos
+        document.getElementById('profileCompanyName').setAttribute('readonly', true);
+        document.getElementById('profileRif').setAttribute('readonly', true);
+        document.getElementById('profileAddress').setAttribute('readonly', true);
+        document.getElementById('profilePhone').setAttribute('readonly', true);
+        document.getElementById('profileEmail').setAttribute('readonly', true);
+        document.getElementById('profileSpecialContributor').setAttribute('disabled', true);
+
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+    });
+}
     /**
      * Cambia la pestaña activa en la interfaz.
      * @param {string} tab - Nombre de la pestaña (Invoices, Clients, Profile).
