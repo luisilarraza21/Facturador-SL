@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Registro e Inicio de Sesión</title>
+    <title>Wakal Blitz - Registro e Inicio de Sesión</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,6 +11,12 @@
             padding: 0;
             background-color: #f5f5f5;
             color: #333;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-theme {
+            background-color: #333;
+            color: #f5f5f5;
         }
         .navbar {
             background-color: #ffe600;
@@ -18,7 +24,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+        .navbar:hover {
+            background-color: #e6cc00;
         }
         .logo {
             font-weight: bold;
@@ -26,6 +36,19 @@
             color: #333;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        .dark-theme .logo {
+            color: #333; /* Mantener legible en modo oscuro */
+        }
+        .main-title {
+            text-align: center;
+            font-size: 32px;
+            margin: 20px 0;
+            color: #2968c8;
+            text-transform: uppercase;
+        }
+        .dark-theme .main-title {
+            color: #4a90e2;
         }
         .container {
             max-width: 500px;
@@ -35,9 +58,14 @@
         .card {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 30px;
             margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+        .dark-theme .card {
+            background: #444;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         .auth-logo {
             text-align: center;
@@ -55,9 +83,15 @@
             border-bottom: 2px solid #ddd;
             transition: all 0.3s ease;
         }
+        .dark-theme .auth-tab {
+            border-bottom-color: #666;
+        }
         .auth-tab.active {
             border-bottom: 2px solid #2968c8;
             font-weight: bold;
+        }
+        .dark-theme .auth-tab.active {
+            border-bottom-color: #4a90e2;
         }
         .auth-form {
             margin-top: 20px;
@@ -71,6 +105,9 @@
             font-weight: 500;
             color: #555;
         }
+        .dark-theme label {
+            color: #ddd;
+        }
         input, select {
             width: 100%;
             padding: 12px;
@@ -78,11 +115,21 @@
             border-radius: 4px;
             font-size: 16px;
             box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dark-theme input, .dark-theme select {
+            background: #555;
+            border-color: #666;
+            color: #f5f5f5;
         }
         input:focus, select:focus {
             outline: none;
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+        }
+        .dark-theme input:focus, .dark-theme select:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
         }
         .btn {
             background: #2968c8;
@@ -98,6 +145,12 @@
         .btn:hover {
             background: #1d4f9e;
         }
+        .dark-theme .btn {
+            background: #4a90e2;
+        }
+        .dark-theme .btn:hover {
+            background: #357abd;
+        }
         .text-center {
             text-align: center;
         }
@@ -108,6 +161,9 @@
             color: #2968c8;
             text-decoration: none;
             cursor: pointer;
+        }
+        .dark-theme .link {
+            color: #4a90e2;
         }
         .link:hover {
             text-decoration: underline;
@@ -121,6 +177,10 @@
             text-align: center;
             display: none;
         }
+        .dark-theme .success-message {
+            background-color: #28a745;
+            color: #fff;
+        }
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
@@ -129,6 +189,10 @@
             margin-bottom: 20px;
             text-align: center;
             display: none;
+        }
+        .dark-theme .error-message {
+            background-color: #dc3545;
+            color: #fff;
         }
         .checkbox-group {
             display: flex;
@@ -139,20 +203,25 @@
             width: auto;
             margin-right: 10px;
         }
+        .dark-theme .checkbox-group label {
+            color: #ddd;
+        }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">FacturaML</div>
+        <div class="logo">Wakal Blitz</div>
     </div>
     
+    <div class="main-title">Wakal Blitz</div>
+
     <div class="container">
         <div class="success-message" id="successMessage"></div>
         <div class="error-message" id="errorMessage"></div>
         
         <div class="card">
             <div class="auth-logo">
-                <div class="logo">FacturaML</div>
+                <div class="logo">Wakal Blitz</div>
             </div>
             
             <div class="auth-tabs">
@@ -179,7 +248,7 @@
                 
                 <div class="form-group">
                     <label for="rif">RIF*</label>
-                    <input type="text" id="rif" placeholder="Ej: J-12345678-9" required>
+                    <input type="text" id="rif" placeholder="Ej: 123456789" required>
                 </div>
                 
                 <div class="form-group">
@@ -279,7 +348,7 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             const companyName = document.getElementById('companyName').value.trim();
-            const rif = document.getElementById('rif').value.trim().toUpperCase();
+            const rif = document.getElementById('rif').value.trim();
             const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
 
@@ -295,10 +364,10 @@
                 return false;
             }
 
-            // Validar formato de RIF (J-12345678-9, V-12345678, etc.)
-            const rifRegex = /^[VEJPG]-[0-9]{8}-[0-9]$/;
+            // Validar formato de RIF (solo números, longitud entre 7 y 9)
+            const rifRegex = /^[0-9]{7,9}$/;
             if (!rifRegex.test(rif)) {
-                showError('El formato del RIF debe ser J-12345678-9 (o V/E/P/G seguido de 8 dígitos y 1 dígito).');
+                showError('El RIF debe contener solo números y tener entre 7 y 9 dígitos.');
                 return false;
             }
 
@@ -329,7 +398,7 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             const companyName = document.getElementById('companyName').value.trim();
-            const rif = document.getElementById('rif').value.trim().toUpperCase();
+            const rif = document.getElementById('rif').value.trim();
             const address = document.getElementById('address').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const isSpecialContributor = document.getElementById('isSpecialContributor').checked;
@@ -421,6 +490,12 @@
                 }
             });
         });
+
+        // Aplicar modo oscuro si está en localStorage
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (currentUser && currentUser.darkTheme) {
+            document.body.classList.add('dark-theme');
+        }
     </script>
 </body>
 </html>
