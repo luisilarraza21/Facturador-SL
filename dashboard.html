@@ -293,7 +293,7 @@
             background: #c82333;
         }
         .invoice-details {
-            font-size: 10px; /* Reducir tamaño de fuente para más espacio */
+            font-size: 10px; /* Mantener tamaño de fuente del visualizador */
         }
         .invoice-details h3 {
             margin-bottom: 10px;
@@ -306,10 +306,10 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            font-size: 10px; /* Reducir tamaño de fuente en tablas */
+            font-size: 10px; /* Mantener tamaño de fuente */
         }
         .invoice-details th, .invoice-details td {
-            padding: 6px; /* Reducir padding para ahorrar espacio */
+            padding: 6px; /* Mantener padding */
             border: 1px solid #ddd;
             text-align: left;
         }
@@ -320,10 +320,10 @@
             width: 50%;
             margin-left: auto;
             border-collapse: collapse;
-            font-size: 10px; /* Reducir tamaño de fuente */
+            font-size: 10px; /* Mantener tamaño de fuente */
         }
         .two-column-table th, .two-column-table td {
-            padding: 6px; /* Reducir padding */
+            padding: 6px; /* Mantener padding */
             border: 1px solid #ddd;
             text-align: right;
         }
@@ -351,7 +351,7 @@
         }
         .invoice-footer {
             margin-top: 20px;
-            font-size: 8px; /* Reducir tamaño de fuente del footer */
+            font-size: 8px; /* Mantener tamaño de fuente */
             color: #666;
             text-align: center;
             border-top: 1px solid #ddd;
@@ -479,8 +479,9 @@
         </div>
     </div>
 
-    <!-- Incluir jsPDF para una mejor generación de PDFs -->
+    <!-- Incluir jsPDF para generación de PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <script>
         // Variables globales
@@ -722,8 +723,8 @@
 
             // Crear un contenedor temporal con estilo ajustado
             const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = element.innerHTML;
-            tempContainer.style.fontSize = '10px'; // Fuente más pequeña
+            tempContainer.innerHTML = element.innerHTML.trim(); // Eliminar espacios innecesarios
+            tempContainer.style.fontSize = '10px';
             tempContainer.style.padding = '10px';
             tempContainer.style.backgroundColor = '#ffffff';
             tempContainer.style.color = '#000000';
@@ -732,7 +733,7 @@
                 table.style.width = '100%';
             });
             tempContainer.querySelectorAll('th, td').forEach(cell => {
-                cell.style.padding = '4px'; // Reducir padding
+                cell.style.padding = '4px';
             });
 
             const { jsPDF } = window.jspdf;
@@ -741,50 +742,58 @@
                 unit: 'mm',
                 format: 'a4',
                 putOnlyUsedFonts: true,
-                floatPrecision: 16 // Precisión para evitar problemas de renderizado
+                floatPrecision: 16
             });
 
-            // Añadir contenido con control de paginación
+            // Añadir contenido con control de paginación optimizado
             const margin = 10;
             const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
             const pageHeight = doc.internal.pageSize.getHeight() - 2 * margin;
             let y = margin;
 
-            // Función para agregar texto o elementos
-            function addContent(htmlElement, yPos) {
-                const splitText = doc.splitTextToSize(htmlElement.outerHTML, pageWidth - 20); // Ajustar ancho
-                splitText.forEach((text, index) => {
-                    if (y + 10 > pageHeight) {
+            // Función para agregar texto
+            function addText(text, yPos) {
+                const lines = doc.splitTextToSize(text, pageWidth - 20);
+                lines.forEach(line => {
+                    if (y > pageHeight - 10) {
                         doc.addPage();
                         y = margin;
                     }
-                    doc.text(text, margin, y);
-                    y += 10; // Incremento ajustado para fuente pequeña
+                    doc.text(line, margin, y);
+                    y += 5; // Incremento menor para optimizar espacio
                 });
             }
 
-            // Convertir el HTML a elementos y agregar manualmente
-            const elements = tempContainer.children;
-            for (let elem of elements) {
+            // Procesar elementos manualmente
+            const elements = Array.from(tempContainer.children);
+            elements.forEach(elem => {
                 if (elem.tagName === 'TABLE') {
+                    const tableData = [];
+                    const headers = Array.from(elem.querySelectorAll('th')).map(th => th.textContent);
+                    const rows = Array.from(elem.querySelectorAll('tr')).slice(1).map(tr => 
+                        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+                    );
+                    tableData.push(headers, ...rows);
+
                     doc.autoTable({
-                        html: elem,
+                        head: [tableData[0]],
+                        body: tableData.slice(1),
                         startY: y,
                         theme: 'striped',
-                        styles: { fontSize: 8, cellPadding: 2 },
-                        columnStyles: { 0: { cellWidth: 'auto' }, 1: { cellWidth: 'auto' } }, // Ajustar ancho de columnas
+                        styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                        columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 60 }, 2: { cellWidth: 20 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 } },
                         margin: { top: margin },
-                        avoidPageSplit: true // Intentar evitar división de tablas
+                        avoidPageSplit: true // Evitar división de tablas
                     });
-                    y = doc.lastAutoTable.finalY + 10;
+                    y = doc.lastAutoTable.finalY + 5;
                 } else {
-                    addContent(elem, y);
+                    addText(elem.textContent, y);
                 }
-                if (y + 20 > pageHeight) {
+                if (y > pageHeight - 20) {
                     doc.addPage();
                     y = margin;
                 }
-            }
+            });
 
             // Añadir numeración de páginas
             const totalPages = doc.internal.getNumberOfPages();
@@ -794,13 +803,14 @@
                 doc.text(`Página ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
             }
 
+            // Optimizar y guardar
             doc.save(`Factura_${invoice.docNumber}.pdf`);
         }
 
         function sendInvoiceByEmail(index) {
             const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
             const invoice = userInvoices[index];
-            showInvoiceDetails(index); // Generar contenido para asegurar que esté actualizado
+            showInvoiceDetails(index);
             const subject = encodeURIComponent(`Factura ${extractDocNumber(invoice.docNumber)} - ${invoice.clientName}`);
             const body = encodeURIComponent(document.getElementById('invoiceDetails').innerText);
             const clientEmails = invoice.clientEmails.length > 0 ? invoice.clientEmails.join(',') : 'cliente@ejemplo.com';
