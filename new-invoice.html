@@ -349,7 +349,7 @@
             margin-bottom: 20px;
         }
         .invoice-details th, .invoice-details td {
-            padding: 8px  th {
+            padding: 8px;
             border: 1px solid #ddd;
             text-align: left;
         }
@@ -638,7 +638,9 @@
         }
 
         function generateDocNumber(docType) {
-            const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userInvoicesKey = `invoices_${currentUser.rif}`;
+            const allInvoices = JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
             const invoicesOfType = allInvoices.filter(invoice => invoice.docType === docType);
             const lastNumber = invoicesOfType.length > 0 ? Math.max(...invoicesOfType.map(invoice => parseInt(invoice.docNumber, 10) || 0)) : 0;
             return (lastNumber + 1).toString().padStart(8, '0');
@@ -827,7 +829,9 @@
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const docNumber = generateDocNumber(data.docType);
             const docNumberDisplay = extractDocNumberForDisplay(docNumber);
-            const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
+            const userInvoicesKey = `invoices_${currentUser.rif}`;
+            const userInvoices = JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
+            const controlNumberIndex = userInvoices.length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
             const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
@@ -975,7 +979,9 @@
             if (!validateForm(data)) return;
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const docNumber = generateDocNumber(data.docType);
-            const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
+            const userInvoicesKey = `invoices_${currentUser.rif}`;
+            const userInvoices = JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
+            const controlNumberIndex = userInvoices.length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
             const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
             const invoiceData = {
@@ -1007,13 +1013,12 @@
                 exchangeRate: exchangeRate,
                 footerText: footerText
             };
-            const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            if (allInvoices.some(invoice => invoice.docType === data.docType && invoice.docNumber === docNumber)) {
+            if (userInvoices.some(invoice => invoice.docType === data.docType && invoice.docNumber === docNumber)) {
                 showAlert('Error: El número de documento ya existe para este tipo.', 'warning');
                 return;
             }
-            allInvoices.push(invoiceData);
-            localStorage.setItem('invoices', JSON.stringify(allInvoices));
+            userInvoices.push(invoiceData);
+            localStorage.setItem(userInvoicesKey, JSON.stringify(userInvoices));
             showAlert('Documento generado exitosamente.', 'success');
             setTimeout(() => window.location.href = 'dashboard.html', 1500);
         }
