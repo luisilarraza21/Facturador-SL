@@ -513,21 +513,11 @@
         }
 
         // Inicialización
-        // Al inicio de DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (!currentUser) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // Aplicar tema oscuro si está activado
-    if (currentUser.darkTheme) {
-        document.body.classList.add('dark-theme');
-    }
-
-    // Resto del código de inicialización...
-});
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = loadUserData();
+            if (!currentUser) return;
+            const userInvoices = getUserInvoices(currentUser);
+            const availableInvoices = loadStats(userInvoices, currentUser);
 
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
