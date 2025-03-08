@@ -29,8 +29,14 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .dark-theme .navbar {
+            background-color: #e6cc00;
+        }
         .navbar:hover {
             background-color: #e6cc00;
+        }
+        .dark-theme .navbar:hover {
+            background-color: #d9bf00;
         }
         .logo {
             font-weight: bold;
@@ -38,6 +44,9 @@
             color: #333;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        .dark-theme .logo {
+            color: #f5f5f5;
         }
         .container {
             max-width: 1200px;
@@ -188,69 +197,18 @@
             background: #c82333;
         }
         .invoice-preview {
-            font-size: 14px;
-            padding: 20px;
-            border: 1px solid #ddd;
-        }
-        .dark-theme .invoice-preview {
-            border-color: #666;
-        }
-        .invoice-header {
-            margin-bottom: 20px;
-        }
-        .invoice-details table {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+            height: 60vh;
+            border: none;
         }
-        .invoice-details th, .invoice-details td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
-            border-color: #666;
-        }
-        .two-column-table {
-            width: 50%;
-            margin-left: auto;
-            border-collapse: collapse;
-        }
-        .two-column-table th, .two-column-table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: right;
-        }
-        .dark-theme .two-column-table th, .dark-theme .two-column-table td {
-            border-color: #666;
-        }
-        .invoice-footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-        .dark-theme .invoice-footer {
-            color: #ddd;
-            border-top-color: #666;
-        }
-        .template-1 .invoice-header {
-            text-align: center;
-        }
-        .template-2 .invoice-header {
-            display: flex;
-            justify-content: space-between;
-        }
-        .template-3 .invoice-header {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .dark-theme .template-3 .invoice-header {
-            background: #555;
+        @media (max-width: 768px) {
+            .template-options {
+                flex-direction: column;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
@@ -288,9 +246,13 @@
     <div class="modal" id="previewModal">
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
-            <div class="invoice-preview" id="invoicePreview"></div>
+            <iframe id="invoicePreview" class="invoice-preview"></iframe>
         </div>
     </div>
+
+    <!-- Incluir jsPDF para generación de PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <script>
         // Funciones de utilidad
@@ -323,12 +285,27 @@
             alert(`Plantilla ${templateId} seleccionada. Se aplicará en tus facturas.`);
         }
 
-        function previewTemplate(templateId) {
+        async function loadImageAsBase64(url) {
+            try {
+                const response = await fetch(url, { mode: 'cors' });
+                const blob = await response.blob();
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            } catch (error) {
+                console.error('Error al cargar la imagen:', error);
+                return null;
+            }
+        }
+
+        async function previewTemplate(templateId) {
             const currentUser = loadUserData();
             if (!currentUser) return;
-            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
-            const preview = document.getElementById('invoicePreview');
-            let templateHtml = '';
+            const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
+            const logoBase64 = await loadImageAsBase64(logoUrl);
 
             // Datos de ejemplo
             const sampleData = {
@@ -342,6 +319,9 @@
                 date: '2025-03-08',
                 clientName: 'Cliente Ejemplo',
                 clientId: 'V-12345678',
+                clientAddress: 'Av. Principal, Caracas',
+                clientPhone: '0414-1234567',
+                clientEmails: ['cliente@ejemplo.com'],
                 items: [
                     { code: '001', description: 'Producto Ejemplo', quantity: 2, price: 500, subtotal: 1000 }
                 ],
@@ -363,138 +343,161 @@
                 footerText: `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162.`
             };
 
-            if (templateId === 1) {
-                // Plantilla 1: Clásica (logo centrado arriba)
-                templateHtml = `
-                    <div class="template-1">
-                        <div class="invoice-header">
-                            <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
-                            <h2>${sampleData.companyName}</h2>
-                            <p>RIF: ${sampleData.rif}</p>
-                            <p>Dirección: ${sampleData.address}</p>
-                            <p>Teléfono: ${sampleData.phone}</p>
-                        </div>
-                        <h3>Factura</h3>
-                        <p>Nº Documento: ${sampleData.docNumber}</p>
-                        <p>Nº Control: ${sampleData.controlNumber}</p>
-                        <p>Fecha: ${sampleData.date}</p>
-                        <p>Cliente: ${sampleData.clientName}</p>
-                        <p>RIF/Cédula: ${sampleData.clientId}</p>
-                        <table class="invoice-details">
-                            <thead>
-                                <tr><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Precio (Bs)</th><th>Subtotal (Bs)</th></tr>
-                            </thead>
-                            <tbody>
-                                ${sampleData.items.map(item => `
-                                    <tr>
-                                        <td>${item.code}</td>
-                                        <td>${item.description}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>${formatCurrency(item.price)}</td>
-                                        <td>${formatCurrency(item.subtotal)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <table class="two-column-table">
-                            <thead><tr><th></th><th>Bs</th><th>USD</th></tr></thead>
-                            <tbody>
-                                <tr><th>Total</th><td>${formatCurrency(sampleData.totalBs)}</td><td>${formatCurrency(sampleData.totalUsd)}</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="invoice-footer"><p>${sampleData.footerText}</p></div>
-                    </div>
-                `;
-            } else if (templateId === 2) {
-                // Plantilla 2: Moderna (logo a la izquierda)
-                templateHtml = `
-                    <div class="template-2">
-                        <div class="invoice-header">
-                            <div>
-                                <img src="${logo}" alt="Logo" style="width: 80px; height: 80px; float: left; margin-right: 15px;">
-                                <h2>${sampleData.companyName}</h2>
-                                <p>RIF: ${sampleData.rif}</p>
-                            </div>
-                            <div>
-                                <h3>Factura</h3>
-                                <p>Nº Documento: ${sampleData.docNumber}</p>
-                                <p>Nº Control: ${sampleData.controlNumber}</p>
-                                <p>Fecha: ${sampleData.date}</p>
-                            </div>
-                        </div>
-                        <p>Cliente: ${sampleData.clientName}</p>
-                        <p>RIF/Cédula: ${sampleData.clientId}</p>
-                        <table class="invoice-details">
-                            <thead>
-                                <tr><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Precio (Bs)</th><th>Subtotal (Bs)</th></tr>
-                            </thead>
-                            <tbody>
-                                ${sampleData.items.map(item => `
-                                    <tr>
-                                        <td>${item.code}</td>
-                                        <td>${item.description}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>${formatCurrency(item.price)}</td>
-                                        <td>${formatCurrency(item.subtotal)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <table class="two-column-table">
-                            <thead><tr><th></th><th>Bs</th><th>USD</th></tr></thead>
-                            <tbody>
-                                <tr><th>Total</th><td>${formatCurrency(sampleData.totalBs)}</td><td>${formatCurrency(sampleData.totalUsd)}</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="invoice-footer"><p>${sampleData.footerText}</p></div>
-                    </div>
-                `;
-            } else if (templateId === 3) {
-                // Plantilla 3: Elegante (logo con fondo)
-                templateHtml = `
-                    <div class="template-3">
-                        <div class="invoice-header">
-                            <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
-                            <h2>${sampleData.companyName}</h2>
-                            <p>RIF: ${sampleData.rif}</p>
-                            <p>Dirección: ${sampleData.address}</p>
-                            <p>Teléfono: ${sampleData.phone}</p>
-                        </div>
-                        <h3>Factura</h3>
-                        <p>Nº Documento: ${sampleData.docNumber}</p>
-                        <p>Nº Control: ${sampleData.controlNumber}</p>
-                        <p>Fecha: ${sampleData.date}</p>
-                        <p>Cliente: ${sampleData.clientName}</p>
-                        <p>RIF/Cédula: ${sampleData.clientId}</p>
-                        <table class="invoice-details">
-                            <thead>
-                                <tr><th>Código</th><th>Descripción</th><th>Cantidad</th><th>Precio (Bs)</th><th>Subtotal (Bs)</th></tr>
-                            </thead>
-                            <tbody>
-                                ${sampleData.items.map(item => `
-                                    <tr>
-                                        <td>${item.code}</td>
-                                        <td>${item.description}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>${formatCurrency(item.price)}</td>
-                                        <td>${formatCurrency(item.subtotal)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <table class="two-column-table">
-                            <thead><tr><th></th><th>Bs</th><th>USD</th></tr></thead>
-                            <tbody>
-                                <tr><th>Total</th><td>${formatCurrency(sampleData.totalBs)}</td><td>${formatCurrency(sampleData.totalUsd)}</td></tr>
-                            </tbody>
-                        </table>
-                        <div class="invoice-footer"><p>${sampleData.footerText}</p></div>
-                    </div>
-                `;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                putOnlyUsedFonts: true,
+                floatPrecision: 16
+            });
+
+            const margin = 10;
+            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            const pageHeight = doc.internal.pageSize.getHeight() - 2 * margin;
+            let y = margin;
+
+            // Función para agregar texto
+            function addText(text, x, yPos, options = {}) {
+                const lines = doc.splitTextToSize(text, pageWidth - 20);
+                lines.forEach(line => {
+                    if (y > pageHeight - 10) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    doc.text(line, x, y, options);
+                    y += 5;
+                });
+                return y;
             }
 
-            preview.innerHTML = templateHtml;
+            // Agregar logo
+            if (logoBase64) {
+                const imgWidth = 30;
+                const imgHeight = 30;
+                let logoX;
+
+                if (templateId === 1 || templateId === 3) {
+                    logoX = (doc.internal.pageSize.getWidth() - imgWidth) / 2; // Centrado
+                } else {
+                    logoX = margin; // Alineado a la izquierda para template-2
+                }
+
+                try {
+                    doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight);
+                    y += imgHeight + 5;
+                } catch (error) {
+                    console.error('Error al agregar la imagen:', error);
+                    y += 5;
+                }
+            }
+
+            // Agregar información de la empresa
+            doc.setFontSize(14);
+            y = addText(sampleData.companyName, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
+            doc.setFontSize(10);
+            y = addText(`RIF: ${sampleData.rif}`, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
+            y = addText(`Dirección: ${sampleData.address}`, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
+            y = addText(`Teléfono: ${sampleData.phone}`, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
+            y += 5;
+
+            // Información de la factura
+            doc.setFontSize(12);
+            const docTitle = getDocTypeText(sampleData.docType);
+            y = addText(docTitle, margin, y, { align: templateId === 2 ? 'right' : 'left' });
+            doc.setFontSize(10);
+            y = addText(`Tipo de Documento: ${getDocTypeText(sampleData.docType)}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
+            y = addText(`Nº Documento: ${sampleData.docNumber}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
+            y = addText(`Nº Control: ${sampleData.controlNumber}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
+            y = addText(`Fecha: ${sampleData.date}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
+            y += 5;
+
+            // Información del cliente
+            doc.setFontSize(12);
+            y = addText('Cliente', margin, y);
+            doc.setFontSize(10);
+            y = addText(`Nombre: ${sampleData.clientName}`, margin, y);
+            y = addText(`RIF/Cédula: ${sampleData.clientId}`, margin, y);
+            y = addText(`Dirección: ${sampleData.clientAddress}`, margin, y);
+            y = addText(`Teléfono: ${sampleData.clientPhone}`, margin, y);
+            y = addText(`Correos: ${sampleData.clientEmails.join(', ')}`, margin, y);
+            y += 5;
+
+            // Tabla de ítems
+            const tableData = sampleData.items.map(item => [
+                item.code || '-',
+                item.description,
+                item.quantity.toString(),
+                formatCurrency(item.price),
+                formatCurrency(item.subtotal)
+            ]);
+            doc.autoTable({
+                head: [['Código', 'Descripción', 'Cantidad', 'Precio Unitario (Bs)', 'Subtotal (Bs)']],
+                body: tableData,
+                startY: y,
+                theme: 'striped',
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 60 }, 2: { cellWidth: 20 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 } },
+                margin: { top: margin },
+                avoidPageSplit: true
+            });
+            y = doc.lastAutoTable.finalY + 5;
+
+            // Tabla de totales
+            const totalTableData = [
+                ['Subtotal', formatCurrency(sampleData.subtotalBs), formatCurrency(sampleData.subtotalUsd)],
+                ['Monto exento', formatCurrency(sampleData.exemptAmountBs), formatCurrency(sampleData.exemptAmountUsd)],
+                ['Base imponible', formatCurrency(sampleData.taxableBaseBs), formatCurrency(sampleData.taxableBaseUsd)],
+                [`IVA (${sampleData.alicuota}%)`, formatCurrency(sampleData.taxBs), formatCurrency(sampleData.taxUsd)],
+                ['IGTF (3%)', formatCurrency(sampleData.igtfBs), formatCurrency(sampleData.igtfUsd)],
+                ['Total', formatCurrency(sampleData.totalBs), formatCurrency(sampleData.totalUsd)]
+            ];
+            doc.autoTable({
+                head: [['', 'Bs', 'USD']],
+                body: totalTableData,
+                startY: y,
+                theme: 'striped',
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 40 }, 2: { cellWidth: 40 } },
+                margin: { left: doc.internal.pageSize.getWidth() - 90 - margin },
+                avoidPageSplit: true
+            });
+            y = doc.lastAutoTable.finalY + 5;
+
+            // Método de pago y tasa de cambio
+            y = addText(`Método de Pago: ${sampleData.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`, margin, y);
+            y = addText(`Tasa de cambio: ${sampleData.exchangeRate} Bs/USD`, margin, y);
+            y += 5;
+
+            // Footer
+            if (sampleData.footerText) {
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                y = addText(sampleData.footerText, margin, y, { align: 'center' });
+            }
+
+            // Numeración de páginas
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Página ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+            }
+
+            // Mostrar el PDF en el iframe
+            const pdfDataUri = doc.output('datauristring');
+            const iframe = document.getElementById('invoicePreview');
+            iframe.src = pdfDataUri;
             document.getElementById('previewModal').style.display = 'flex';
+        }
+
+        function getDocTypeText(docType) {
+            switch (docType) {
+                case 'factura': return 'Factura';
+                case 'nota-credito': return 'Nota de Crédito';
+                case 'nota-debito': return 'Nota de Débito';
+                default: return docType;
+            }
         }
 
         // Inicialización
@@ -520,6 +523,8 @@
 
             document.getElementById('modalClose').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
+                const iframe = document.getElementById('invoicePreview');
+                iframe.src = ''; // Limpiar el iframe al cerrar
             });
         });
     </script>
