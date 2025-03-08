@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Nuevo Documento</title>
+    <title>Wakal Blitz - Nuevo Documento</title>
     <style>
         * {
             margin: 0;
@@ -22,15 +22,21 @@
             color: #f5f5f5;
         }
         .navbar {
-            background-color: #ffe600;
+            background-color: #2968c8;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .dark-theme .navbar {
+            background-color: #1d4f9e;
+        }
         .navbar:hover {
-            background-color: #e6cc00;
+            background-color: #1d4f9e;
+        }
+        .dark-theme .navbar:hover {
+            background-color: #153e7e;
         }
         .logo-section {
             display: flex;
@@ -53,9 +59,15 @@
         .logo {
             font-weight: bold;
             font-size: 24px;
-            color: #333;
+            color: #fff;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        .logo span {
+            font-size: 14px;
+            font-weight: normal;
+            display: block;
+            color: #ddd;
         }
         .nav-user {
             display: flex;
@@ -65,20 +77,30 @@
         .user-info {
             margin-right: 15px;
             font-size: 16px;
-            color: #444;
+            color: #fff;
             font-style: italic;
         }
+        .dark-theme .user-info {
+            color: #ddd;
+        }
         .logout-btn {
-            background: #2968c8;
-            color: white;
+            background: #fff;
+            color: #2968c8;
             border: none;
             padding: 8px 12px;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
+        .dark-theme .logout-btn {
+            background: #ddd;
+            color: #1d4f9e;
+        }
         .logout-btn:hover {
-            background: #1d4f9e;
+            background: #e6e6e6;
+        }
+        .dark-theme .logout-btn:hover {
+            background: #ccc;
         }
         .container {
             max-width: 1200px;
@@ -87,6 +109,7 @@
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ddd;
         }
         .dark-theme .container {
             background: #444;
@@ -97,6 +120,7 @@
             margin-bottom: 15px;
             border-bottom: 1px solid #eee;
             padding-bottom: 8px;
+            color: #333;
         }
         .dark-theme .section-title {
             color: #f5f5f5;
@@ -276,6 +300,7 @@
             max-width: 800px;
             max-height: 80vh;
             overflow-y: auto;
+            position: relative;
         }
         .dark-theme .modal-content {
             background: #444;
@@ -300,9 +325,23 @@
             border-color: #666;
         }
         .invoice-header {
+            margin-bottom: 20px;
+        }
+        .template-1 .invoice-header {
+            text-align: center;
+        }
+        .template-2 .invoice-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+        }
+        .template-3 .invoice-header {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .dark-theme .template-3 .invoice-header {
+            background: #555;
         }
         .invoice-details table {
             width: 100%;
@@ -310,7 +349,7 @@
             margin-bottom: 20px;
         }
         .invoice-details th, .invoice-details td {
-            padding: 8px;
+            padding: 8px  th {
             border: 1px solid #ddd;
             text-align: left;
         }
@@ -349,21 +388,34 @@
             padding: 15px;
             border-radius: 4px;
             z-index: 1001;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
         .alert-success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        .dark-theme .alert-success {
+            background: #28a745;
+            color: #fff;
+        }
         .alert-warning {
             background: #fff3cd;
             color: #856404;
             border: 1px solid #ffeeba;
         }
+        .dark-theme .alert-warning {
+            background: #e0a800;
+            color: #fff;
+        }
         .alert-info {
             background: #cce5ff;
             color: #004085;
             border: 1px solid #b8daff;
+        }
+        .dark-theme .alert-info {
+            background: #4a90e2;
+            color: #fff;
         }
     </style>
 </head>
@@ -371,7 +423,7 @@
     <div class="navbar">
         <div class="logo-section">
             <button class="back-btn" id="backButton">←</button>
-            <div class="logo">FacturaML</div>
+            <div class="logo">Wakal Blitz<span>by: Soluciones Láser</span></div>
         </div>
         <div class="nav-user">
             <div class="user-info" id="userDisplayName">Cargando...</div>
@@ -596,20 +648,6 @@
             return parseInt(docNumber, 10).toString();
         }
 
-        function validateImage(file) {
-            const maxSizeInBytes = 2 * 1024 * 1024;
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(file.type)) {
-                showAlert('Por favor selecciona una imagen válida (JPEG, PNG o GIF).', 'warning');
-                return false;
-            }
-            if (file.size > maxSizeInBytes) {
-                showAlert('La imagen no debe exceder los 2MB.', 'warning');
-                return false;
-            }
-            return true;
-        }
-
         function addEmailField() {
             const emailFields = document.getElementById('emailFields');
             const newEmailDiv = document.createElement('div');
@@ -662,6 +700,7 @@
         }
 
         function updateInvoiceTotals() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             let subtotal = 0;
             const items = document.querySelectorAll('#itemsTableBody tr');
             items.forEach(row => {
@@ -676,7 +715,8 @@
             const paymentMethod = document.getElementById('paymentMethod').value;
             const taxableBase = subtotal - exemptAmount;
             const tax = taxableBase * (alicuota / 100);
-            const igtf = (paymentMethod === 'dolares-efectivo' || paymentMethod === 'dolares-transferencia') ? subtotal * 0.03 : 0;
+            // IGTF aplica si el usuario es contribuyente especial o si el pago es en dólares
+            const igtf = (currentUser.specialTaxPayer || paymentMethod === 'dolares-efectivo' || paymentMethod === 'dolares-transferencia') ? subtotal * 0.03 : 0;
             const total = subtotal + tax + igtf;
 
             const subtotalUsd = subtotal / exchangeRate;
@@ -784,39 +824,93 @@
             const data = getInvoiceFormData();
             if (!validateForm(data)) return;
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const docNumber = generateDocNumber(data.docType);
             const docNumberDisplay = extractDocNumberForDisplay(docNumber);
             const controlNumberIndex = JSON.parse(localStorage.getItem('invoices') || '[]').length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
             const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
+            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
             const preview = document.getElementById('invoicePreview');
-            preview.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="${currentUser.profilePic || 'https://via.placeholder.com/100'}" alt="Foto de perfil" style="width: 100px; height: 100px; border-radius: 50%;">
-                </div>
-                <div class="invoice-header">
-                    <div>
-                        <h2>${currentUser.companyName}</h2>
-                        <p>RIF: ${currentUser.rif}</p>
-                        <p>Dirección: ${currentUser.address || '-'}</p>
-                        <p>Teléfono: ${currentUser.phone || '-'}</p>
-                    </div>
-                    <div>
+            let templateHtml = '';
+
+            if (selectedTemplate === '1') {
+                templateHtml = `
+                    <div class="template-1">
+                        <div class="invoice-header">
+                            <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
+                            <h2>${currentUser.companyName}</h2>
+                            <p>RIF: ${currentUser.rif}</p>
+                            <p>Dirección: ${currentUser.address || '-'}</p>
+                            <p>Teléfono: ${currentUser.phone || '-'}</p>
+                        </div>
                         <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
                         <p>Tipo de Documento: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
                         <p>Nº Documento: ${docNumberDisplay}</p>
                         <p>Nº Control: ${controlNumber}</p>
                         <p>Fecha: ${data.invoiceDate}</p>
-                    </div>
-                </div>
-                <div class="invoice-details">
-                    <h3>Cliente</h3>
-                    <p>Nombre: ${data.clientName}</p>
-                    <p>RIF/Cédula: ${data.clientId}</p>
-                    <p>Dirección: ${data.clientAddress || '-'}</p>
-                    <p>Teléfono: ${data.clientPhone || '-'}</p>
-                    <p>Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}</p>
-                </div>
+                        <div class="invoice-details">
+                            <h3>Cliente</h3>
+                            <p>Nombre: ${data.clientName}</p>
+                            <p>RIF/Cédula: ${data.clientId}</p>
+                            <p>Dirección: ${data.clientAddress || '-'}</p>
+                            <p>Teléfono: ${data.clientPhone || '-'}</p>
+                            <p>Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}</p>
+                        </div>
+                `;
+            } else if (selectedTemplate === '2') {
+                templateHtml = `
+                    <div class="template-2">
+                        <div class="invoice-header">
+                            <div>
+                                <img src="${logo}" alt="Logo" style="width: 80px; height: 80px; float: left; margin-right: 15px;">
+                                <h2>${currentUser.companyName}</h2>
+                                <p>RIF: ${currentUser.rif}</p>
+                            </div>
+                            <div>
+                                <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
+                                <p>Tipo de Documento: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
+                                <p>Nº Documento: ${docNumberDisplay}</p>
+                                <p>Nº Control: ${controlNumber}</p>
+                                <p>Fecha: ${data.invoiceDate}</p>
+                            </div>
+                        </div>
+                        <div class="invoice-details">
+                            <h3>Cliente</h3>
+                            <p>Nombre: ${data.clientName}</p>
+                            <p>RIF/Cédula: ${data.clientId}</p>
+                            <p>Dirección: ${data.clientAddress || '-'}</p>
+                            <p>Teléfono: ${data.clientPhone || '-'}</p>
+                            <p>Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}</p>
+                        </div>
+                `;
+            } else if (selectedTemplate === '3') {
+                templateHtml = `
+                    <div class="template-3">
+                        <div class="invoice-header">
+                            <img src="${logo}" alt="Logo" style="width: 100px; height: 100px; border-radius: 50%;">
+                            <h2>${currentUser.companyName}</h2>
+                            <p>RIF: ${currentUser.rif}</p>
+                            <p>Dirección: ${currentUser.address || '-'}</p>
+                            <p>Teléfono: ${currentUser.phone || '-'}</p>
+                        </div>
+                        <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
+                        <p>Tipo de Documento: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
+                        <p>Nº Documento: ${docNumberDisplay}</p>
+                        <p>Nº Control: ${controlNumber}</p>
+                        <p>Fecha: ${data.invoiceDate}</p>
+                        <div class="invoice-details">
+                            <h3>Cliente</h3>
+                            <p>Nombre: ${data.clientName}</p>
+                            <p>RIF/Cédula: ${data.clientId}</p>
+                            <p>Dirección: ${data.clientAddress || '-'}</p>
+                            <p>Teléfono: ${data.clientPhone || '-'}</p>
+                            <p>Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}</p>
+                        </div>
+                `;
+            }
+
+            templateHtml += `
                 <table class="invoice-details">
                     <thead>
                         <tr>
@@ -857,10 +951,13 @@
                     </tbody>
                 </table>
                 <p>Método de Pago: ${data.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                <p>Tasa de Cambio: ${exchangeRate} Bs/USD</p>
                 <div class="invoice-footer">
                     <p>${footerText}</p>
                 </div>
-            `;
+            </div>`;
+
+            preview.innerHTML = templateHtml;
             document.getElementById('previewModal').style.display = 'flex';
         }
 
@@ -912,7 +1009,7 @@
             };
             const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
             if (allInvoices.some(invoice => invoice.docType === data.docType && invoice.docNumber === docNumber)) {
-                showAlert('Error: El número de documento ya existe para este tipo.', 'error');
+                showAlert('Error: El número de documento ya existe para este tipo.', 'warning');
                 return;
             }
             allInvoices.push(invoiceData);
@@ -931,7 +1028,6 @@
             document.getElementById('userDisplayName').textContent = currentUser.companyName;
             document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
 
-            // Aplicar modo oscuro si está activado
             if (currentUser.darkTheme) {
                 document.body.classList.add('dark-theme');
             }
