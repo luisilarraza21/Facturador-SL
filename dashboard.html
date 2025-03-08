@@ -714,6 +714,60 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
+        async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous'; // Para manejar CORS
+                img.src = url;
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Redimensionar manteniendo la proporción
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convertir a base64 con compresión
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    const base64 = dataUrl.split(',')[1];
+                    resolve(base64);
+                };
+
+                img.onerror = (error) => {
+                    console.error('Error al cargar la imagen para redimensionar:', error);
+                    reject(error);
+                };
+            });
+        }
+
+        async function loadImageAsBase64(url) {
+            try {
+                // Redimensionar la imagen a 100x100 píxeles con compresión
+                const base64 = await resizeImage(url, 100, 100, 0.7);
+                return base64;
+            } catch (error) {
+                console.error('Error al cargar y redimensionar la imagen:', error);
+                return null;
+            }
+        }
+
         async function downloadInvoiceAsPdf(index) {
             const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
             const invoice = userInvoices[index];
@@ -721,7 +775,7 @@
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
 
-            // Convertir logo a base64
+            // Convertir logo a base64 con redimensionamiento
             const logoBase64 = await loadImageAsBase64(logoUrl);
 
             const { jsPDF } = window.jspdf;
@@ -730,7 +784,8 @@
                 unit: 'mm',
                 format: 'a4',
                 putOnlyUsedFonts: true,
-                floatPrecision: 16
+                floatPrecision: 16,
+                compress: true // Activar compresión general del PDF
             });
 
             const margin = 10;
@@ -763,7 +818,7 @@
                     logoX = margin; // Alineado a la izquierda para template-2
                 }
 
-                doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight);
+                doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST'); // Usar compresión 'FAST'
                 y += imgHeight + 5;
             }
 
@@ -873,22 +928,6 @@
             }
 
             doc.save(`Factura_${extractDocNumber(invoice.docNumber)}.pdf`);
-        }
-
-        async function loadImageAsBase64(url) {
-            try {
-                const response = await fetch(url, { mode: 'cors' });
-                const blob = await response.blob();
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                });
-            } catch (error) {
-                console.error('Error al cargar la imagen:', error);
-                return null;
-            }
         }
 
         function sendInvoiceByEmail(index) {
