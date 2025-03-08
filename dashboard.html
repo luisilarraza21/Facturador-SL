@@ -354,6 +354,7 @@
             text-align: center;
             border-top: 1px solid #ddd;
             padding-top: 10px;
+            page-break-after: always; /* Forzar salto de página después del footer */
         }
         .dark-theme .invoice-footer {
             color: #ddd;
@@ -419,7 +420,7 @@
             <div class="user-info">
                 <img src="https://via.placeholder.com/30" alt="Foto de perfil" class="user-pic" id="userPic">
                 <span id="userDisplayName">Cargando...</span>
-            </div>
+           </div>
             <button class="digital-btn" id="digitalButton">Mi Factura Digital</button>
             <button class="user-btn" id="userButton">Usuario</button>
             <button class="logout-btn" id="logoutButton">Cerrar sesión</button>
@@ -582,12 +583,11 @@
             const invoice = userInvoices[index];
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const details = document.getElementById('invoiceDetails');
-            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1'; // Default a plantilla 1
+            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
             let templateHtml = '';
 
             if (selectedTemplate === '1') {
-                // Plantilla 1: Clásica (logo centrado arriba)
                 templateHtml = `
                     <div class="template-1">
                         <div class="invoice-header">
@@ -612,7 +612,6 @@
                         </div>
                 `;
             } else if (selectedTemplate === '2') {
-                // Plantilla 2: Moderna (logo a la izquierda)
                 templateHtml = `
                     <div class="template-2">
                         <div class="invoice-header">
@@ -639,7 +638,6 @@
                         </div>
                 `;
             } else if (selectedTemplate === '3') {
-                // Plantilla 3: Elegante (logo con fondo)
                 templateHtml = `
                     <div class="template-3">
                         <div class="invoice-header">
@@ -715,18 +713,26 @@
         }
 
         function downloadInvoiceAsPdf(index) {
-            showInvoiceDetails(index); // Generar contenido con la plantilla seleccionada
-            const element = document.getElementById('invoiceDetails');
             const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
             const invoice = userInvoices[index];
+            showInvoiceDetails(index); // Generar contenido con la plantilla seleccionada
+            const element = document.getElementById('invoiceDetails');
             const opt = {
-                margin: 1,
+                margin: [0.5, 0.5, 0.5, 0.5], // Márgenes en pulgadas [arriba, derecha, abajo, izquierda]
                 filename: `Factura_${invoice.docNumber}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], avoid: ['table', '.invoice-footer'] } // Evitar cortes en tablas y footer
             };
-            html2pdf().from(element).set(opt).save();
+            html2pdf().set(opt).from(element).toPdf().get('pdf').then((pdf) => {
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(10);
+                    pdf.text('Página ' + i + ' de ' + totalPages, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 0.3, { align: 'center' });
+                }
+            }).save();
         }
 
         function sendInvoiceByEmail(index) {
@@ -748,7 +754,6 @@
             const currentUser = loadUserData();
             if (!currentUser) return;
 
-            // Aplicar modo oscuro si está activado
             if (currentUser.darkTheme) {
                 document.body.classList.add('dark-theme');
             }
@@ -801,12 +806,12 @@
             });
 
             document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:contains("Nº Control")')?.textContent.split(': ')[1]);
+                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:nth-child(5)').textContent.split(': ')[1]);
                 if (index !== -1) downloadInvoiceAsPdf(index);
             });
 
             document.getElementById('emailBtn').addEventListener('click', () => {
-                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:contains("Nº Control")')?.textContent.split(': ')[1]);
+                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:nth-child(5)').textContent.split(': ')[1]);
                 if (index !== -1) sendInvoiceByEmail(index);
             });
 
