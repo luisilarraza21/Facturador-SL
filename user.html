@@ -272,18 +272,39 @@
             setTimeout(() => alertDiv.remove(), 3000);
         }
 
+        // Sincronizar currentUser con la lista de usuarios
+        function syncCurrentUserWithUsers(currentUser) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userIndex = users.findIndex(u => u.email === currentUser.email);
+            if (userIndex !== -1) {
+                // Actualizar el usuario en la lista de usuarios
+                users[userIndex] = { ...users[userIndex], ...currentUser };
+                localStorage.setItem('users', JSON.stringify(users));
+                // Actualizar currentUser en localStorage
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+        }
+
         // Cargar datos del usuario
         function loadUserData() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
                 window.location.href = 'index.html';
                 return null;
             }
 
-            document.getElementById('companyName').value = currentUser.companyName;
-            document.getElementById('rif').value = currentUser.rif;
-            document.getElementById('phone').value = currentUser.phone;
-            document.getElementById('email').value = currentUser.email;
+            // Sincronizar con la lista de usuarios para obtener los datos más recientes
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const storedUser = users.find(u => u.email === currentUser.email);
+            if (storedUser) {
+                currentUser = { ...currentUser, ...storedUser };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+
+            document.getElementById('companyName').value = currentUser.companyName || '';
+            document.getElementById('rif').value = currentUser.rif || '';
+            document.getElementById('phone').value = currentUser.phone || '';
+            document.getElementById('email').value = currentUser.email || '';
             document.getElementById('address').value = currentUser.address || '';
             document.getElementById('emailNotifications').checked = currentUser.emailNotifications || false;
             document.getElementById('darkTheme').checked = currentUser.darkTheme || false;
@@ -380,9 +401,7 @@
         function saveChanges() {
             if (!validateForm()) return;
 
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-
+            let currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const updatedUser = {
                 ...currentUser,
                 companyName: document.getElementById('companyName').value.trim(),
@@ -396,15 +415,11 @@
                 ...(document.getElementById('password').value && { password: document.getElementById('password').value })
             };
 
-            // Actualizar currentUser
-            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            // Sincronizar con la lista de usuarios
+            syncCurrentUserWithUsers(updatedUser);
 
-            // Actualizar la lista de usuarios
-            const userIndex = users.findIndex(u => u.email === currentUser.email);
-            if (userIndex !== -1) {
-                users[userIndex] = { ...users[userIndex], ...updatedUser };
-                localStorage.setItem('users', JSON.stringify(users));
-            }
+            // Actualizar el currentUser local para reflejar los cambios
+            currentUser = updatedUser;
 
             addActivityEntry(currentUser, 'Perfil actualizado');
             showAlert('Cambios guardados exitosamente.', 'success');
@@ -426,7 +441,7 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            const currentUser = loadUserData();
+            let currentUser = loadUserData();
             if (!currentUser) return;
 
             document.getElementById('profilePicInput').addEventListener('change', (e) => {
@@ -443,20 +458,9 @@
                         const base64Image = reader.result;
                         document.getElementById('profilePic').src = base64Image;
 
-                        // Actualizar currentUser.profilePic inmediatamente en localStorage
-                        const updatedUser = {
-                            ...currentUser,
-                            profilePic: base64Image
-                        };
-                        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-
-                        // Actualizar también en la lista de usuarios
-                        const users = JSON.parse(localStorage.getItem('users')) || [];
-                        const userIndex = users.findIndex(u => u.email === currentUser.email);
-                        if (userIndex !== -1) {
-                            users[userIndex] = { ...users[userIndex], profilePic: base64Image };
-                            localStorage.setItem('users', JSON.stringify(users));
-                        }
+                        // Actualizar currentUser.profilePic
+                        currentUser.profilePic = base64Image;
+                        syncCurrentUserWithUsers(currentUser);
 
                         addActivityEntry(currentUser, 'Foto de perfil actualizada');
                     };
@@ -473,7 +477,15 @@
             document.getElementById('deleteAccountButton').addEventListener('click', deleteAccount);
 
             document.getElementById('darkTheme').addEventListener('change', (e) => {
-                document.body.classList.toggle('dark-theme', e.target.checked);
+                const isDarkTheme = e.target.checked;
+                document.body.classList.toggle('dark-theme', isDarkTheme);
+                currentUser.darkTheme = isDarkTheme;
+                syncCurrentUserWithUsers(currentUser);
+            });
+
+            document.getElementById('emailNotifications').addEventListener('change', (e) => {
+                currentUser.emailNotifications = e.target.checked;
+                syncCurrentUserWithUsers(currentUser);
             });
         });
     </script>
