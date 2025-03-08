@@ -3,171 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Panel de Control</title>
+    <title>FacturaML - Nuevo Documento</title>
     <style>
-        /* Estilos base (se completarán en el siguiente paso) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-    </style>
-</head>
-<body>
-    <div class="navbar">
-        <div class="logo">FacturaML</div>
-        <div class="nav-user">
-            <div class="user-info" id="userDisplayName">Cargando...</div>
-            <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
-        </div>
-    </div>
-
-    <div class="container">
-        <h2 class="section-title">Panel de Control</h2>
-        <button class="btn" style="margin-bottom: 20px;" id="newInvoiceBtn">Nueva Factura</button>
-
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab('facturas')">Facturas</button>
-            <button class="tab-button" onclick="openTab('clientes')">Clientes</button>
-            <button class="tab-button" onclick="openTab('perfil')">Mi Perfil</button>
-        </div>
-
-        <div id="facturas" class="tab-content active">
-            <div class="summary-box">
-                <div class="summary-card">
-                    <h3>Total Facturado (Bs.)</h3>
-                    <p id="totalBs">0,00</p>
-                </div>
-                <div class="summary-card">
-                    <h3>Total Facturado (USD)</h3>
-                    <p id="totalUsd">0,00</p>
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tipo de Documento</th>
-                        <th>Nº Documento</th>
-                        <th>Nº Control</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Total (Bs.)</th>
-                        <th>Total (USD)</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="invoicesTable"></tbody>
-            </table>
-        </div>
-
-        <div id="clientes" class="tab-content">
-            <div class="form-section">
-                <h3>Gestión de Clientes</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="clientName">Nombre o Razón Social*</label>
-                        <input type="text" id="clientName">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientId">Cédula o RIF*</label>
-                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="clientAddress">Dirección*</label>
-                        <input type="text" id="clientAddress">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientPhone">Teléfono</label>
-                        <input type="text" id="clientPhone">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="clientEmails">Correo(s) (separados por coma)</label>
-                    <input type="text" id="clientEmails" placeholder="Ej: correo1@example.com, correo2@example.com">
-                </div>
-                <button class="btn" id="saveClientBtn">Guardar Cliente</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cédula/RIF</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Correos</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTable"></tbody>
-            </table>
-        </div>
-
-        <div id="perfil" class="tab-content">
-            <div class="form-section">
-                <h3>Mi Perfil</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nombre de la Empresa</label>
-                        <p id="profileCompanyName">Cargando...</p>
-                    </div>
-                    <div class="form-group">
-                        <label>RIF</label>
-                        <p id="profileRif">Cargando...</p>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Dirección</label>
-                        <p id="profileAddress">Cargando...</p>
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono</label>
-                        <p id="profilePhone">Cargando...</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Correo</label>
-                    <p id="profileEmail">Cargando...</p>
-                </div>
-                <div class="form-group">
-                    <label>Estatus Tributario</label>
-                    <p id="profileTaxStatus">Cargando...</p>
-                </div>
-                <div id="lowInvoicesWarning" class="alert alert-warning hidden">
-                    ¡Atención! Te quedan menos de 10 facturas disponibles. <button class="btn btn-success" id="buyMoreInvoicesBtn">Comprar Más</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Funciones JavaScript (se completarán en el siguiente paso)
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Panel de Control</title>
-    <style>
-        /* ===========================================================================
-         * ESTILOS GENERALES - Adaptados de new-invoice.html
-         * ===========================================================================
-         * Estilos base para el dashboard con diseño limpio y responsivo.
-         * Paleta de colores: azul (#2968c8), amarillo (#ffe600).
-         * =========================================================================== */
         * {
             margin: 0;
             padding: 0;
@@ -252,41 +89,18 @@
             color: #333;
         }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
+        .invoice-form {
             margin-bottom: 20px;
-        }
-
-        .tab-button {
-            padding: 10px 20px;
-            border: none;
-            background: #f8f9fa;
-            border-radius: 4px 4px 0 0;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-        .tab-button.active {
-            background: #2968c8;
-            color: white;
-        }
-
-        .tab-button:hover {
-            background: #e9ecef;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
         }
 
         .form-section {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #555;
         }
 
         .form-row {
@@ -308,7 +122,7 @@
             color: #555;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -318,10 +132,50 @@
             transition: border-color 0.3s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table th, .items-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .items-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .items-table input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .summary-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            background: #f8f9fa;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 10px 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-table th {
+            font-weight: 600;
+            background: #e9ecef;
         }
 
         .btn {
@@ -349,37 +203,86 @@
             background: #5a6268;
         }
 
-        .summary-box {
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .action-buttons {
             display: flex;
-            gap: 20px;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .invoice-preview {
+            font-size: 14px;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        .summary-card {
-            flex: 1;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        table {
+        .invoice-details table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            background: #fff;
         }
 
-        th, td {
-            padding: 12px 15px;
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            border: 1px solid #ddd;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
 
-        th {
-            background-color: #f8f9fa;
-            font-weight: 600;
+        .two-column-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+
+        .two-column-table th, .two-column-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: right;
         }
 
         .alert {
@@ -418,28 +321,21 @@
             border: 1px solid #f5c6cb;
         }
 
-        .hidden {
-            display: none;
-        }
-
         @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            .tab-button {
-                width: 100%;
-            }
-            .summary-box {
-                flex-direction: column;
-            }
             .form-row {
                 flex-direction: column;
+            }
+            .summary-table, .two-column-table {
+                width: 100%;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Estructura HTML del Paso 1 -->
     <div class="navbar">
         <div class="logo">FacturaML</div>
         <div class="nav-user">
@@ -449,59 +345,23 @@
     </div>
 
     <div class="container">
-        <h2 class="section-title">Panel de Control</h2>
-        <button class="btn" style="margin-bottom: 20px;" id="newInvoiceBtn">Nueva Factura</button>
-
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab('facturas')">Facturas</button>
-            <button class="tab-button" onclick="openTab('clientes')">Clientes</button>
-            <button class="tab-button" onclick="openTab('perfil')">Mi Perfil</button>
-        </div>
-
-        <div id="facturas" class="tab-content active">
-            <div class="summary-box">
-                <div class="summary-card">
-                    <h3>Total Facturado (Bs.)</h3>
-                    <p id="totalBs">0,00</p>
-                </div>
-                <div class="summary-card">
-                    <h3>Total Facturado (USD)</h3>
-                    <p id="totalUsd">0,00</p>
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tipo de Documento</th>
-                        <th>Nº Documento</th>
-                        <th>Nº Control</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Total (Bs.)</th>
-                        <th>Total (USD)</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="invoicesTable"></tbody>
-            </table>
-        </div>
-
-        <div id="clientes" class="tab-content">
+        <h2 class="section-title">Nuevo Documento</h2>
+        <div class="invoice-form">
             <div class="form-section">
-                <h3>Gestión de Clientes</h3>
+                <h3>Información del Cliente</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="clientName">Nombre o Razón Social*</label>
-                        <input type="text" id="clientName">
+                        <input type="text" id="clientName" required>
                     </div>
                     <div class="form-group">
                         <label for="clientId">Cédula o RIF*</label>
-                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9">
+                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="clientAddress">Dirección*</label>
+                        <label for="clientAddress">Dirección</label>
                         <input type="text" id="clientAddress">
                     </div>
                     <div class="form-group">
@@ -509,95 +369,182 @@
                         <input type="text" id="clientPhone">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="clientEmails">Correo(s) (separados por coma)</label>
-                    <input type="text" id="clientEmails" placeholder="Ej: correo1@example.com, correo2@example.com">
-                </div>
-                <button class="btn" id="saveClientBtn">Guardar Cliente</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cédula/RIF</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Correos</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTable"></tbody>
-            </table>
-        </div>
 
-        <div id="perfil" class="tab-content">
             <div class="form-section">
-                <h3>Mi Perfil</h3>
+                <h3>Detalles del Documento</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nombre de la Empresa</label>
-                        <p id="profileCompanyName">Cargando...</p>
+                        <label for="docType">Tipo de Documento*</label>
+                        <select id="docType" required>
+                            <option value="factura">Factura</option>
+                            <option value="nota_credito">Nota de Crédito</option>
+                            <option value="nota_debito">Nota de Débito</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>RIF</label>
-                        <p id="profileRif">Cargando...</p>
+                        <label for="invoiceDate">Fecha*</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Método de Pago*</label>
+                        <select id="paymentMethod" required>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="pago_movil">Pago Móvil</option>
+                            <option value="zelle">Zelle</option>
+                        </select>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Artículos</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Código</th>
+                            <th width="30%">Descripción</th>
+                            <th width="15%">Cantidad</th>
+                            <th width="20%">Precio Unitario</th>
+                            <th width="20%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <tr>
+                            <td><input type="text" class="item-code" placeholder="Código"></td>
+                            <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                            <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                            <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                            <td class="item-subtotal">0.00</td>
+                            <td><button class="btn-secondary remove-item">X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-secondary" id="addItemBtn">Agregar Artículo</button>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Dirección</label>
-                        <p id="profileAddress">Cargando...</p>
+                        <label for="exemptAmount">Monto Exento (Bs.)</label>
+                        <input type="number" id="exemptAmount" step="0.01" min="0" value="0.00">
                     </div>
                     <div class="form-group">
-                        <label>Teléfono</label>
-                        <p id="profilePhone">Cargando...</p>
+                        <label for="alicuota">Alícuota IVA (%)*</label>
+                        <select id="alicuota" required>
+                            <option value="16">16%</option>
+                            <option value="8">8%</option>
+                            <option value="0">0%</option>
+                        </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Correo</label>
-                    <p id="profileEmail">Cargando...</p>
-                </div>
-                <div class="form-group">
-                    <label>Estatus Tributario</label>
-                    <p id="profileTaxStatus">Cargando...</p>
-                </div>
-                <div id="lowInvoicesWarning" class="alert alert-warning hidden">
-                    ¡Atención! Te quedan menos de 10 facturas disponibles. <button class="btn btn-success" id="buyMoreInvoicesBtn">Comprar Más</button>
-                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <td id="subtotalBs">0,00</td>
+                            <td id="subtotalUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Monto Exento</td>
+                            <td id="exemptBs">0,00</td>
+                            <td id="exemptUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Base Imponible</td>
+                            <td id="taxableBs">0,00</td>
+                            <td id="taxableUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IVA</td>
+                            <td id="taxBs">0,00</td>
+                            <td id="taxUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IGTF (3%)</td>
+                            <td id="igtfBs">0,00</td>
+                            <td id="igtfUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td id="totalBs"><strong>0,00</strong></td>
+                            <td id="totalUsd"><strong>0,00</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
+                <button class="btn btn-success" id="previewInvoiceBtn">Vista Previa</button>
+                <button class="btn" id="saveInvoiceBtn">Generar Documento</button>
             </div>
         </div>
     </div>
 
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">×</span>
+            <div class="invoice-preview" id="invoicePreview"></div>
+        </div>
+    </div>
+
     <script>
-        // Funciones JavaScript (se completarán en el siguiente paso)
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('userDisplayName').textContent = currentUser.companyName;
+            document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+
+            document.getElementById('addItemBtn').addEventListener('click', () => {
+                alert('Funcionalidad de agregar artículo pendiente');
+            });
+
+            document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
+                if (confirm('¿Seguro que deseas cancelar?')) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+
+            document.getElementById('previewInvoiceBtn').addEventListener('click', () => {
+                alert('Funcionalidad de vista previa pendiente');
+            });
+
+            document.getElementById('saveInvoiceBtn').addEventListener('click', () => {
+                alert('Funcionalidad de generar documento pendiente');
+            });
+
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('previewModal').style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Estilos del Paso 2 -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Panel de Control</title>
+    <title>FacturaML - Nuevo Documento</title>
     <style>
-        /* Estilos del Paso 2 */
-        /* ===========================================================================
-         <!DOCTYPE html>
-<html lang="es">
-<head>
-    <!-- Estilos del dashboard (como en el paso anterior) -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Panel de Control</title>
-    <style>
-        /* Estilos completos del dashboard (como en el paso anterior) */
-        /* ===========================================================================
-         * ESTILOS GENERALES - Adaptados de new-invoice.html
-         * ===========================================================================
-         * Estilos base para el dashboard con diseño limpio y responsivo.
-         * Paleta de colores: azul (#2968c8), amarillo (#ffe600).
-         * =========================================================================== */
+        /* Estilos idénticos a la Parte 1 */
         * {
             margin: 0;
             padding: 0;
@@ -682,41 +629,18 @@
             color: #333;
         }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
+        .invoice-form {
             margin-bottom: 20px;
-        }
-
-        .tab-button {
-            padding: 10px 20px;
-            border: none;
-            background: #f8f9fa;
-            border-radius: 4px 4px 0 0;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-        .tab-button.active {
-            background: #2968c8;
-            color: white;
-        }
-
-        .tab-button:hover {
-            background: #e9ecef;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
         }
 
         .form-section {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #555;
         }
 
         .form-row {
@@ -738,7 +662,7 @@
             color: #555;
         }
 
-        input, select, textarea {
+        input, select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -748,10 +672,50 @@
             transition: border-color 0.3s ease;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table th, .items-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .items-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .items-table input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .summary-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            background: #f8f9fa;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 10px 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-table th {
+            font-weight: 600;
+            background: #e9ecef;
         }
 
         .btn {
@@ -779,37 +743,86 @@
             background: #5a6268;
         }
 
-        .summary-box {
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .action-buttons {
             display: flex;
-            gap: 20px;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .invoice-preview {
+            font-size: 14px;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        .summary-card {
-            flex: 1;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        table {
+        .invoice-details table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            background: #fff;
         }
 
-        th, td {
-            padding: 12px 15px;
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            border: 1px solid #ddd;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
 
-        th {
-            background-color: #f8f9fa;
-            font-weight: 600;
+        .two-column-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+
+        .two-column-table th, .two-column-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: right;
         }
 
         .alert {
@@ -848,22 +861,16 @@
             border: 1px solid #f5c6cb;
         }
 
-        .hidden {
-            display: none;
-        }
-
         @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            .tab-button {
-                width: 100%;
-            }
-            .summary-box {
-                flex-direction: column;
-            }
             .form-row {
                 flex-direction: column;
+            }
+            .summary-table, .two-column-table {
+                width: 100%;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
             }
         }
     </style>
@@ -878,59 +885,23 @@
     </div>
 
     <div class="container">
-        <h2 class="section-title">Panel de Control</h2>
-        <button class="btn" style="margin-bottom: 20px;" id="newInvoiceBtn">Nueva Factura</button>
-
-        <div class="tabs">
-            <button class="tab-button active" onclick="openTab('facturas')">Facturas</button>
-            <button class="tab-button" onclick="openTab('clientes')">Clientes</button>
-            <button class="tab-button" onclick="openTab('perfil')">Mi Perfil</button>
-        </div>
-
-        <div id="facturas" class="tab-content active">
-            <div class="summary-box">
-                <div class="summary-card">
-                    <h3>Total Facturado (Bs.)</h3>
-                    <p id="totalBs">0,00</p>
-                </div>
-                <div class="summary-card">
-                    <h3>Total Facturado (USD)</h3>
-                    <p id="totalUsd">0,00</p>
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tipo de Documento</th>
-                        <th>Nº Documento</th>
-                        <th>Nº Control</th>
-                        <th>Cliente</th>
-                        <th>Fecha</th>
-                        <th>Total (Bs.)</th>
-                        <th>Total (USD)</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="invoicesTable"></tbody>
-            </table>
-        </div>
-
-        <div id="clientes" class="tab-content">
+        <h2 class="section-title">Nuevo Documento</h2>
+        <div class="invoice-form">
             <div class="form-section">
-                <h3>Gestión de Clientes</h3>
+                <h3>Información del Cliente</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="clientName">Nombre o Razón Social*</label>
-                        <input type="text" id="clientName">
+                        <input type="text" id="clientName" required>
                     </div>
                     <div class="form-group">
                         <label for="clientId">Cédula o RIF*</label>
-                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9">
+                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="clientAddress">Dirección*</label>
+                        <label for="clientAddress">Dirección</label>
                         <input type="text" id="clientAddress">
                     </div>
                     <div class="form-group">
@@ -938,77 +909,143 @@
                         <input type="text" id="clientPhone">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="clientEmails">Correo(s) (separados por coma)</label>
-                    <input type="text" id="clientEmails" placeholder="Ej: correo1@example.com, correo2@example.com">
-                </div>
-                <button class="btn" id="saveClientBtn">Guardar Cliente</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cédula/RIF</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
-                        <th>Correos</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTable"></tbody>
-            </table>
-        </div>
 
-        <div id="perfil" class="tab-content">
             <div class="form-section">
-                <h3>Mi Perfil</h3>
+                <h3>Detalles del Documento</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nombre de la Empresa</label>
-                        <p id="profileCompanyName">Cargando...</p>
+                        <label for="docType">Tipo de Documento*</label>
+                        <select id="docType" required>
+                            <option value="factura">Factura</option>
+                            <option value="nota_credito">Nota de Crédito</option>
+                            <option value="nota_debito">Nota de Débito</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>RIF</label>
-                        <p id="profileRif">Cargando...</p>
+                        <label for="invoiceDate">Fecha*</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Método de Pago*</label>
+                        <select id="paymentMethod" required>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="pago_movil">Pago Móvil</option>
+                            <option value="zelle">Zelle</option>
+                        </select>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Artículos</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Código</th>
+                            <th width="30%">Descripción</th>
+                            <th width="15%">Cantidad</th>
+                            <th width="20%">Precio Unitario</th>
+                            <th width="20%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <tr>
+                            <td><input type="text" class="item-code" placeholder="Código"></td>
+                            <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                            <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                            <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                            <td class="item-subtotal">0.00</td>
+                            <td><button class="btn-secondary remove-item">X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-secondary" id="addItemBtn">Agregar Artículo</button>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Dirección</label>
-                        <p id="profileAddress">Cargando...</p>
+                        <label for="exemptAmount">Monto Exento (Bs.)</label>
+                        <input type="number" id="exemptAmount" step="0.01" min="0" value="0.00">
                     </div>
                     <div class="form-group">
-                        <label>Teléfono</label>
-                        <p id="profilePhone">Cargando...</p>
+                        <label for="alicuota">Alícuota IVA (%)*</label>
+                        <select id="alicuota" required>
+                            <option value="16">16%</option>
+                            <option value="8">8%</option>
+                            <option value="0">0%</option>
+                        </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Correo</label>
-                    <p id="profileEmail">Cargando...</p>
-                </div>
-                <div class="form-group">
-                    <label>Estatus Tributario</label>
-                    <p id="profileTaxStatus">Cargando...</p>
-                </div>
-                <div id="lowInvoicesWarning" class="alert alert-warning hidden">
-                    ¡Atención! Te quedan menos de 10 facturas disponibles. <button class="btn btn-success" id="buyMoreInvoicesBtn">Comprar Más</button>
-                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <td id="subtotalBs">0,00</td>
+                            <td id="subtotalUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Monto Exento</td>
+                            <td id="exemptBs">0,00</td>
+                            <td id="exemptUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Base Imponible</td>
+                            <td id="taxableBs">0,00</td>
+                            <td id="taxableUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IVA</td>
+                            <td id="taxBs">0,00</td>
+                            <td id="taxUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IGTF (3%)</td>
+                            <td id="igtfBs">0,00</td>
+                            <td id="igtfUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td id="totalBs"><strong>0,00</strong></td>
+                            <td id="totalUsd"><strong>0,00</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
+                <button class="btn btn-success" id="previewInvoiceBtn">Vista Previa</button>
+                <button class="btn" id="saveInvoiceBtn">Generar Documento</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // ===========================================================================
-        // FUNCIONES BÁSICAS - Adaptadas de new-invoice.html
-        // ===========================================================================
-        // Funciones reutilizables para autenticación, alertas, formato y validaciones.
-        // ===========================================================================
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">×</span>
+            <div class="invoice-preview" id="invoicePreview"></div>
+        </div>
+    </div>
 
-        /**
-         * Muestra una alerta temporal en la interfaz.
-         * @param {string} message - El mensaje a mostrar.
-         * @param {string} type - Tipo de alerta (success, warning, danger, info).
-         */
+    <script>
+        // Variables globales
+        let exchangeRate = 64.74; // Tasa fija por ahora, igual que dashboard.html
+
+        // Funciones de utilidad
+        function formatCurrency(amount) {
+            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
@@ -1017,65 +1054,1585 @@
             setTimeout(() => alertDiv.remove(), 5000);
         }
 
-        /**
-         * Formatea un número como moneda venezolana (Bolívares).
-         * @param {number} amount - El monto a formatear.
-         * @returns {string} - El monto formateado con comas y "Bs.".
-         */
+        // Gestión de ítems
+        function addItemRow() {
+            const tbody = document.getElementById('itemsTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="item-code" placeholder="Código"></td>
+                <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                <td class="item-subtotal">0.00</td>
+                <td><button class="btn-secondary remove-item">X</button></td>
+            `;
+            tbody.appendChild(row);
+            attachItemListeners(row);
+            updateInvoiceTotals();
+        }
+
+        function attachItemListeners(row) {
+            const quantity = row.querySelector('.item-quantity');
+            const price = row.querySelector('.item-price');
+            const removeBtn = row.querySelector('.remove-item');
+
+            quantity.addEventListener('input', updateInvoiceTotals);
+            price.addEventListener('input', updateInvoiceTotals);
+            removeBtn.addEventListener('click', () => {
+                if (document.querySelectorAll('#itemsTableBody tr').length > 1) {
+                    row.remove();
+                    updateInvoiceTotals();
+                } else {
+                    showAlert('Debe haber al menos un artículo.', 'warning');
+                }
+            });
+        }
+
+        function updateInvoiceTotals() {
+            let subtotal = 0;
+            const items = document.querySelectorAll('#itemsTableBody tr');
+            items.forEach(row => {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const itemSubtotal = quantity * price;
+                row.querySelector('.item-subtotal').textContent = formatCurrency(itemSubtotal);
+                subtotal += itemSubtotal;
+            });
+
+            const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
+            const alicuota = parseFloat(document.getElementById('alicuota').value) || 0;
+            const taxableBase = subtotal - exemptAmount;
+            const tax = taxableBase * (alicuota / 100);
+            const igtf = subtotal * 0.03; // 3% IGTF
+            const total = subtotal + tax + igtf;
+
+            document.getElementById('subtotalBs').textContent = formatCurrency(subtotal);
+            document.getElementById('exemptBs').textContent = formatCurrency(exemptAmount);
+            document.getElementById('taxableBs').textContent = formatCurrency(taxableBase);
+            document.getElementById('taxBs').textContent = formatCurrency(tax);
+            document.getElementById('igtfBs').textContent = formatCurrency(igtf);
+            document.getElementById('totalBs').textContent = formatCurrency(total);
+
+            // USD se calculará en la Parte 3
+            document.getElementById('subtotalUsd').textContent = '0,00';
+            document.getElementById('exemptUsd').textContent = '0,00';
+            document.getElementById('taxableUsd').textContent = '0,00';
+            document.getElementById('taxUsd').textContent = '0,00';
+            document.getElementById('igtfUsd').textContent = '0,00';
+            document.getElementById('totalUsd').textContent = '0,00';
+        }
+
+        // Obtener datos del formulario
+        function getInvoiceFormData() {
+            const items = Array.from(document.querySelectorAll('#itemsTableBody tr')).map(row => ({
+                code: row.querySelector('.item-code').value,
+                description: row.querySelector('.item-description').value,
+                quantity: parseFloat(row.querySelector('.item-quantity').value) || 0,
+                price: parseFloat(row.querySelector('.item-price').value) || 0,
+                subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0
+            }));
+
+            return {
+                clientName: document.getElementById('clientName').value.trim(),
+                clientId: document.getElementById('clientId').value.trim().toUpperCase(),
+                clientAddress: document.getElementById('clientAddress').value.trim(),
+                clientPhone: document.getElementById('clientPhone').value.trim(),
+                docType: document.getElementById('docType').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                items: items,
+                exemptAmount: parseFloat(document.getElementById('exemptAmount').value) || 0,
+                alicuota: parseFloat(document.getElementById('alicuota').value) || 0,
+                subtotal: parseFloat(document.getElementById('subtotalBs').textContent.replace(/,/g, '')) || 0,
+                taxableBase: parseFloat(document.getElementById('taxableBs').textContent.replace(/,/g, '')) || 0,
+                tax: parseFloat(document.getElementById('taxBs').textContent.replace(/,/g, '')) || 0,
+                igtf: parseFloat(document.getElementById('igtfBs').textContent.replace(/,/g, '')) || 0,
+                total: parseFloat(document.getElementById('totalBs').textContent.replace(/,/g, '')) || 0
+            };
+        }
+
+        // Validar formulario
+        function validateForm(data) {
+            if (!data.clientName || !data.clientId || !data.invoiceDate || !data.items.length || data.items.some(item => !item.description || item.quantity <= 0 || item.price <= 0)) {
+                showAlert('Por favor completa todos los campos obligatorios y verifica los ítems.', 'warning');
+                return false;
+            }
+            return true;
+        }
+
+        // Vista previa básica
+        function previewInvoice() {
+            const data = getInvoiceFormData();
+            if (!validateForm(data)) return;
+
+            const preview = document.getElementById('invoicePreview');
+            preview.innerHTML = `
+                <h2>${data.docType.charAt(0).toUpperCase() + data.docType.slice(1)}</h2>
+                <p>Cliente: ${data.clientName}</p>
+                <p>RIF/Cédula: ${data.clientId}</p>
+                <p>Fecha: ${data.invoiceDate}</p>
+                <table class="invoice-details">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario (Bs.)</th>
+                            <th>Subtotal (Bs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.items.map(item => `
+                            <tr>
+                                <td>${item.code || '-'}</td>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${formatCurrency(item.price)}</td>
+                                <td>${formatCurrency(item.subtotal)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <table class="two-column-table">
+                    <tr><th>Subtotal (Bs.)</th><td>${formatCurrency(data.subtotal)}</td></tr>
+                    <tr><th>Monto Exento (Bs.)</th><td>${formatCurrency(data.exemptAmount)}</td></tr>
+                    <tr><th>Base Imponible (Bs.)</th><td>${formatCurrency(data.taxableBase)}</td></tr>
+                    <tr><th>IVA (${data.alicuota}%)</th><td>${formatCurrency(data.tax)}</td></tr>
+                    <tr><th>IGTF (3%)</th><td>${formatCurrency(data.igtf)}</td></tr>
+                    <tr><th>Total (Bs.)</th><td>${formatCurrency(data.total)}</td></tr>
+                </table>
+            `;
+            document.getElementById('previewModal').style.display = 'flex';
+        }
+
+        // Guardar factura
+        function saveInvoice() {
+            const data = getInvoiceFormData();
+            if (!validateForm(data)) return;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const docNumber = `FAC-${currentUser.rif}-${invoices.length + 1}`; // Numeración simple
+            const controlNumber = `CTRL-${String(invoices.length + 1).padStart(8, '0')}`;
+
+            const invoiceData = {
+                sellerRif: currentUser.rif,
+                docType: data.docType,
+                docNumber: docNumber,
+                controlNumber: controlNumber,
+                clientName: data.clientName,
+                clientId: data.clientId,
+                date: data.invoiceDate,
+                paymentMethod: data.paymentMethod,
+                items: data.items,
+                exemptAmount: data.exemptAmount,
+                alicuota: data.alicuota,
+                subtotal: data.subtotal,
+                taxableBase: data.taxableBase,
+                tax: data.tax,
+                igtf: data.igtf,
+                total: data.total
+            };
+
+            invoices.push(invoiceData);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            showAlert('Factura generada exitosamente.', 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('userDisplayName').textContent = currentUser.companyName;
+            document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+
+            document.getElementById('addItemBtn').addEventListener('click', addItemRow);
+
+            document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
+                if (confirm('¿Seguro que deseas cancelar?')) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+
+            document.getElementById('previewInvoiceBtn').addEventListener('click', previewInvoice);
+
+            document.getElementById('saveInvoiceBtn').addEventListener('click', saveInvoice);
+
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('previewModal').style.display = 'none';
+            });
+
+            document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
+            document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
+
+            document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
+            updateInvoiceTotals();
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacturaML - Nuevo Documento</title>
+    <style>
+        /* Estilos idénticos a la Parte 2 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: #ffe600;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar:hover {
+            background-color: #e6cc00;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            margin-right: 15px;
+            font-size: 16px;
+            color: #444;
+            font-style: italic;
+        }
+
+        .logout-btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-btn:hover {
+            background: #1d4f9e;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ddd;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            color: #333;
+        }
+
+        .invoice-form {
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2968c8;
+            box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table th, .items-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .items-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .items-table input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .summary-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            background: #f8f9fa;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 10px 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-table th {
+            font-weight: 600;
+            background: #e9ecef;
+        }
+
+        .btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1d4f9e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .invoice-preview {
+            font-size: 14px;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .two-column-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+
+        .two-column-table th, .two-column-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            z-index: 1001;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            .summary-table, .two-column-table {
+                width: 100%;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">FacturaML</div>
+        <div class="nav-user">
+            <div class="user-info" id="userDisplayName">Cargando...</div>
+            <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">Nuevo Documento</h2>
+        <div class="invoice-form">
+            <div class="form-section">
+                <h3>Información del Cliente</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Nombre o Razón Social*</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientId">Cédula o RIF*</label>
+                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientAddress">Dirección</label>
+                        <input type="text" id="clientAddress">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Teléfono</label>
+                        <input type="text" id="clientPhone">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Detalles del Documento</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="docType">Tipo de Documento*</label>
+                        <select id="docType" required>
+                            <option value="factura">Factura</option>
+                            <option value="nota_credito">Nota de Crédito</option>
+                            <option value="nota_debito">Nota de Débito</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceDate">Fecha*</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Método de Pago*</label>
+                        <select id="paymentMethod" required>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="pago_movil">Pago Móvil</option>
+                            <option value="zelle">Zelle</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Artículos</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Código</th>
+                            <th width="30%">Descripción</th>
+                            <th width="15%">Cantidad</th>
+                            <th width="20%">Precio Unitario</th>
+                            <th width="20%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <tr>
+                            <td><input type="text" class="item-code" placeholder="Código"></td>
+                            <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                            <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                            <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                            <td class="item-subtotal">0.00</td>
+                            <td><button class="btn-secondary remove-item">X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-secondary" id="addItemBtn">Agregar Artículo</button>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exemptAmount">Monto Exento (Bs.)</label>
+                        <input type="number" id="exemptAmount" step="0.01" min="0" value="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="alicuota">Alícuota IVA (%)*</label>
+                        <select id="alicuota" required>
+                            <option value="16">16%</option>
+                            <option value="8">8%</option>
+                            <option value="0">0%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <td id="subtotalBs">0,00</td>
+                            <td id="subtotalUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Monto Exento</td>
+                            <td id="exemptBs">0,00</td>
+                            <td id="exemptUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Base Imponible</td>
+                            <td id="taxableBs">0,00</td>
+                            <td id="taxableUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IVA</td>
+                            <td id="taxBs">0,00</td>
+                            <td id="taxUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IGTF (3%)</td>
+                            <td id="igtfBs">0,00</td>
+                            <td id="igtfUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td id="totalBs"><strong>0,00</strong></td>
+                            <td id="totalUsd"><strong>0,00</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
+                <button class="btn btn-success" id="previewInvoiceBtn">Vista Previa</button>
+                <button class="btn" id="saveInvoiceBtn">Generar Documento</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">×</span>
+            <div class="invoice-preview" id="invoicePreview"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let exchangeRate = 64.74; // Tasa inicial simulada, igual que dashboard.html
+
+        // Funciones de utilidad
         function formatCurrency(amount) {
-            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' Bs.';
+            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
 
-        /**
-         * Formatea una fecha al estilo venezolano.
-         * @param {string} dateString - La fecha en formato ISO.
-         * @returns {string} - Fecha formateada (dd/mm/yyyy).
-         */
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-VE');
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
         }
 
-        /**
-         * Valida el formato de un RIF o cédula venezolana.
-         * @param {string} clientId - El RIF o cédula a validar.
-         * @returns {boolean} - True si es válido, false si no.
-         */
+        // Simular obtención de tasa de cambio
+        async function fetchExchangeRate() {
+            try {
+                const response = { success: true, rate: 64.74, date: '2025-03-07' }; // Simulado
+                if (response.success) {
+                    exchangeRate = response.rate;
+                    showAlert(`Tasa del dólar BCV (${response.date}): ${exchangeRate} VES/USD`, 'info');
+                }
+            } catch (error) {
+                showAlert('Error al cargar tasa del dólar. Usando valor por defecto.', 'warning');
+            }
+            updateInvoiceTotals();
+        }
+
+        // Gestión de ítems
+        function addItemRow() {
+            const tbody = document.getElementById('itemsTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="item-code" placeholder="Código"></td>
+                <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                <td class="item-subtotal">0.00</td>
+                <td><button class="btn-secondary remove-item">X</button></td>
+            `;
+            tbody.appendChild(row);
+            attachItemListeners(row);
+            updateInvoiceTotals();
+        }
+
+        function attachItemListeners(row) {
+            const quantity = row.querySelector('.item-quantity');
+            const price = row.querySelector('.item-price');
+            const removeBtn = row.querySelector('.remove-item');
+
+            quantity.addEventListener('input', updateInvoiceTotals);
+            price.addEventListener('input', updateInvoiceTotals);
+            removeBtn.addEventListener('click', () => {
+                if (document.querySelectorAll('#itemsTableBody tr').length > 1) {
+                    row.remove();
+                    updateInvoiceTotals();
+                } else {
+                    showAlert('Debe haber al menos un artículo.', 'warning');
+                }
+            });
+        }
+
+        function updateInvoiceTotals() {
+            let subtotal = 0;
+            const items = document.querySelectorAll('#itemsTableBody tr');
+            items.forEach(row => {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const itemSubtotal = quantity * price;
+                row.querySelector('.item-subtotal').textContent = formatCurrency(itemSubtotal);
+                subtotal += itemSubtotal;
+            });
+
+            const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
+            const alicuota = parseFloat(document.getElementById('alicuota').value) || 0;
+            const taxableBase = subtotal - exemptAmount;
+            const tax = taxableBase * (alicuota / 100);
+            const igtf = subtotal * 0.03; // 3% IGTF
+            const total = subtotal + tax + igtf;
+
+            // Calcular valores en USD
+            const subtotalUsd = subtotal / exchangeRate;
+            const exemptUsd = exemptAmount / exchangeRate;
+            const taxableUsd = taxableBase / exchangeRate;
+            const taxUsd = tax / exchangeRate;
+            const igtfUsd = igtf / exchangeRate;
+            const totalUsd = total / exchangeRate;
+
+            // Actualizar tabla de resumen
+            document.getElementById('subtotalBs').textContent = formatCurrency(subtotal);
+            document.getElementById('exemptBs').textContent = formatCurrency(exemptAmount);
+            document.getElementById('taxableBs').textContent = formatCurrency(taxableBase);
+            document.getElementById('taxBs').textContent = formatCurrency(tax);
+            document.getElementById('igtfBs').textContent = formatCurrency(igtf);
+            document.getElementById('totalBs').textContent = formatCurrency(total);
+
+            document.getElementById('subtotalUsd').textContent = formatCurrency(subtotalUsd);
+            document.getElementById('exemptUsd').textContent = formatCurrency(exemptUsd);
+            document.getElementById('taxableUsd').textContent = formatCurrency(taxableUsd);
+            document.getElementById('taxUsd').textContent = formatCurrency(taxUsd);
+            document.getElementById('igtfUsd').textContent = formatCurrency(igtfUsd);
+            document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
+        }
+
+        // Obtener datos del formulario
+        function getInvoiceFormData() {
+            const items = Array.from(document.querySelectorAll('#itemsTableBody tr')).map(row => ({
+                code: row.querySelector('.item-code').value,
+                description: row.querySelector('.item-description').value,
+                quantity: parseFloat(row.querySelector('.item-quantity').value) || 0,
+                price: parseFloat(row.querySelector('.item-price').value) || 0,
+                subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0
+            }));
+
+            return {
+                clientName: document.getElementById('clientName').value.trim(),
+                clientId: document.getElementById('clientId').value.trim().toUpperCase(),
+                clientAddress: document.getElementById('clientAddress').value.trim(),
+                clientPhone: document.getElementById('clientPhone').value.trim(),
+                docType: document.getElementById('docType').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                items: items,
+                exemptAmount: parseFloat(document.getElementById('exemptAmount').value) || 0,
+                alicuota: parseFloat(document.getElementById('alicuota').value) || 0,
+                subtotalBs: parseFloat(document.getElementById('subtotalBs').textContent.replace(/,/g, '')) || 0,
+                exemptBs: parseFloat(document.getElementById('exemptBs').textContent.replace(/,/g, '')) || 0,
+                taxableBs: parseFloat(document.getElementById('taxableBs').textContent.replace(/,/g, '')) || 0,
+                taxBs: parseFloat(document.getElementById('taxBs').textContent.replace(/,/g, '')) || 0,
+                igtfBs: parseFloat(document.getElementById('igtfBs').textContent.replace(/,/g, '')) || 0,
+                totalBs: parseFloat(document.getElementById('totalBs').textContent.replace(/,/g, '')) || 0,
+                subtotalUsd: parseFloat(document.getElementById('subtotalUsd').textContent.replace(/,/g, '')) || 0,
+                exemptUsd: parseFloat(document.getElementById('exemptUsd').textContent.replace(/,/g, '')) || 0,
+                taxableUsd: parseFloat(document.getElementById('taxableUsd').textContent.replace(/,/g, '')) || 0,
+                taxUsd: parseFloat(document.getElementById('taxUsd').textContent.replace(/,/g, '')) || 0,
+                igtfUsd: parseFloat(document.getElementById('igtfUsd').textContent.replace(/,/g, '')) || 0,
+                totalUsd: parseFloat(document.getElementById('totalUsd').textContent.replace(/,/g, '')) || 0
+            };
+        }
+
+        // Validar formulario
+        function validateForm(data) {
+            if (!data.clientName || !data.clientId || !data.invoiceDate || !data.items.length || data.items.some(item => !item.description || item.quantity <= 0 || item.price <= 0)) {
+                showAlert('Por favor completa todos los campos obligatorios y verifica los ítems.', 'warning');
+                return false;
+            }
+            return true;
+        }
+
+        // Vista previa con dos columnas
+        function previewInvoice() {
+            const data = getInvoiceFormData();
+            if (!validateForm(data)) return;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const preview = document.getElementById('invoicePreview');
+            preview.innerHTML = `
+                <div class="invoice-header">
+                    <div>
+                        <h2>${data.docType.charAt(0).toUpperCase() + data.docType.slice(1)}</h2>
+                        <p>Emisor: ${currentUser.companyName}</p>
+                        <p>RIF: ${currentUser.rif}</p>
+                    </div>
+                    <div>
+                        <p>Nº Documento: Pendiente</p>
+                        <p>Nº Control: Pendiente</p>
+                        <p>Fecha: ${data.invoiceDate}</p>
+                    </div>
+                </div>
+                <div class="invoice-details">
+                    <h3>Cliente</h3>
+                    <p>Nombre: ${data.clientName}</p>
+                    <p>RIF/Cédula: ${data.clientId}</p>
+                    <p>Dirección: ${data.clientAddress || '-'}</p>
+                    <p>Teléfono: ${data.clientPhone || '-'}</p>
+                </div>
+                <table class="invoice-details">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario (Bs.)</th>
+                            <th>Subtotal (Bs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.items.map(item => `
+                            <tr>
+                                <td>${item.code || '-'}</td>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${formatCurrency(item.price)}</td>
+                                <td>${formatCurrency(item.subtotal)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <table class="two-column-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs.</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th>Subtotal</th><td>${formatCurrency(data.subtotalBs)}</td><td>${formatCurrency(data.subtotalUsd)}</td></tr>
+                        <tr><th>Monto Exento</th><td>${formatCurrency(data.exemptBs)}</td><td>${formatCurrency(data.exemptUsd)}</td></tr>
+                        <tr><th>Base Imponible</th><td>${formatCurrency(data.taxableBs)}</td><td>${formatCurrency(data.taxableUsd)}</td></tr>
+                        <tr><th>IVA (${data.alicuota}%)</th><td>${formatCurrency(data.taxBs)}</td><td>${formatCurrency(data.taxUsd)}</td></tr>
+                        <tr><th>IGTF (3%)</th><td>${formatCurrency(data.igtfBs)}</td><td>${formatCurrency(data.igtfUsd)}</td></tr>
+                        <tr><th>Total</th><td>${formatCurrency(data.totalBs)}</td><td>${formatCurrency(data.totalUsd)}</td></tr>
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('previewModal').style.display = 'flex';
+        }
+
+        // Guardar factura con dos columnas
+        function saveInvoice() {
+            const data = getInvoiceFormData();
+            if (!validateForm(data)) return;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const docNumber = `FAC-${currentUser.rif}-${invoices.length + 1}`;
+            const controlNumber = `CTRL-${String(invoices.length + 1).padStart(8, '0')}`;
+
+            const invoiceData = {
+                sellerRif: currentUser.rif,
+                docType: data.docType,
+                docNumber: docNumber,
+                controlNumber: controlNumber,
+                clientName: data.clientName,
+                clientId: data.clientId,
+                date: data.invoiceDate,
+                paymentMethod: data.paymentMethod,
+                items: data.items,
+                exemptAmountBs: data.exemptBs,
+                exemptAmountUsd: data.exemptUsd,
+                alicuota: data.alicuota,
+                subtotalBs: data.subtotalBs,
+                subtotalUsd: data.subtotalUsd,
+                taxableBaseBs: data.taxableBs,
+                taxableBaseUsd: data.taxableUsd,
+                taxBs: data.taxBs,
+                taxUsd: data.taxUsd,
+                igtfBs: data.igtfBs,
+                igtfUsd: data.igtfUsd,
+                totalBs: data.totalBs,
+                totalUsd: data.totalUsd,
+                exchangeRate: exchangeRate
+            };
+
+            invoices.push(invoiceData);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            showAlert('Factura generada exitosamente.', 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+            document.getElementById('userDisplayName').textContent = currentUser.companyName;
+            document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+
+            fetchExchangeRate();
+
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            });
+
+            document.getElementById('addItemBtn').addEventListener('click', addItemRow);
+
+            document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
+                if (confirm('¿Seguro que deseas cancelar?')) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+
+            document.getElementById('previewInvoiceBtn').addEventListener('click', previewInvoice);
+
+            document.getElementById('saveInvoiceBtn').addEventListener('click', saveInvoice);
+
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('previewModal').style.display = 'none';
+            });
+
+            document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
+            document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
+
+            document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
+            updateInvoiceTotals();
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacturaML - Nuevo Documento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: #ffe600;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar:hover {
+            background-color: #e6cc00;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 24px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            margin-right: 15px;
+            font-size: 16px;
+            color: #444;
+            font-style: italic;
+        }
+
+        .logout-btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-btn:hover {
+            background: #1d4f9e;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ddd;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            color: #333;
+        }
+
+        .invoice-form {
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2968c8;
+            box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table th, .items-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .items-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .items-table input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .summary-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            background: #f8f9fa;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 10px 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-table th {
+            font-weight: 600;
+            background: #e9ecef;
+        }
+
+        .btn {
+            background: #2968c8;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1d4f9e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .invoice-preview {
+            font-size: 14px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background: #fff;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .two-column-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+
+        .two-column-table th, .two-column-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+
+        .invoice-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            z-index: 1001;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            .summary-table, .two-column-table {
+                width: 100%;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .invoice-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">FacturaML</div>
+        <div class="nav-user">
+            <div class="user-info" id="userDisplayName">Cargando...</div>
+            <button class="logout-btn" id="logoutButton">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">Nuevo Documento</h2>
+        <div class="invoice-form">
+            <div class="form-section">
+                <h3>Información del Cliente</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientName">Nombre o Razón Social*</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientId">Cédula o RIF*</label>
+                        <input type="text" id="clientId" placeholder="Ej: V-12345678 o J-12345678-9" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientAddress">Dirección</label>
+                        <input type="text" id="clientAddress">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Teléfono</label>
+                        <input type="text" id="clientPhone" placeholder="Ej: +584121234567">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Detalles del Documento</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="docType">Tipo de Documento*</label>
+                        <select id="docType" required>
+                            <option value="factura">Factura</option>
+                            <option value="nota_credito">Nota de Crédito</option>
+                            <option value="nota_debito">Nota de Débito</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="invoiceDate">Fecha*</label>
+                        <input type="date" id="invoiceDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Método de Pago*</label>
+                        <select id="paymentMethod" required>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="pago_movil">Pago Móvil</option>
+                            <option value="zelle">Zelle</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Artículos</h3>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Código</th>
+                            <th width="30%">Descripción</th>
+                            <th width="15%">Cantidad</th>
+                            <th width="20%">Precio Unitario</th>
+                            <th width="20%">Subtotal</th>
+                            <th width="5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <tr>
+                            <td><input type="text" class="item-code" placeholder="Código"></td>
+                            <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                            <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                            <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                            <td class="item-subtotal">0.00</td>
+                            <td><button class="btn-secondary remove-item">X</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-secondary" id="addItemBtn">Agregar Artículo</button>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exemptAmount">Monto Exento (Bs.)</label>
+                        <input type="number" id="exemptAmount" step="0.01" min="0" value="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="alicuota">Alícuota IVA (%)*</label>
+                        <select id="alicuota" required>
+                            <option value="16">16%</option>
+                            <option value="8">8%</option>
+                            <option value="0">0%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <td id="subtotalBs">0,00</td>
+                            <td id="subtotalUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Monto Exento</td>
+                            <td id="exemptBs">0,00</td>
+                            <td id="exemptUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>Base Imponible</td>
+                            <td id="taxableBs">0,00</td>
+                            <td id="taxableUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IVA</td>
+                            <td id="taxBs">0,00</td>
+                            <td id="taxUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td>IGTF (3%)</td>
+                            <td id="igtfBs">0,00</td>
+                            <td id="igtfUsd">0,00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td id="totalBs"><strong>0,00</strong></td>
+                            <td id="totalUsd"><strong>0,00</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
+                <button class="btn btn-success" id="previewInvoiceBtn">Vista Previa</button>
+                <button class="btn" id="saveInvoiceBtn">Generar Documento</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">×</span>
+            <div class="invoice-preview" id="invoicePreview"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let exchangeRate = 64.74;
+
+        // Funciones de utilidad
+        function formatCurrency(amount) {
+            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        // Validaciones
         function validateClientId(clientId) {
             const rifRegex = /^[VEJPG]-[0-9]{8}-[0-9]$/;
             const cedulaRegex = /^[VE]-[0-9]{1,8}$/;
             return rifRegex.test(clientId) || cedulaRegex.test(clientId);
         }
 
-        /**
-         * Valida el formato de correos electrónicos (múltiples, separados por comas).
-         * @param {string} emails - Cadena de correos electrónicos.
-         * @returns {boolean} - True si son válidos, false si no.
-         */
-        function validateEmails(emails) {
-            if (!emails) return true;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const emailArray = emails.split(',').map(email => email.trim()).filter(email => email.length > 0);
-            return emailArray.every(email => emailRegex.test(email));
-        }
-
-        /**
-         * Valida el formato de un teléfono venezolano (opcional).
-         * @param {string} phone - El número de teléfono a validar.
-         * @returns {boolean} - True si es válido o vacío, false si no.
-         */
         function validatePhone(phone) {
-            if (!phone) return true;
+            if (!phone) return true; // Opcional
             const phoneRegex = /^(\+58|0)[0-9]{10}$/;
             return phoneRegex.test(phone);
         }
 
-        let exchangeRate = 64.74;
-
-        /**
-         * Simula la obtención de la tasa de cambio del dólar.
-         * @returns {Promise<void>}
-         */
+        // Simular obtención de tasa de cambio
         async function fetchExchangeRate() {
             try {
                 const response = { success: true, rate: 64.74, date: '2025-03-07' };
@@ -1086,231 +2643,315 @@
             } catch (error) {
                 showAlert('Error al cargar tasa del dólar. Usando valor por defecto.', 'warning');
             }
-            updateDashboardStats();
+            updateInvoiceTotals();
         }
 
-        /**
-         * Abre la pestaña seleccionada.
-         * @param {string} tabName - Nombre de la pestaña.
-         */
-        function openTab(tabName) {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.querySelector(`#${tabName}`).classList.add('active');
-            document.querySelector(`button[onclick="openTab('${tabName}')"]`).classList.add('active');
+        // Gestión de ítems
+        function addItemRow() {
+            const tbody = document.getElementById('itemsTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="item-code" placeholder="Código"></td>
+                <td><input type="text" class="item-description" placeholder="Descripción del artículo" required></td>
+                <td><input type="number" class="item-quantity" min="1" value="1" required></td>
+                <td><input type="number" step="0.01" class="item-price" min="0" value="0.00" placeholder="Precio en Bs." required></td>
+                <td class="item-subtotal">0.00</td>
+                <td><button class="btn-secondary remove-item">X</button></td>
+            `;
+            tbody.appendChild(row);
+            attachItemListeners(row);
+            updateInvoiceTotals();
         }
 
-        /**
-         * Inicializa la página verificando autenticación y configurando valores iniciales.
-         */
-        function initializePage() {
+        function attachItemListeners(row) {
+            const quantity = row.querySelector('.item-quantity');
+            const price = row.querySelector('.item-price');
+            const removeBtn = row.querySelector('.remove-item');
+
+            quantity.addEventListener('input', updateInvoiceTotals);
+            price.addEventListener('input', updateInvoiceTotals);
+            removeBtn.addEventListener('click', () => {
+                if (document.querySelectorAll('#itemsTableBody tr').length > 1) {
+                    row.remove();
+                    updateInvoiceTotals();
+                } else {
+                    showAlert('Debe haber al menos un artículo.', 'warning');
+                }
+            });
+        }
+
+        function updateInvoiceTotals() {
+            let subtotal = 0;
+            const items = document.querySelectorAll('#itemsTableBody tr');
+            items.forEach(row => {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                const itemSubtotal = quantity * price;
+                row.querySelector('.item-subtotal').textContent = formatCurrency(itemSubtotal);
+                subtotal += itemSubtotal;
+            });
+
+            const exemptAmount = parseFloat(document.getElementById('exemptAmount').value) || 0;
+            const alicuota = parseFloat(document.getElementById('alicuota').value) || 0;
+            const taxableBase = subtotal - exemptAmount;
+            const tax = taxableBase * (alicuota / 100);
+            const igtf = subtotal * 0.03;
+            const total = subtotal + tax + igtf;
+
+            const subtotalUsd = subtotal / exchangeRate;
+            const exemptUsd = exemptAmount / exchangeRate;
+            const taxableUsd = taxableBase / exchangeRate;
+            const taxUsd = tax / exchangeRate;
+            const igtfUsd = igtf / exchangeRate;
+            const totalUsd = total / exchangeRate;
+
+            document.getElementById('subtotalBs').textContent = formatCurrency(subtotal);
+            document.getElementById('exemptBs').textContent = formatCurrency(exemptAmount);
+            document.getElementById('taxableBs').textContent = formatCurrency(taxableBase);
+            document.getElementById('taxBs').textContent = formatCurrency(tax);
+            document.getElementById('igtfBs').textContent = formatCurrency(igtf);
+            document.getElementById('totalBs').textContent = formatCurrency(total);
+
+            document.getElementById('subtotalUsd').textContent = formatCurrency(subtotalUsd);
+            document.getElementById('exemptUsd').textContent = formatCurrency(exemptUsd);
+            document.getElementById('taxableUsd').textContent = formatCurrency(taxableUsd);
+            document.getElementById('taxUsd').textContent = formatCurrency(taxUsd);
+            document.getElementById('igtfUsd').textContent = formatCurrency(igtfUsd);
+            document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
+        }
+
+        // Obtener datos del formulario
+        function getInvoiceFormData() {
+            const items = Array.from(document.querySelectorAll('#itemsTableBody tr')).map(row => ({
+                code: row.querySelector('.item-code').value,
+                description: row.querySelector('.item-description').value,
+                quantity: parseFloat(row.querySelector('.item-quantity').value) || 0,
+                price: parseFloat(row.querySelector('.item-price').value) || 0,
+                subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0
+            }));
+
+            return {
+                clientName: document.getElementById('clientName').value.trim(),
+                clientId: document.getElementById('clientId').value.trim().toUpperCase(),
+                clientAddress: document.getElementById('clientAddress').value.trim(),
+                clientPhone: document.getElementById('clientPhone').value.trim(),
+                docType: document.getElementById('docType').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                items: items,
+                exemptAmountBs: parseFloat(document.getElementById('exemptBs').textContent.replace(/,/g, '')) || 0,
+                exemptAmountUsd: parseFloat(document.getElementById('exemptUsd').textContent.replace(/,/g, '')) || 0,
+                alicuota: parseFloat(document.getElementById('alicuota').value) || 0,
+                subtotalBs: parseFloat(document.getElementById('subtotalBs').textContent.replace(/,/g, '')) || 0,
+                subtotalUsd: parseFloat(document.getElementById('subtotalUsd').textContent.replace(/,/g, '')) || 0,
+                taxableBaseBs: parseFloat(document.getElementById('taxableBs').textContent.replace(/,/g, '')) || 0,
+                taxableBaseUsd: parseFloat(document.getElementById('taxableUsd').textContent.replace(/,/g, '')) || 0,
+                taxBs: parseFloat(document.getElementById('taxBs').textContent.replace(/,/g, '')) || 0,
+                taxUsd: parseFloat(document.getElementById('taxUsd').textContent.replace(/,/g, '')) || 0,
+                igtfBs: parseFloat(document.getElementById('igtfBs').textContent.replace(/,/g, '')) || 0,
+                igtfUsd: parseFloat(document.getElementById('igtfUsd').textContent.replace(/,/g, '')) || 0,
+                totalBs: parseFloat(document.getElementById('totalBs').textContent.replace(/,/g, '')) || 0,
+                totalUsd: parseFloat(document.getElementById('totalUsd').textContent.replace(/,/g, '')) || 0
+            };
+        }
+
+        // Validar formulario
+        function validateForm(data) {
+            let isValid = true;
+
+            if (!data.clientName) {
+                showAlert('El nombre del cliente es obligatorio.', 'warning');
+                isValid = false;
+            }
+            if (!validateClientId(data.clientId)) {
+                showAlert('El RIF o cédula no tiene un formato válido. Ejemplo: V-12345678 o J-12345678-9', 'warning');
+                isValid = false;
+            }
+            if (data.clientPhone && !validatePhone(data.clientPhone)) {
+                showAlert('El teléfono debe tener un formato válido. Ejemplo: +584121234567', 'warning');
+                isValid = false;
+            }
+            if (!data.invoiceDate) {
+                showAlert('La fecha es obligatoria.', 'warning');
+                isValid = false;
+            }
+            if (!data.items.length || data.items.some(item => 
+                !item.description || item.quantity <= 0 || item.price < 0 || item.subtotal < 0)) {
+                showAlert('Por favor verifica los ítems: descripción, cantidad y precio deben ser válidos.', 'warning');
+                isValid = false;
+            }
+            if (data.exemptAmountBs < 0 || data.subtotalBs < 0 || data.totalBs < 0) {
+                showAlert('Los montos no pueden ser negativos.', 'warning');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Vista previa mejorada
+        function previewInvoice() {
+            const data = getInvoiceFormData();
+            if (!validateForm(data)) return;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const docPrefix = data.docType === 'factura' ? 'FAC' : data.docType === 'nota_credito' ? 'NC' : 'ND';
+            const docNumber = `${docPrefix}-${currentUser.rif}-${invoices.length + 1}`;
+            const controlNumber = `CTRL-${String(invoices.length + 1).padStart(8, '0')}`;
+
+            const preview = document.getElementById('invoicePreview');
+            preview.innerHTML = `
+                <div class="invoice-header">
+                    <div>
+                        <h2>${currentUser.companyName}</h2>
+                        <p>RIF: ${currentUser.rif}</p>
+                        <p>Dirección: ${currentUser.address}</p>
+                        <p>Teléfono: ${currentUser.phone}</p>
+                    </div>
+                    <div>
+                        <h3>${data.docType.charAt(0).toUpperCase() + data.docType.slice(1)}</h3>
+                        <p>Nº Documento: ${docNumber}</p>
+                        <p>Nº Control: ${controlNumber}</p>
+                        <p>Fecha: ${data.invoiceDate}</p>
+                        <p>Método de Pago: ${data.paymentMethod.charAt(0).toUpperCase() + data.paymentMethod.slice(1)}</p>
+                    </div>
+                </div>
+                <div class="invoice-details">
+                    <h3>Datos del Cliente</h3>
+                    <p>Nombre: ${data.clientName}</p>
+                    <p>RIF/Cédula: ${data.clientId}</p>
+                    <p>Dirección: ${data.clientAddress || '-'}</p>
+                    <p>Teléfono: ${data.clientPhone || '-'}</p>
+                </div>
+                <table class="invoice-details">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario (Bs.)</th>
+                            <th>Subtotal (Bs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.items.map(item => `
+                            <tr>
+                                <td>${item.code || '-'}</td>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${formatCurrency(item.price)}</td>
+                                <td>${formatCurrency(item.subtotal)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <table class="two-column-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs.</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th>Subtotal</th><td>${formatCurrency(data.subtotalBs)}</td><td>${formatCurrency(data.subtotalUsd)}</td></tr>
+                        <tr><th>Monto Exento</th><td>${formatCurrency(data.exemptAmountBs)}</td><td>${formatCurrency(data.exemptAmountUsd)}</td></tr>
+                        <tr><th>Base Imponible</th><td>${formatCurrency(data.taxableBaseBs)}</td><td>${formatCurrency(data.taxableBaseUsd)}</td></tr>
+                        <tr><th>IVA (${data.alicuota}%)</th><td>${formatCurrency(data.taxBs)}</td><td>${formatCurrency(data.taxUsd)}</td></tr>
+                        <tr><th>IGTF (3%)</th><td>${formatCurrency(data.igtfBs)}</td><td>${formatCurrency(data.igtfUsd)}</td></tr>
+                        <tr><th>Total</th><td>${formatCurrency(data.totalBs)}</td><td>${formatCurrency(data.totalUsd)}</td></tr>
+                    </tbody>
+                </table>
+                <div class="invoice-footer">
+                    <p>FacturaML - Sistema de Facturación Electrónica</p>
+                    <p>Tasa de cambio aplicada: ${exchangeRate} Bs./USD - Fecha: 07/03/2025</p>
+                    <p>Documento generado conforme a las normativas del SENIAT</p>
+                </div>
+            `;
+            document.getElementById('previewModal').style.display = 'flex';
+        }
+
+        // Guardar factura
+        function saveInvoice() {
+            const data = getInvoiceFormData();
+            if (!validateForm(data)) return;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const docPrefix = data.docType === 'factura' ? 'FAC' : data.docType === 'nota_credito' ? 'NC' : 'ND';
+            const docNumber = `${docPrefix}-${currentUser.rif}-${invoices.length + 1}`;
+            const controlNumber = `CTRL-${String(invoices.length + 1).padStart(8, '0')}`;
+
+            const invoiceData = {
+                sellerRif: currentUser.rif,
+                docType: data.docType,
+                docNumber: docNumber,
+                controlNumber: controlNumber,
+                clientName: data.clientName,
+                clientId: data.clientId,
+                date: data.invoiceDate,
+                paymentMethod: data.paymentMethod,
+                items: data.items,
+                exemptAmountBs: data.exemptAmountBs,
+                exemptAmountUsd: data.exemptAmountUsd,
+                alicuota: data.alicuota,
+                subtotalBs: data.subtotalBs,
+                subtotalUsd: data.subtotalUsd,
+                taxableBaseBs: data.taxableBaseBs,
+                taxableBaseUsd: data.taxableBaseUsd,
+                taxBs: data.taxBs,
+                taxUsd: data.taxUsd,
+                igtfBs: data.igtfBs,
+                igtfUsd: data.igtfUsd,
+                totalBs: data.totalBs,
+                totalUsd: data.totalUsd,
+                exchangeRate: exchangeRate
+            };
+
+            invoices.push(invoiceData);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            showAlert('Factura generada exitosamente.', 'success');
+            setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
-                showAlert('Usuario no autenticado. Redirigiendo al login.', 'danger');
-                setTimeout(() => window.location.href = 'index.html', 2000);
-                return;
-            }
-            // Verificar campos mínimos requeridos
-            if (!currentUser.companyName || !currentUser.rif || !currentUser.address) {
-                showAlert('Datos del usuario incompletos. Por favor, inicie sesión nuevamente.', 'danger');
-                localStorage.removeItem('currentUser');
-                setTimeout(() => window.location.href = 'index.html', 2000);
+                window.location.href = 'index.html';
                 return;
             }
             document.getElementById('userDisplayName').textContent = currentUser.companyName;
-            fetchExchangeRate();
-            loadInvoices();
-            loadClients();
-            loadProfile();
-        }
+            document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
 
-        /**
-         * Configura los event listeners básicos.
-         */
-        function setupEventListeners() {
+            fetchExchangeRate();
+
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
                 window.location.href = 'index.html';
             });
 
-            document.getElementById('newInvoiceBtn').addEventListener('click', () => {
-                window.location.href = 'new-invoice.html';
+            document.getElementById('addItemBtn').addEventListener('click', addItemRow);
+
+            document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
+                if (confirm('¿Seguro que deseas cancelar?')) {
+                    window.location.href = 'dashboard.html';
+                }
             });
 
-            document.getElementById('saveClientBtn').addEventListener('click', saveClient);
+            document.getElementById('previewInvoiceBtn').addEventListener('click', previewInvoice);
 
-            document.getElementById('buyMoreInvoicesBtn').addEventListener('click', buyMoreInvoices);
-        }
+            document.getElementById('saveInvoiceBtn').addEventListener('click', saveInvoice);
 
-        // ===========================================================================
-        // FUNCIONES DE GESTIÓN DE FACTURAS
-        // ===========================================================================
-
-        function loadInvoices() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const userInvoices = invoices.filter(invoice => invoice.sellerRif === currentUser.rif);
-            const table = document.getElementById('invoicesTable');
-            table.innerHTML = '';
-            userInvoices.forEach(invoice => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${invoice.docType || 'N/A'}</td>
-                    <td>${invoice.docNumber || 'N/A'}</td>
-                    <td>${invoice.controlNumber || 'N/A'}</td>
-                    <td>${invoice.clientName || 'N/A'}</td>
-                    <td>${invoice.date ? formatDate(invoice.date) : 'N/A'}</td>
-                    <td>${invoice.total ? formatCurrency(invoice.total) : '0,00 Bs.'}</td>
-                    <td>${invoice.total ? formatCurrency(invoice.total / exchangeRate) : '0,00 Bs.'}</td>
-                    <td><button class="btn btn-secondary">Ver</button></td>
-                `;
-                table.appendChild(row);
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('previewModal').style.display = 'none';
             });
-            updateDashboardStats();
-        }
 
-        function updateDashboardStats() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const userInvoices = invoices.filter(invoice => invoice.sellerRif === currentUser.rif);
-            const totalBs = userInvoices.reduce((sum, invoice) => sum + (invoice.total || 0), 0);
-            const totalUsd = totalBs / exchangeRate;
-            document.getElementById('totalBs').textContent = formatCurrency(totalBs);
-            document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
-        }
+            document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
+            document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
 
-        // ===========================================================================
-        // FUNCIONES DE GESTIÓN DE CLIENTES
-        // ===========================================================================
-
-        function saveClient() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const name = document.getElementById('clientName').value.trim();
-            const id = document.getElementById('clientId').value.trim().toUpperCase();
-            const address = document.getElementById('clientAddress').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const emails = document.getElementById('clientEmails').value.trim();
-
-            let isValid = true;
-            if (!name) {
-                showAlert('El nombre del cliente es obligatorio.', 'warning');
-                isValid = false;
-            }
-            if (!validateClientId(id)) {
-                showAlert('El RIF o cédula no tiene un formato válido. Ejemplo: V-12345678 o J-12345678-9', 'warning');
-                isValid = false;
-            }
-            if (!address) {
-                showAlert('La dirección del cliente es obligatoria.', 'warning');
-                isValid = false;
-            }
-            if (phone && !validatePhone(phone)) {
-                showAlert('El teléfono debe tener un formato válido. Ejemplo: +584121234567', 'warning');
-                isValid = false;
-            }
-            if (emails && !validateEmails(emails)) {
-                showAlert('Ingresa al menos un correo electrónico válido.', 'warning');
-                isValid = false;
-            }
-
-            if (!isValid) return;
-
-            let clients = JSON.parse(localStorage.getItem('clients') || '[]');
-            const existingClient = clients.find(c => c.id === id && c.sellerRif === currentUser.rif);
-
-            const clientData = {
-                sellerRif: currentUser.rif,
-                name: name,
-                id: id,
-                address: address,
-                phone: phone || '',
-                emails: emails ? emails.split(',').map(e => e.trim()).filter(e => e) : [],
-                invoiceCount: existingClient ? existingClient.invoiceCount : 0
-            };
-
-            if (existingClient) {
-                clients = clients.map(c => (c.id === id && c.sellerRif === currentUser.rif ? clientData : c));
-                showAlert('Cliente actualizado exitosamente.', 'success');
-            } else {
-                clients.push(clientData);
-                showAlert('Cliente guardado exitosamente.', 'success');
-            }
-
-            localStorage.setItem('clients', JSON.stringify(clients));
-            loadClients();
-            clearClientForm();
-        }
-
-        function loadClients() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
-            const userClients = clients.filter(client => client.sellerRif === currentUser.rif);
-            const table = document.getElementById('clientsTable');
-            table.innerHTML = '';
-            userClients.forEach(client => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${client.name || 'N/A'}</td>
-                    <td>${client.id || 'N/A'}</td>
-                    <td>${client.address || 'N/A'}</td>
-                    <td>${client.phone || '-'}</td>
-                    <td>${client.emails.join(', ') || '-'}</td>
-                    <td><button class="btn btn-secondary">Editar</button></td>
-                `;
-                table.appendChild(row);
-            });
-        }
-
-        function clearClientForm() {
-            document.getElementById('clientName').value = '';
-            document.getElementById('clientId').value = '';
-            document.getElementById('clientAddress').value = '';
-            document.getElementById('clientPhone').value = '';
-            document.getElementById('clientEmails').value = '';
-        }
-
-        // ===========================================================================
-        // FUNCIONES DE PERFIL
-        // ===========================================================================
-
-        function loadProfile() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            document.getElementById('profileCompanyName').textContent = currentUser.companyName || 'N/A';
-            document.getElementById('profileRif').textContent = currentUser.rif || 'N/A';
-            document.getElementById('profileAddress').textContent = currentUser.address || 'N/A';
-            document.getElementById('profilePhone').textContent = currentUser.phone || 'N/A';
-            document.getElementById('profileEmail').textContent = currentUser.email || 'N/A';
-            document.getElementById('profileTaxStatus').textContent = currentUser.isSpecialContributor ? 'Contribuyente Especial' : 'Normal';
-
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const userInvoices = invoices.filter(invoice => invoice.sellerRif === currentUser.rif);
-            const invoiceLimit = parseInt(localStorage.getItem('invoiceLimit') || '100');
-            const availableInvoices = Math.max(0, invoiceLimit - userInvoices.length);
-            const lowInvoicesWarning = document.getElementById('lowInvoicesWarning');
-            if (availableInvoices < 10) {
-                lowInvoicesWarning.classList.remove('hidden');
-            } else {
-                lowInvoicesWarning.classList.add('hidden');
-            }
-        }
-
-        function buyMoreInvoices() {
-            const currentLimit = parseInt(localStorage.getItem('invoiceLimit') || '100');
-            const additionalInvoices = 100;
-            const newLimit = currentLimit + additionalInvoices;
-            localStorage.setItem('invoiceLimit', newLimit.toString());
-            showAlert(`Has comprado ${additionalInvoices} facturas adicionales. Nuevo límite: ${newLimit}.`, 'success');
-            loadProfile();
-            updateDashboardStats();
-        }
-
-        // ===========================================================================
-        // INICIALIZACIÓN
-        // ===========================================================================
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initializePage();
-            setupEventListeners();
+            document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
+            updateInvoiceTotals();
         });
     </script>
 </body>
