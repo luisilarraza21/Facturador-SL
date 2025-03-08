@@ -583,6 +583,16 @@
     <style>
         /* Estilos del Paso 2 */
         /* ===========================================================================
+         <!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Estilos del dashboard (como en el paso anterior) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FacturaML - Panel de Control</title>
+    <style>
+        /* Estilos completos del dashboard (como en el paso anterior) */
+        /* ===========================================================================
          * ESTILOS GENERALES - Adaptados de new-invoice.html
          * ===========================================================================
          * Estilos base para el dashboard con diseño limpio y responsivo.
@@ -1060,7 +1070,7 @@
             return phoneRegex.test(phone);
         }
 
-        let exchangeRate = 64.74; // Tasa por defecto (igual que en new-invoice.html)
+        let exchangeRate = 64.74;
 
         /**
          * Simula la obtención de la tasa de cambio del dólar.
@@ -1096,12 +1106,14 @@
         function initializePage() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
-                showAlert('Usuario no autenticado o datos incompletos. Redirigiendo al login.', 'danger');
+                showAlert('Usuario no autenticado. Redirigiendo al login.', 'danger');
                 setTimeout(() => window.location.href = 'index.html', 2000);
                 return;
             }
-            if (!currentUser.rif || !currentUser.companyName || !currentUser.address) {
+            // Verificar campos mínimos requeridos
+            if (!currentUser.companyName || !currentUser.rif || !currentUser.address) {
                 showAlert('Datos del usuario incompletos. Por favor, inicie sesión nuevamente.', 'danger');
+                localStorage.removeItem('currentUser');
                 setTimeout(() => window.location.href = 'index.html', 2000);
                 return;
             }
@@ -1137,19 +1149,19 @@
         function loadInvoices() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const userInvoices = invoices.filter(invoice => invoice.sellerRif === currentUser.rif); // Usamos rif para consistencia
+            const userInvoices = invoices.filter(invoice => invoice.sellerRif === currentUser.rif);
             const table = document.getElementById('invoicesTable');
             table.innerHTML = '';
             userInvoices.forEach(invoice => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${invoice.docType}</td>
-                    <td>${invoice.docNumber}</td>
-                    <td>${invoice.controlNumber}</td>
-                    <td>${invoice.clientName}</td>
-                    <td>${formatDate(invoice.date)}</td>
-                    <td>${formatCurrency(invoice.total)}</td>
-                    <td>${formatCurrency(invoice.total / exchangeRate)}</td>
+                    <td>${invoice.docType || 'N/A'}</td>
+                    <td>${invoice.docNumber || 'N/A'}</td>
+                    <td>${invoice.controlNumber || 'N/A'}</td>
+                    <td>${invoice.clientName || 'N/A'}</td>
+                    <td>${invoice.date ? formatDate(invoice.date) : 'N/A'}</td>
+                    <td>${invoice.total ? formatCurrency(invoice.total) : '0,00 Bs.'}</td>
+                    <td>${invoice.total ? formatCurrency(invoice.total / exchangeRate) : '0,00 Bs.'}</td>
                     <td><button class="btn btn-secondary">Ver</button></td>
                 `;
                 table.appendChild(row);
@@ -1161,7 +1173,7 @@
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
             const userInvoices = invoices.filter(invoice => invoice.sellerRif === currentUser.rif);
-            const totalBs = userInvoices.reduce((sum, invoice) => sum + invoice.total, 0);
+            const totalBs = userInvoices.reduce((sum, invoice) => sum + (invoice.total || 0), 0);
             const totalUsd = totalBs / exchangeRate;
             document.getElementById('totalBs').textContent = formatCurrency(totalBs);
             document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
@@ -1196,7 +1208,7 @@
                 showAlert('El teléfono debe tener un formato válido. Ejemplo: +584121234567', 'warning');
                 isValid = false;
             }
-            if (!validateEmails(emails)) {
+            if (emails && !validateEmails(emails)) {
                 showAlert('Ingresa al menos un correo electrónico válido.', 'warning');
                 isValid = false;
             }
@@ -1212,7 +1224,7 @@
                 id: id,
                 address: address,
                 phone: phone || '',
-                emails: emails.split(',').map(e => e.trim()).filter(e => e),
+                emails: emails ? emails.split(',').map(e => e.trim()).filter(e => e) : [],
                 invoiceCount: existingClient ? existingClient.invoiceCount : 0
             };
 
@@ -1238,9 +1250,9 @@
             userClients.forEach(client => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${client.name}</td>
-                    <td>${client.id}</td>
-                    <td>${client.address}</td>
+                    <td>${client.name || 'N/A'}</td>
+                    <td>${client.id || 'N/A'}</td>
+                    <td>${client.address || 'N/A'}</td>
                     <td>${client.phone || '-'}</td>
                     <td>${client.emails.join(', ') || '-'}</td>
                     <td><button class="btn btn-secondary">Editar</button></td>
@@ -1263,9 +1275,9 @@
 
         function loadProfile() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            document.getElementById('profileCompanyName').textContent = currentUser.companyName;
-            document.getElementById('profileRif').textContent = currentUser.rif;
-            document.getElementById('profileAddress').textContent = currentUser.address;
+            document.getElementById('profileCompanyName').textContent = currentUser.companyName || 'N/A';
+            document.getElementById('profileRif').textContent = currentUser.rif || 'N/A';
+            document.getElementById('profileAddress').textContent = currentUser.address || 'N/A';
             document.getElementById('profilePhone').textContent = currentUser.phone || 'N/A';
             document.getElementById('profileEmail').textContent = currentUser.email || 'N/A';
             document.getElementById('profileTaxStatus').textContent = currentUser.isSpecialContributor ? 'Contribuyente Especial' : 'Normal';
