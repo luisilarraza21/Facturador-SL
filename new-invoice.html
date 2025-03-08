@@ -867,12 +867,17 @@
         }
 
         // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            if (!currentUser) {
-                window.location.href = 'index.html';
-                return;
-            }
+       document.addEventListener('DOMContentLoaded', () => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Aplicar tema oscuro si está activado
+    if (currentUser.darkTheme) {
+        document.body.classList.add('dark-theme');
+    }
             document.getElementById('userDisplayName').textContent = currentUser.companyName;
             document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
 
