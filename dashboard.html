@@ -137,6 +137,17 @@
         .btn-secondary:hover {
             background: #5a6268;
         }
+        .btn-primary {
+            background: #28a745;
+        }
+        .btn-primary:hover {
+            background: #218838;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
         .pagination {
             display: flex;
             justify-content: center;
@@ -229,6 +240,9 @@
             .pagination {
                 flex-direction: column;
             }
+            .action-bar {
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -256,6 +270,10 @@
                 <h4>Último Nº Control</h4>
                 <p id="lastControlNumber">CTRL-00000000</p>
             </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-primary" id="generateInvoiceButton">Generar Factura</button>
         </div>
 
         <table class="invoices-table">
@@ -336,6 +354,7 @@
             if (availableInvoices <= 0) {
                 showAlert('Has alcanzado el límite de 100 facturas. Contacta soporte para adquirir más.', 'warning');
             }
+            return availableInvoices;
         }
 
         // Cargar tabla de facturas con paginación
@@ -437,6 +456,7 @@
             if (!currentUser) return;
 
             const userInvoices = getUserInvoices(currentUser);
+            const availableInvoices = loadStats(userInvoices, currentUser);
 
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
@@ -462,7 +482,14 @@
                 document.getElementById('detailsModal').style.display = 'none';
             });
 
-            loadStats(userInvoices, currentUser);
+            document.getElementById('generateInvoiceButton').addEventListener('click', () => {
+                if (availableInvoices > 0) {
+                    window.location.href = 'new-invoice.html';
+                } else {
+                    showAlert('No puedes generar más facturas. Has alcanzado el límite de 100. Contacta soporte.', 'warning');
+                }
+            });
+
             loadInvoicesTable(userInvoices);
         });
     </script>
