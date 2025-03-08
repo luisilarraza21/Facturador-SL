@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FacturaML - Mi Factura Digital</title>
+    <title>Wakal Blitz - Mi Factura Digital</title>
     <style>
         * {
             margin: 0;
@@ -72,7 +72,7 @@
         .template-card {
             flex: 1;
             min-width: 250px;
-            background: #f8f9fa;
+            background: #4a4a4a; /* Fondo gris oscuro para consistencia con la imagen */
             padding: 15px;
             border-radius: 8px;
             text-align: center;
@@ -98,7 +98,7 @@
         }
         .template-card h4 {
             font-size: 16px;
-            color: #555;
+            color: #ddd; /* Texto claro para contraste con fondo gris */
             margin-bottom: 10px;
         }
         .dark-theme .template-card h4 {
@@ -256,25 +256,25 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">FacturaML</div>
+        <div class="logo">Wakal Blitz</div>
     </div>
     <div class="container">
         <h2 class="section-title">Mi Factura Digital - Selección de Plantilla</h2>
         <div class="template-options">
             <div class="template-card">
-                <img src="https://via.placeholder.com/200x100?text=Plantilla+1" alt="Plantilla 1" id="template1Img">
+                <img src="" alt="Plantilla 1" id="template1Img">
                 <h4>Plantilla 1 - Clásica</h4>
                 <button class="btn btn-choose" onclick="chooseTemplate(1)">Elegir</button>
                 <button class="btn" onclick="previewTemplate(1)">Previsualizar</button>
             </div>
             <div class="template-card">
-                <img src="https://via.placeholder.com/200x100?text=Plantilla+2" alt="Plantilla 2" id="template2Img">
+                <img src="" alt="Plantilla 2" id="template2Img">
                 <h4>Plantilla 2 - Moderna</h4>
                 <button class="btn btn-choose" onclick="chooseTemplate(2)">Elegir</button>
                 <button class="btn" onclick="previewTemplate(2)">Previsualizar</button>
             </div>
             <div class="template-card">
-                <img src="https://via.placeholder.com/200x100?text=Plantilla+3" alt="Plantilla 3" id="template3Img">
+                <img src="" alt="Plantilla 3" id="template3Img">
                 <h4>Plantilla 3 - Elegante</h4>
                 <button class="btn btn-choose" onclick="chooseTemplate(3)">Elegir</button>
                 <button class="btn" onclick="previewTemplate(3)">Previsualizar</button>
@@ -312,11 +312,9 @@
             if (!currentUser) return;
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
 
-            // Plantilla 1: Clásica
+            // Actualizar imágenes de plantillas al cargar la página
             document.getElementById('template1Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Clásica`)}`;
-            // Plantilla 2: Moderna
             document.getElementById('template2Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Moderna`)}`;
-            // Plantilla 3: Elegante
             document.getElementById('template3Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Elegante`)}`;
         }
 
@@ -509,6 +507,7 @@
                 document.body.classList.add('dark-theme');
             }
 
+            // Actualizar imágenes de plantillas al cargar la página
             updateTemplateImages();
 
             document.getElementById('backToDashboard').addEventListener('click', () => {
