@@ -173,6 +173,17 @@
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
         }
+        .id-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .id-container select {
+            width: 80px;
+        }
+        .id-container input {
+            flex: 1;
+        }
         .email-container {
             display: flex;
             align-items: center;
@@ -441,8 +452,15 @@
                         <input type="text" id="clientName" required>
                     </div>
                     <div class="form-group">
-                        <label for="clientId">Cédula o RIF*</label>
-                        <input type="text" id="clientId" placeholder="Ejemplo: V-12345678 o J-12345678-9" required>
+                        <label for="clientIdNumber">Cédula o RIF*</label>
+                        <div class="id-container">
+                            <select id="clientIdType" required>
+                                <option value="J">J (RIF)</option>
+                                <option value="V">V (Venezolano)</option>
+                                <option value="E">E (Extranjero)</option>
+                            </select>
+                            <input type="number" id="clientIdNumber" min="1000000" max="999999999" placeholder="7 a 9 dígitos" required>
+                        </div>
                     </div>
                 </div>
                 <div class="form-row">
@@ -582,9 +600,16 @@
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
             <div class="invoice-preview" id="invoicePreview"></div>
-            <button class="btn btn-secondary" id="downloadPreviewBtn">Descargar como Texto</button>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" id="downloadPreviewBtn">Descargar como PDF</button>
+            </div>
         </div>
     </div>
+
+    <!-- Incluir jsPDF para generación de PDFs desde el repositorio local -->
+    <script src="./jspdf.umd.min.js"></script>
+    <script src="./jspdf.plugin.autotable.min.js"></script>
+
     <script>
         // Variables globales
         let exchangeRate = 64.74;
@@ -606,10 +631,9 @@
             setTimeout(() => alertDiv.remove(), 5000);
         }
 
-        function validateClientId(clientId) {
-            const rifRegex = /^[VEJPG]-[0-9]{8}-[0-9]$/;
-            const cedulaRegex = /^[VE]-[0-9]{1,8}$/;
-            return rifRegex.test(clientId) || cedulaRegex.test(clientId);
+        function validateClientId(clientIdNumber) {
+            const digits = String(clientIdNumber);
+            return digits.length >= 7 && digits.length <= 9;
         }
 
         function validatePhone(phone) {
@@ -755,9 +779,12 @@
                 subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0
             }));
             const clientEmails = Array.from(document.querySelectorAll('.client-email')).map(input => input.value.trim()).filter(email => email);
+            const clientIdType = document.getElementById('clientIdType').value;
+            const clientIdNumber = document.getElementById('clientIdNumber').value;
+            const clientId = `${clientIdType}-${clientIdNumber}`;
             return {
                 clientName: document.getElementById('clientName').value.trim(),
-                clientId: document.getElementById('clientId').value.trim().toUpperCase(),
+                clientId: clientId,
                 clientAddress: document.getElementById('clientAddress').value.trim(),
                 clientPhone: document.getElementById('clientPhone').value.trim(),
                 clientEmails: clientEmails,
@@ -787,8 +814,9 @@
                 showAlert('El nombre o razón social del cliente es obligatorio.', 'warning');
                 isValid = false;
             }
-            if (!validateClientId(data.clientId)) {
-                showAlert('El RIF o cédula no tiene un formato válido. Ejemplo: V-12345678 o J-12345678-9', 'warning');
+            const clientIdNumber = document.getElementById('clientIdNumber').value;
+            if (!validateClientId(clientIdNumber)) {
+                showAlert('El número de cédula o RIF debe tener entre 7 y 9 dígitos.', 'warning');
                 isValid = false;
             }
             if (data.clientPhone && !validatePhone(data.clientPhone)) {
@@ -820,6 +848,220 @@
                 isValid = false;
             }
             return isValid;
+        }
+
+        async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous'; // Para manejar CORS
+                img.src = url;
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Redimensionar manteniendo la proporción
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convertir a base64 con compresión
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    const base64 = dataUrl.split(',')[1];
+                    resolve(base64);
+                };
+
+                img.onerror = (error) => {
+                    console.error('Error al cargar la imagen para redimensionar:', error);
+                    reject(error);
+                };
+            });
+        }
+
+        async function loadImageAsBase64(url) {
+            try {
+                // Redimensionar la imagen a 100x100 píxeles con compresión
+                const base64 = await resizeImage(url, 100, 100, 0.7);
+                return base64;
+            } catch (error) {
+                console.error('Error al cargar y redimensionar la imagen:', error);
+                return null;
+            }
+        }
+
+        async function downloadPreviewAsPdf(data, docNumber, controlNumber, footerText) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
+            const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
+
+            // Convertir logo a base64 con redimensionamiento
+            const logoBase64 = await loadImageAsBase64(logoUrl);
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                putOnlyUsedFonts: true,
+                floatPrecision: 16,
+                compress: true // Activar compresión general del PDF
+            });
+
+            const margin = 10;
+            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            let y = margin;
+
+            // Función para agregar texto con alineación
+            function addText(text, x, align = 'left') {
+                const lines = doc.splitTextToSize(text, pageWidth - 20);
+                lines.forEach(line => {
+                    if (y > doc.internal.pageSize.getHeight() - 20) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    doc.text(line, x, y, { align: align });
+                    y += 5;
+                });
+                return y;
+            }
+
+            // Agregar logo
+            if (logoBase64) {
+                const imgWidth = selectedTemplate === '2' ? 30 : 40;
+                const imgHeight = selectedTemplate === '2' ? 30 : 40;
+                let logoX;
+
+                if (selectedTemplate === '1' || selectedTemplate === '3') {
+                    logoX = (doc.internal.pageSize.getWidth() - imgWidth) / 2; // Centrado
+                } else {
+                    logoX = margin; // Alineado a la izquierda para template-2
+                }
+
+                doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST'); // Usar compresión 'FAST'
+                y += imgHeight + 5;
+            }
+
+            // Información de la empresa
+            doc.setFontSize(14);
+            y = addText(currentUser.companyName, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            doc.setFontSize(10);
+            y = addText(`RIF: ${currentUser.rif}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            y = addText(`Dirección: ${currentUser.address || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            y = addText(`Teléfono: ${currentUser.phone || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            y += 5;
+
+            // Información de la factura
+            doc.setFontSize(12);
+            const docTitle = data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito';
+            if (selectedTemplate === '2') {
+                y = addText(docTitle, pageWidth + margin, 'right');
+                doc.setFontSize(10);
+                y = addText(`Tipo de Documento: ${docTitle}`, pageWidth + margin, 'right');
+                y = addText(`Nº Documento: ${docNumber}`, pageWidth + margin, 'right');
+                y = addText(`Nº Control: ${controlNumber}`, pageWidth + margin, 'right');
+                y = addText(`Fecha: ${data.invoiceDate}`, pageWidth + margin, 'right');
+            } else {
+                y = addText(docTitle, margin, 'left');
+                doc.setFontSize(10);
+                y = addText(`Tipo de Documento: ${docTitle}`, margin, 'left');
+                y = addText(`Nº Documento: ${docNumber}`, margin, 'left');
+                y = addText(`Nº Control: ${controlNumber}`, margin, 'left');
+                y = addText(`Fecha: ${data.invoiceDate}`, margin, 'left');
+            }
+            y += 5;
+
+            // Información del cliente
+            doc.setFontSize(12);
+            y = addText('Cliente', margin, 'left');
+            doc.setFontSize(10);
+            y = addText(`Nombre: ${data.clientName}`, margin, 'left');
+            y = addText(`RIF/Cédula: ${data.clientId}`, margin, 'left');
+            y = addText(`Dirección: ${data.clientAddress || '-'}`, margin, 'left');
+            y = addText(`Teléfono: ${data.clientPhone || '-'}`, margin, 'left');
+            y = addText(`Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}`, margin, 'left');
+            y += 5;
+
+            // Tabla de ítems
+            const itemsTableData = data.items.map(item => [
+                item.code || '-',
+                item.description,
+                item.quantity.toString(),
+                formatCurrency(item.price),
+                formatCurrency(item.subtotal)
+            ]);
+            doc.autoTable({
+                head: [['Código', 'Descripción', 'Cantidad', 'Precio Unitario (Bs)', 'Subtotal (Bs)']],
+                body: itemsTableData,
+                startY: y,
+                theme: 'striped',
+                styles: { fontSize: 10, cellPadding: 6, overflow: 'linebreak' },
+                columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 60 }, 2: { cellWidth: 20 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 } },
+                margin: { top: margin },
+                didDrawPage: () => { y = doc.lastAutoTable.finalY + 5; }
+            });
+            y = doc.lastAutoTable.finalY + 5;
+
+            // Tabla de totales
+            const totalTableData = [
+                ['Subtotal', formatCurrency(data.subtotalBs), formatCurrency(data.subtotalUsd)],
+                ['Monto exento', formatCurrency(data.exemptAmountBs), formatCurrency(data.exemptAmountUsd)],
+                ['Base imponible', formatCurrency(data.taxableBaseBs), formatCurrency(data.taxableBaseUsd)],
+                [`IVA (${data.alicuota}%)`, formatCurrency(data.taxBs), formatCurrency(data.taxUsd)],
+                ['IGTF (3%)', formatCurrency(data.igtfBs), formatCurrency(data.igtfUsd)],
+                ['Total', formatCurrency(data.totalBs), formatCurrency(data.totalUsd)]
+            ];
+            doc.autoTable({
+                head: [['', 'Bs', 'USD']],
+                body: totalTableData,
+                startY: y,
+                theme: 'striped',
+                styles: { fontSize: 10, cellPadding: 6, overflow: 'linebreak' },
+                columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 40 }, 2: { cellWidth: 40 } },
+                margin: { left: pageWidth - 120 + margin },
+                didDrawPage: () => { y = doc.lastAutoTable.finalY + 5; }
+            });
+            y = doc.lastAutoTable.finalY + 5;
+
+            // Método de pago y tasa de cambio
+            doc.setFontSize(10);
+            y = addText(`Método de Pago: ${data.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`, margin, 'left');
+            y = addText(`Tasa de cambio: ${exchangeRate} Bs/USD`, margin, 'left');
+            y += 5;
+
+            // Footer
+            if (footerText) {
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth + margin, y);
+                y += 5;
+                y = addText(footerText, (pageWidth / 2) + margin, 'center');
+            }
+
+            // Numeración de páginas
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Página ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+            }
+
+            doc.save(`Factura_Preview_${docNumber}.pdf`);
         }
 
         function previewInvoice() {
@@ -963,15 +1205,9 @@
 
             preview.innerHTML = templateHtml;
             document.getElementById('previewModal').style.display = 'flex';
-        }
 
-        function downloadPreview() {
-            const previewContent = document.getElementById('invoicePreview').innerText;
-            const blob = new Blob([previewContent], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'factura_preview.txt';
-            link.click();
+            // Actualizar el evento del botón de descarga para usar PDF
+            document.getElementById('downloadPreviewBtn').onclick = () => downloadPreviewAsPdf(data, docNumberDisplay, controlNumber, footerText);
         }
 
         function saveInvoice() {
@@ -1060,7 +1296,6 @@
             document.getElementById('modalClose').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
             });
-            document.getElementById('downloadPreviewBtn').addEventListener('click', downloadPreview);
             document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
             document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
             document.getElementById('paymentMethod').addEventListener('change', updateInvoiceTotals);
