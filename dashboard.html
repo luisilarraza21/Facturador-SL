@@ -150,10 +150,11 @@
             background: #2968c8;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin: 0 5px;
         }
         .btn:hover {
             background: #1d4f9e;
@@ -170,6 +171,13 @@
         }
         .btn-primary:hover {
             background: #218838;
+        }
+        .btn-email {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-email:hover {
+            background: #e0a800;
         }
         .action-bar {
             display: flex;
@@ -205,12 +213,23 @@
             position: relative;
         }
         .modal-close {
-            position: absolute;
+            position: fixed;
             top: 10px;
-            right: 15px;
-            font-size: 24px;
+            right: 10px;
+            font-size: 30px;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
             cursor: pointer;
-            color: #333;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+        .modal-close:hover {
+            background: #c82333;
         }
         .invoice-details {
             font-size: 14px;
@@ -237,6 +256,19 @@
             padding: 8px;
             border: 1px solid #ddd;
             text-align: right;
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .invoice-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
         }
         .alert {
             position: fixed;
@@ -322,7 +354,7 @@
                     <th>Fecha</th>
                     <th>Total (Bs)</th>
                     <th>Total (USD)</th>
-                    <th>Acción</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody id="invoicesTableBody"></tbody>
@@ -337,8 +369,16 @@
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
             <div class="invoice-details" id="invoiceDetails"></div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" id="downloadPdfBtn">Descargar (PDF)</button>
+                <button class="btn btn-email" id="emailBtn">Enviar vía Email</button>
+            </div>
         </div>
     </div>
+
+    <!-- Incluir html2pdf.js para descargar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script>
         // Variables globales
         const FACTURAS_PER_PAGE = 3;
@@ -358,7 +398,6 @@
             setTimeout(() => alertDiv.remove(), 5000);
         }
 
-        // Validar usuario y cargar datos
         function loadUserData() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
@@ -370,13 +409,11 @@
             return currentUser;
         }
 
-        // Filtrar facturas por usuario
         function getUserInvoices(currentUser) {
             const allInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
             return allInvoices.filter(invoice => invoice.sellerRif === currentUser.rif);
         }
 
-        // Cargar estadísticas
         function loadStats(userInvoices, currentUser) {
             const usedInvoices = userInvoices.length;
             const availableInvoices = MAX_FACTURAS - usedInvoices;
@@ -390,26 +427,19 @@
             return availableInvoices;
         }
 
-        // Mapear tipo de documento a texto legible
         function getDocTypeText(docType) {
             switch (docType) {
-                case 'factura':
-                    return 'Factura';
-                case 'nota-credito':
-                    return 'Nota de Crédito';
-                case 'nota-debito':
-                    return 'Nota de Débito';
-                default:
-                    return docType;
+                case 'factura': return 'Factura';
+                case 'nota-credito': return 'Nota de Crédito';
+                case 'nota-debito': return 'Nota de Débito';
+                default: return docType;
             }
         }
 
-        // Extraer número de documento sin prefijo y sin ceros a la izquierda
         function extractDocNumber(docNumber) {
-            return parseInt(docNumber, 10).toString(); // Eliminar ceros a la izquierda
+            return parseInt(docNumber, 10).toString();
         }
 
-        // Cargar tabla de facturas con paginación
         function loadInvoicesTable(userInvoices) {
             const tbody = document.getElementById('invoicesTableBody');
             tbody.innerHTML = '';
@@ -428,7 +458,11 @@
                     <td>${invoice.date}</td>
                     <td>${formatCurrency(invoice.totalBs)}</td>
                     <td>${formatCurrency(invoice.totalUsd)}</td>
-                    <td><button class="btn" onclick="showInvoiceDetails(${globalIndex})">Ver detalles</button></td>
+                    <td>
+                        <button class="btn" onclick="showInvoiceDetails(${globalIndex})">Ver</button>
+                        <button class="btn btn-secondary" onclick="downloadInvoiceAsPdf(${globalIndex})">Descargar (PDF)</button>
+                        <button class="btn btn-email" onclick="sendInvoiceByEmail(${globalIndex})">Enviar vía Email</button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
@@ -436,7 +470,6 @@
             updatePagination(userInvoices.length);
         }
 
-        // Actualizar paginación
         function updatePagination(totalInvoices) {
             const totalPages = Math.ceil(totalInvoices / FACTURAS_PER_PAGE);
             document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages || 1}`;
@@ -444,7 +477,6 @@
             document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
         }
 
-        // Mostrar detalles de la factura
         function showInvoiceDetails(index) {
             const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
             const invoice = userInvoices[index];
@@ -455,13 +487,29 @@
                 <div style="text-align: center; margin-bottom: 20px;">
                     <img src="${currentUser.profilePic || 'https://via.placeholder.com/100'}" alt="Logotipo" style="width: 100px; height: 100px; border-radius: 50%;">
                 </div>
-                <h3>${getDocTypeText(invoice.docType)}</h3>
-                <p>Nº Documento: ${extractDocNumber(invoice.docNumber)}</p>
-                <p>Nº Control: ${invoice.controlNumber}</p>
-                <p>Fecha: ${invoice.date}</p>
-                <p>Cliente: ${invoice.clientName}</p>
-                <p>RIF/Cédula: ${invoice.clientId}</p>
-                <p>Método de Pago: ${invoice.paymentMethod.charAt(0).toUpperCase() + invoice.paymentMethod.slice(1)}</p>
+                <div class="invoice-header">
+                    <div>
+                        <h2>${currentUser.companyName}</h2>
+                        <p>RIF: ${currentUser.rif}</p>
+                        <p>Dirección: ${currentUser.address || '-'}</p>
+                        <p>Teléfono: ${currentUser.phone || '-'}</p>
+                    </div>
+                    <div>
+                        <h3>${getDocTypeText(invoice.docType)}</h3>
+                        <p>Tipo de Documento: ${getDocTypeText(invoice.docType)}</p>
+                        <p>Nº Documento: ${extractDocNumber(invoice.docNumber)}</p>
+                        <p>Nº Control: ${invoice.controlNumber}</p>
+                        <p>Fecha: ${invoice.date}</p>
+                    </div>
+                </div>
+                <div class="invoice-details">
+                    <h3>Cliente</h3>
+                    <p>Nombre: ${invoice.clientName}</p>
+                    <p>RIF/Cédula: ${invoice.clientId}</p>
+                    <p>Dirección: ${invoice.clientAddress || '-'}</p>
+                    <p>Teléfono: ${invoice.clientPhone || '-'}</p>
+                    <p>Correos: ${invoice.clientEmails.length > 0 ? invoice.clientEmails.join(', ') : '-'}</p>
+                </div>
                 <table class="invoice-details">
                     <thead>
                         <tr>
@@ -501,13 +549,37 @@
                         <tr><th>Total</th><td>${formatCurrency(invoice.totalBs)}</td><td>${formatCurrency(invoice.totalUsd)}</td></tr>
                     </tbody>
                 </table>
+                <p>Método de Pago: ${invoice.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
                 <p>Tasa de cambio: ${invoice.exchangeRate} Bs/USD</p>
-                ${invoice.footerText ? `<p><strong>Coletilla:</strong> ${invoice.footerText}</p>` : ''}
+                ${invoice.footerText ? `<div class="invoice-footer"><p>${invoice.footerText}</p></div>` : ''}
             `;
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // Función para la coletilla fija (alineada con new-invoice.html)
+        function downloadInvoiceAsPdf(index) {
+            const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
+            const invoice = userInvoices[index];
+            showInvoiceDetails(index); // Generar contenido en el modal
+            const element = document.getElementById('invoiceDetails');
+            const opt = {
+                margin: 1,
+                filename: `Factura_${invoice.docNumber}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save();
+        }
+
+        function sendInvoiceByEmail(index) {
+            const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
+            const invoice = userInvoices[index];
+            const subject = encodeURIComponent(`Factura ${extractDocNumber(invoice.docNumber)} - ${invoice.clientName}`);
+            const body = encodeURIComponent(document.getElementById('invoiceDetails').innerText);
+            const clientEmails = invoice.clientEmails.length > 0 ? invoice.clientEmails.join(',') : 'cliente@ejemplo.com';
+            window.location.href = `mailto:${clientEmails}?subject=${subject}&body=${body}`;
+        }
+
         function getDefaultFooterText(controlNumber, invoiceDate) {
             return `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${invoiceDate}`;
         }
@@ -556,7 +628,17 @@
             });
 
             document.getElementById('backButton').addEventListener('click', () => {
-                window.location.href = 'index.html'; // Ajusta según la página principal deseada
+                window.location.href = 'index.html';
+            });
+
+            document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:contains("Nº Control")').textContent.split(': ')[1]);
+                downloadInvoiceAsPdf(index);
+            });
+
+            document.getElementById('emailBtn').addEventListener('click', () => {
+                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:contains("Nº Control")').textContent.split(': ')[1]);
+                sendInvoiceByEmail(index);
             });
 
             loadInvoicesTable(userInvoices);
