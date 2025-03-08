@@ -22,7 +22,7 @@
             color: #f5f5f5;
         }
         .navbar {
-            background-color: #ffe600;
+            background-color: #2968c8; /* Cambiado a azul para consistencia */
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
@@ -30,23 +30,23 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .dark-theme .navbar {
-            background-color: #e6cc00;
+            background-color: #1d4f9e; /* Ajuste para tema oscuro */
         }
         .navbar:hover {
-            background-color: #e6cc00;
+            background-color: #1d4f9e; /* Hover azul más oscuro */
         }
         .dark-theme .navbar:hover {
-            background-color: #d9bf00;
+            background-color: #153e7e; /* Hover más oscuro en tema oscuro */
         }
         .logo {
             font-weight: bold;
             font-size: 24px;
-            color: #333;
+            color: #fff; /* Texto blanco para contraste con fondo azul */
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .dark-theme .logo {
-            color: #f5f5f5;
+            color: #ddd; /* Ajuste para tema oscuro */
         }
         .container {
             max-width: 1200px;
@@ -81,7 +81,7 @@
         .template-card {
             flex: 1;
             min-width: 250px;
-            background: #4a4a4a; /* Fondo gris oscuro para consistencia con la imagen */
+            background: #4a4a4a;
             padding: 15px;
             border-radius: 8px;
             text-align: center;
@@ -101,20 +101,22 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-bottom: 10px;
+            background-color: #f5f5f5; /* Fondo claro como fallback */
         }
         .dark-theme .template-card img {
             border-color: #666;
+            background-color: #444; /* Fondo oscuro como fallback */
         }
         .template-card h4 {
             font-size: 16px;
-            color: #ddd; /* Texto claro para contraste con fondo gris */
+            color: #ddd;
             margin-bottom: 10px;
         }
         .dark-theme .template-card h4 {
             color: #ddd;
         }
         .btn {
-            background: #2968c8;
+            background: #2968c8; /* Botones azules por defecto */
             color: white;
             border: none;
             padding: 10px 15px;
@@ -140,7 +142,7 @@
             background: #218838;
         }
         .btn-choose {
-            background: #ffc107;
+            background: #ffc107; /* Amarillo para "Elegir" */
             color: #333;
         }
         .btn-choose:hover {
@@ -220,19 +222,19 @@
         <h2 class="section-title">Mi Factura Digital - Selección de Plantilla</h2>
         <div class="template-options">
             <div class="template-card">
-                <img src="" alt="Plantilla 1" id="template1Img">
+                <img src="" alt="Plantilla 1 - Clásica" id="template1Img">
                 <h4>Plantilla 1 - Clásica</h4>
                 <button class="btn btn-choose" onclick="chooseTemplate(1)">Elegir</button>
                 <button class="btn" onclick="previewTemplate(1)">Previsualizar</button>
             </div>
             <div class="template-card">
-                <img src="" alt="Plantilla 2" id="template2Img">
+                <img src="" alt="Plantilla 2 - Moderna" id="template2Img">
                 <h4>Plantilla 2 - Moderna</h4>
                 <button class="btn btn-choose" onclick="chooseTemplate(2)">Elegir</button>
                 <button class="btn" onclick="previewTemplate(2)">Previsualizar</button>
             </div>
             <div class="template-card">
-                <img src="" alt="Plantilla 3" id="template3Img">
+                <img src="" alt="Plantilla 3 - Elegante" id="template3Img">
                 <h4>Plantilla 3 - Elegante</h4>
                 <button class="btn btn-choose" onclick="chooseTemplate(3)">Elegir</button>
                 <button class="btn" onclick="previewTemplate(3)">Previsualizar</button>
@@ -274,10 +276,24 @@
             if (!currentUser) return;
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
 
-            // Actualizar imágenes de plantillas al cargar la página
-            document.getElementById('template1Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Clásica`)}`;
-            document.getElementById('template2Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Moderna`)}`;
-            document.getElementById('template3Img').src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Factura Elegante`)}`;
+            // Usar un placeholder con el nombre de la plantilla como fallback
+            document.getElementById('template1Img').src = logo.includes('via.placeholder.com') 
+                ? `https://via.placeholder.com/200x100/ffffff/000000?text=Plantilla+1+-+Clásica`
+                : `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Plantilla 1 - Clásica`)}`;
+            document.getElementById('template2Img').src = logo.includes('via.placeholder.com') 
+                ? `https://via.placeholder.com/200x100/ffffff/000000?text=Plantilla+2+-+Moderna`
+                : `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Plantilla 2 - Moderna`)}`;
+            document.getElementById('template3Img').src = logo.includes('via.placeholder.com') 
+                ? `https://via.placeholder.com/200x100/ffffff/000000?text=Plantilla+3+-+Elegante`
+                : `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Plantilla 3 - Elegante`)}`;
+
+            // Asegurar que las imágenes se carguen correctamente con un fallback
+            ['template1Img', 'template2Img', 'template3Img'].forEach(id => {
+                const img = document.getElementById(id);
+                img.onerror = () => {
+                    img.src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(id.replace('Img', '').replace(/^\d+/, '') + ' - Fallback')}`;
+                };
+            });
         }
 
         function chooseTemplate(templateId) {
@@ -423,12 +439,14 @@
                 }
 
                 try {
-                    doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST'); // Usar compresión 'FAST'
+                    doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
                     y += imgHeight + 5;
                 } catch (error) {
                     console.error('Error al agregar la imagen:', error);
                     y += 5;
                 }
+            } else {
+                y += 5; // Saltar espacio si no hay logo
             }
 
             // Agregar información de la empresa
@@ -526,8 +544,12 @@
             // Mostrar el PDF en el iframe
             const pdfDataUri = doc.output('datauristring');
             const iframe = document.getElementById('invoicePreview');
-            iframe.src = pdfDataUri;
-            document.getElementById('previewModal').style.display = 'flex';
+            if (iframe) {
+                iframe.src = pdfDataUri;
+                document.getElementById('previewModal').style.display = 'flex';
+            } else {
+                console.error('Iframe no encontrado');
+            }
         }
 
         function getDocTypeText(docType) {
@@ -563,7 +585,7 @@
             document.getElementById('modalClose').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
                 const iframe = document.getElementById('invoicePreview');
-                iframe.src = ''; // Limpiar el iframe al cerrar
+                if (iframe) iframe.src = ''; // Limpiar el iframe al cerrar
             });
         });
     </script>
