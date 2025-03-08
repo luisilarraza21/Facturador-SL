@@ -104,6 +104,36 @@
             border-color: #2968c8;
             box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
         }
+        .email-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .email-container input {
+            flex: 1;
+        }
+        .add-email-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .add-email-btn:hover {
+            background: #218838;
+        }
+        .remove-email-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .remove-email-btn:hover {
+            background: #c82333;
+        }
         .items-table {
             width: 100%;
             border-collapse: collapse;
@@ -136,6 +166,12 @@
         .summary-table th {
             font-weight: 600;
             background: #e9ecef;
+        }
+        .coletilla {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            text-align: right;
         }
         .btn {
             background: #2968c8;
@@ -292,6 +328,13 @@
                         <input type="text" id="clientPhone" placeholder="Ej: +584121234567">
                     </div>
                 </div>
+                <div class="form-row" id="emailFields">
+                    <div class="form-group email-container">
+                        <label for="clientEmail">Correo Electrónico</label>
+                        <input type="email" class="client-email" placeholder="Ej: cliente@dominio.com">
+                        <button class="add-email-btn" id="addEmailBtn">+</button>
+                    </div>
+                </div>
             </div>
 
             <div class="form-section">
@@ -403,6 +446,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <div class="coletilla" id="coletillaText"></div>
             </div>
 
             <div class="action-buttons">
@@ -417,6 +461,7 @@
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
             <div class="invoice-preview" id="invoicePreview"></div>
+            <button class="btn btn-secondary" id="downloadPreviewBtn">Descargar como Texto</button>
         </div>
     </div>
 
@@ -451,17 +496,43 @@
             return phoneRegex.test(phone);
         }
 
+        function validateEmail(email) {
+            if (!email) return true; // Opcional
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
         async function fetchExchangeRate() {
             try {
+                // Simulación de API (reemplazar con fetch real si es necesario)
                 const response = { success: true, rate: 64.74, date: '2025-03-07' };
                 if (response.success) {
                     exchangeRate = response.rate;
                     showAlert(`Tasa del dólar BCV (${response.date}): ${exchangeRate} VES/USD`, 'info');
                 }
             } catch (error) {
-                showAlert('Error al cargar tasa del dólar. Usando valor por defecto.', 'warning');
+                showAlert('Error al cargar tasa del dólar. Usando valor por defecto: 64.74.', 'warning');
             }
             updateInvoiceTotals();
+        }
+
+        function addEmailField() {
+            const emailFields = document.getElementById('emailFields');
+            const newEmailDiv = document.createElement('div');
+            newEmailDiv.className = 'form-group email-container';
+            newEmailDiv.innerHTML = `
+                <label for="clientEmail">Correo Electrónico</label>
+                <input type="email" class="client-email" placeholder="Ej: cliente@dominio.com">
+                <button class="remove-email-btn">-</button>
+            `;
+            emailFields.appendChild(newEmailDiv);
+            newEmailDiv.querySelector('.remove-email-btn').addEventListener('click', () => {
+                if (emailFields.children.length > 1) {
+                    newEmailDiv.remove();
+                } else {
+                    showAlert('Debe haber al menos un campo de correo.', 'warning');
+                }
+            });
         }
 
         function addItemRow() {
@@ -535,6 +606,17 @@
             document.getElementById('taxUsd').textContent = formatCurrency(taxUsd);
             document.getElementById('igtfUsd').textContent = formatCurrency(igtfUsd);
             document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
+
+            updateColetilla();
+        }
+
+        function updateColetilla() {
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const controlNumberIndex = invoices.length + 1;
+            const controlNumber = formatControlNumber(controlNumberIndex);
+            const invoiceDate = document.getElementById('invoiceDate').value || new Date().toISOString().split('T')[0];
+            const coletilla = `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162. N.° DE PROVIDENCIA: SENIAT/INTI/2021 00000029 DE FECHA: 16/06/2021 N° de control desde ${controlNumber} hasta N° de Control ${controlNumber} de fecha ${invoiceDate}`;
+            document.getElementById('coletillaText').textContent = coletilla;
         }
 
         function getInvoiceFormData() {
@@ -545,12 +627,14 @@
                 price: parseFloat(row.querySelector('.item-price').value) || 0,
                 subtotal: parseFloat(row.querySelector('.item-subtotal').textContent.replace(/,/g, '')) || 0
             }));
+            const emails = Array.from(document.querySelectorAll('.client-email')).map(input => input.value.trim()).filter(email => email);
 
             return {
                 clientName: document.getElementById('clientName').value.trim(),
                 clientId: document.getElementById('clientId').value.trim().toUpperCase(),
                 clientAddress: document.getElementById('clientAddress').value.trim(),
                 clientPhone: document.getElementById('clientPhone').value.trim(),
+                clientEmails: emails,
                 docType: document.getElementById('docType').value,
                 invoiceDate: document.getElementById('invoiceDate').value,
                 paymentMethod: document.getElementById('paymentMethod').value,
@@ -575,7 +659,7 @@
             let isValid = true;
 
             if (!data.clientName) {
-                showAlert('El nombre del cliente es obligatorio.', 'warning');
+                showAlert('El nombre o razón social del cliente es obligatorio.', 'warning');
                 isValid = false;
             }
             if (!validateClientId(data.clientId)) {
@@ -586,8 +670,12 @@
                 showAlert('El teléfono debe tener un formato válido. Ejemplo: +584121234567', 'warning');
                 isValid = false;
             }
+            if (data.clientEmails.length > 0 && !data.clientEmails.every(validateEmail)) {
+                showAlert('Uno o más correos electrónicos no tienen un formato válido. Ejemplo: cliente@dominio.com', 'warning');
+                isValid = false;
+            }
             if (!data.invoiceDate) {
-                showAlert('La fecha es obligatoria.', 'warning');
+                showAlert('La fecha del documento es obligatoria.', 'warning');
                 isValid = false;
             }
             if (!data.items.length || data.items.some(item => 
@@ -645,6 +733,7 @@
                     <p>RIF/Cédula: ${data.clientId}</p>
                     <p>Dirección: ${data.clientAddress || '-'}</p>
                     <p>Teléfono: ${data.clientPhone || '-'}</p>
+                    <p>Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}</p>
                 </div>
                 <table class="invoice-details">
                     <thead>
@@ -692,6 +781,15 @@
             document.getElementById('previewModal').style.display = 'flex';
         }
 
+        function downloadPreview() {
+            const previewContent = document.getElementById('invoicePreview').innerText;
+            const blob = new Blob([previewContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'factura_preview.txt';
+            link.click();
+        }
+
         function saveInvoice() {
             const data = getInvoiceFormData();
             if (!validateForm(data)) return;
@@ -710,6 +808,9 @@
                 controlNumber: controlNumber,
                 clientName: data.clientName,
                 clientId: data.clientId,
+                clientAddress: data.clientAddress,
+                clientPhone: data.clientPhone,
+                clientEmails: data.clientEmails,
                 date: data.invoiceDate,
                 paymentMethod: data.paymentMethod,
                 items: data.items,
@@ -731,7 +832,7 @@
 
             invoices.push(invoiceData);
             localStorage.setItem('invoices', JSON.stringify(invoices));
-            showAlert('Factura generada exitosamente.', 'success');
+            showAlert('Documento generado exitosamente.', 'success');
             setTimeout(() => window.location.href = 'dashboard.html', 1500);
         }
 
@@ -752,6 +853,7 @@
             });
 
             document.getElementById('addItemBtn').addEventListener('click', addItemRow);
+            document.getElementById('addEmailBtn').addEventListener('click', addEmailField);
 
             document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
                 if (confirm('¿Seguro que deseas cancelar?')) {
@@ -760,15 +862,15 @@
             });
 
             document.getElementById('previewInvoiceBtn').addEventListener('click', previewInvoice);
-
             document.getElementById('saveInvoiceBtn').addEventListener('click', saveInvoice);
-
             document.getElementById('modalClose').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
             });
+            document.getElementById('downloadPreviewBtn').addEventListener('click', downloadPreview);
 
             document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
             document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
+            document.getElementById('invoiceDate').addEventListener('change', updateColetilla);
 
             document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
             updateInvoiceTotals();
