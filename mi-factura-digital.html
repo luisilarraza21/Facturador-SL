@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakal Blitz - Mi Factura Digital</title>
+    <title>Mi Factura Digital</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,7 @@
             color: #f5f5f5;
         }
         .navbar {
-            background-color: #2968c8; /* Cambiado a azul para consistencia */
+            background-color: #2968c8;
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
@@ -30,23 +30,23 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .dark-theme .navbar {
-            background-color: #1d4f9e; /* Ajuste para tema oscuro */
+            background-color: #1d4f9e;
         }
         .navbar:hover {
-            background-color: #1d4f9e; /* Hover azul más oscuro */
+            background-color: #1d4f9e;
         }
         .dark-theme .navbar:hover {
-            background-color: #153e7e; /* Hover más oscuro en tema oscuro */
+            background-color: #153e7e;
         }
         .logo {
             font-weight: bold;
             font-size: 24px;
-            color: #fff; /* Texto blanco para contraste con fondo azul */
+            color: #fff;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .dark-theme .logo {
-            color: #ddd; /* Ajuste para tema oscuro */
+            color: #ddd;
         }
         .container {
             max-width: 1200px;
@@ -101,22 +101,19 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-bottom: 10px;
-            background-color: #f5f5f5; /* Fondo claro como fallback */
+            background-color: #f5f5f5;
         }
         .dark-theme .template-card img {
             border-color: #666;
-            background-color: #444; /* Fondo oscuro como fallback */
+            background-color: #444;
         }
         .template-card h4 {
             font-size: 16px;
             color: #ddd;
             margin-bottom: 10px;
         }
-        .dark-theme .template-card h4 {
-            color: #ddd;
-        }
         .btn {
-            background: #2968c8; /* Botones azules por defecto */
+            background: #2968c8;
             color: white;
             border: none;
             padding: 10px 15px;
@@ -127,7 +124,6 @@
         }
         .btn:hover {
             background: #1d4f9e;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
         .btn-secondary {
             background: #6c757d;
@@ -142,7 +138,7 @@
             background: #218838;
         }
         .btn-choose {
-            background: #ffc107; /* Amarillo para "Elegir" */
+            background: #ffc107;
             color: #333;
         }
         .btn-choose:hover {
@@ -216,7 +212,7 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">Wakal Blitz</div>
+        <div class="logo">Mi Factura Digital</div>
     </div>
     <div class="container">
         <h2 class="section-title">Mi Factura Digital - Selección de Plantilla</h2>
@@ -252,11 +248,13 @@
         </div>
     </div>
 
-    <!-- Incluir jsPDF para generación de PDFs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <!-- Incluir jsPDF y AutoTable desde el repositorio local -->
+    <script src="./jspdf.umd.min.js"></script>
+    <script src="./jspdf.plugin.autotable.min.js"></script>
 
     <script>
+        const { jsPDF } = window.jspdf;
+
         // Funciones de utilidad
         function formatCurrency(amount) {
             return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
@@ -274,24 +272,16 @@
         function updateTemplateImages() {
             const currentUser = loadUserData();
             if (!currentUser) return;
-            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
+            const logo = currentUser.profilePic || 'https://via.placeholder.com/200x100?text=Plantilla';
 
-            // Usar un placeholder con el nombre de la plantilla como fallback
-            document.getElementById('template1Img').src = logo.includes('via.placeholder.com') 
-                ? `https://via.placeholder.com/200x100/ffffff/000000?text=Plantilla+1+-+Clásica`
-                : `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Plantilla 1 - Clásica`)}`;
-            document.getElementById('template2Img').src = logo.includes('via.placeholder.com') 
-                ? `https://via.placeholder.com/200x100/ffffff/000000?text=Plantilla+2+-+Moderna`
-                : `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Plantilla 2 - Moderna`)}`;
-            document.getElementById('template3Img').src = logo.includes('via.placeholder.com') 
-                ? `https://via.placeholder.com/200x100/ffffff/000000?text=Plantilla+3+-+Elegante`
-                : `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(`[${logo}] Plantilla 3 - Elegante`)}`;
+            document.getElementById('template1Img').src = logo;
+            document.getElementById('template2Img').src = logo;
+            document.getElementById('template3Img').src = logo;
 
-            // Asegurar que las imágenes se carguen correctamente con un fallback
             ['template1Img', 'template2Img', 'template3Img'].forEach(id => {
                 const img = document.getElementById(id);
                 img.onerror = () => {
-                    img.src = `https://via.placeholder.com/200x100/ffffff/000000?text=${encodeURIComponent(id.replace('Img', '').replace(/^\d+/, '') + ' - Fallback')}`;
+                    img.src = 'https://via.placeholder.com/200x100?text=Plantilla+No+Disponible';
                 };
             });
         }
@@ -301,72 +291,15 @@
             alert(`Plantilla ${templateId} seleccionada. Se aplicará en tus facturas.`);
         }
 
-        async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'Anonymous'; // Para manejar CORS
-                img.src = url;
-
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    // Redimensionar manteniendo la proporción
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                    } else {
-                        if (height > maxHeight) {
-                            width = Math.round((width * maxHeight) / height);
-                            height = maxHeight;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Convertir a base64 con compresión
-                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                    const base64 = dataUrl.split(',')[1];
-                    resolve(base64);
-                };
-
-                img.onerror = (error) => {
-                    console.error('Error al cargar la imagen para redimensionar:', error);
-                    reject(error);
-                };
-            });
-        }
-
-        async function loadImageAsBase64(url) {
-            try {
-                // Redimensionar la imagen a 100x100 píxeles con compresión
-                const base64 = await resizeImage(url, 100, 100, 0.7);
-                return base64;
-            } catch (error) {
-                console.error('Error al cargar y redimensionar la imagen:', error);
-                return null;
-            }
-        }
-
-        async function previewTemplate(templateId) {
+        function previewTemplate(templateId) {
             const currentUser = loadUserData();
             if (!currentUser) return;
-            const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
-            const logoBase64 = await loadImageAsBase64(logoUrl);
 
-            // Datos de ejemplo
             const sampleData = {
-                companyName: currentUser.companyName,
-                rif: currentUser.rif,
-                address: currentUser.address || '-',
-                phone: currentUser.phone || '-',
+                companyName: currentUser.companyName || 'Empresa Ejemplo',
+                rif: currentUser.rif || 'J-12345678-9',
+                address: currentUser.address || 'Sin Dirección',
+                phone: currentUser.phone || 'Sin Teléfono',
                 docType: 'factura',
                 docNumber: '00000001',
                 controlNumber: '00-00000001',
@@ -397,168 +330,157 @@
                 footerText: `Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162.`
             };
 
-            const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
-                format: 'a4',
-                putOnlyUsedFonts: true,
-                floatPrecision: 16,
-                compress: true // Activar compresión general del PDF
+                format: 'a4'
             });
+            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
+            let y = 10;
 
-            const margin = 10;
-            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
-            const pageHeight = doc.internal.pageSize.getHeight() - 2 * margin;
-            let y = margin;
-
-            // Función para agregar texto
-            function addText(text, x, yPos, options = {}) {
-                const lines = doc.splitTextToSize(text, pageWidth - 20);
-                lines.forEach(line => {
-                    if (y > pageHeight - 10) {
-                        doc.addPage();
-                        y = margin;
-                    }
-                    doc.text(line, x, y, options);
-                    y += 5;
-                });
-                return y;
+            // Plantilla 1 - Clásica
+            if (templateId === 1) {
+                doc.addImage(logo, 'JPEG', 90, y, 30, 30, undefined, 'FAST');
+                y += 35;
+                doc.setFontSize(14);
+                doc.text(sampleData.companyName, 105, y, { align: 'center' });
+                y += 5;
+                doc.setFontSize(10);
+                doc.text(`RIF: ${sampleData.rif}`, 105, y, { align: 'center' });
+                y += 5;
+                doc.text(`Dirección: ${sampleData.address}`, 105, y, { align: 'center' });
+                y += 5;
+                doc.text(`Teléfono: ${sampleData.phone}`, 105, y, { align: 'center' });
+                y += 10;
+                doc.setFontSize(12);
+                doc.text('Factura', 10, y);
+                y += 5;
+                doc.setFontSize(10);
+                doc.text(`Nº Documento: ${sampleData.docNumber}`, 10, y);
+                y += 5;
+                doc.text(`Nº Control: ${sampleData.controlNumber}`, 10, y);
+                y += 5;
+                doc.text(`Fecha: ${sampleData.date}`, 10, y);
+                y += 10;
+                doc.text(`Cliente: ${sampleData.clientName}`, 10, y);
+                y += 5;
+                doc.text(`RIF/Cédula: ${sampleData.clientId}`, 10, y);
+                y += 5;
+                doc.text(`Dirección: ${sampleData.clientAddress}`, 10, y);
+                y += 5;
+                doc.text(`Teléfono: ${sampleData.clientPhone}`, 10, y);
+                y += 5;
+                doc.text(`Correos: ${sampleData.clientEmails.join(', ')}`, 10, y);
             }
 
-            // Agregar logo
-            if (logoBase64) {
-                const imgWidth = 30;
-                const imgHeight = 30;
-                let logoX;
-
-                if (templateId === 1 || templateId === 3) {
-                    logoX = (doc.internal.pageSize.getWidth() - imgWidth) / 2; // Centrado
-                } else {
-                    logoX = margin; // Alineado a la izquierda para template-2
-                }
-
-                try {
-                    doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
-                    y += imgHeight + 5;
-                } catch (error) {
-                    console.error('Error al agregar la imagen:', error);
-                    y += 5;
-                }
-            } else {
-                y += 5; // Saltar espacio si no hay logo
+            // Plantilla 2 - Moderna
+            else if (templateId === 2) {
+                doc.addImage(logo, 'JPEG', 10, y, 30, 30, undefined, 'FAST');
+                doc.setFontSize(14);
+                doc.text(sampleData.companyName, 45, y + 5);
+                y += 10;
+                doc.setFontSize(10);
+                doc.text(`RIF: ${sampleData.rif}`, 45, y);
+                y += 15;
+                doc.text('Factura', 170, y, { align: 'right' });
+                y += 5;
+                doc.text(`Nº Documento: ${sampleData.docNumber}`, 170, y, { align: 'right' });
+                y += 5;
+                doc.text(`Nº Control: ${sampleData.controlNumber}`, 170, y, { align: 'right' });
+                y += 5;
+                doc.text(`Fecha: ${sampleData.date}`, 170, y, { align: 'right' });
+                y += 10;
+                doc.text(`Cliente: ${sampleData.clientName}`, 10, y);
+                y += 5;
+                doc.text(`RIF/Cédula: ${sampleData.clientId}`, 10, y);
+                y += 5;
+                doc.text(`Dirección: ${sampleData.clientAddress}`, 10, y);
+                y += 5;
+                doc.text(`Teléfono: ${sampleData.clientPhone}`, 10, y);
+                y += 5;
+                doc.text(`Correos: ${sampleData.clientEmails.join(', ')}`, 10, y);
             }
 
-            // Agregar información de la empresa
-            doc.setFontSize(14);
-            y = addText(sampleData.companyName, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
-            doc.setFontSize(10);
-            y = addText(`RIF: ${sampleData.rif}`, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
-            y = addText(`Dirección: ${sampleData.address}`, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
-            y = addText(`Teléfono: ${sampleData.phone}`, margin, y, { align: templateId === 1 || templateId === 3 ? 'center' : 'left' });
-            y += 5;
-
-            // Información de la factura
-            doc.setFontSize(12);
-            const docTitle = getDocTypeText(sampleData.docType);
-            y = addText(docTitle, margin, y, { align: templateId === 2 ? 'right' : 'left' });
-            doc.setFontSize(10);
-            y = addText(`Tipo de Documento: ${getDocTypeText(sampleData.docType)}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
-            y = addText(`Nº Documento: ${sampleData.docNumber}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
-            y = addText(`Nº Control: ${sampleData.controlNumber}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
-            y = addText(`Fecha: ${sampleData.date}`, margin, y, { align: templateId === 2 ? 'right' : 'left' });
-            y += 5;
-
-            // Información del cliente
-            doc.setFontSize(12);
-            y = addText('Cliente', margin, y);
-            doc.setFontSize(10);
-            y = addText(`Nombre: ${sampleData.clientName}`, margin, y);
-            y = addText(`RIF/Cédula: ${sampleData.clientId}`, margin, y);
-            y = addText(`Dirección: ${sampleData.clientAddress}`, margin, y);
-            y = addText(`Teléfono: ${sampleData.clientPhone}`, margin, y);
-            y = addText(`Correos: ${sampleData.clientEmails.join(', ')}`, margin, y);
-            y += 5;
+            // Plantilla 3 - Elegante
+            else if (templateId === 3) {
+                doc.addImage(logo, 'JPEG', 90, y, 30, 30, undefined, 'FAST');
+                y += 35;
+                doc.setFontSize(14);
+                doc.text(sampleData.companyName, 105, y, { align: 'center' });
+                y += 5;
+                doc.setFontSize(10);
+                doc.text(`RIF: ${sampleData.rif}`, 105, y, { align: 'center' });
+                y += 5;
+                doc.text(`Dirección: ${sampleData.address}`, 105, y, { align: 'center' });
+                y += 5;
+                doc.text(`Teléfono: ${sampleData.phone}`, 105, y, { align: 'center' });
+                y += 10;
+                doc.text('Factura', 10, y);
+                y += 5;
+                doc.text(`Nº Documento: ${sampleData.docNumber}`, 10, y);
+                y += 5;
+                doc.text(`Nº Control: ${sampleData.controlNumber}`, 10, y);
+                y += 5;
+                doc.text(`Fecha: ${sampleData.date}`, 10, y);
+                y += 10;
+                doc.text(`Cliente: ${sampleData.clientName}`, 10, y);
+                y += 5;
+                doc.text(`RIF/Cédula: ${sampleData.clientId}`, 10, y);
+                y += 5;
+                doc.text(`Dirección: ${sampleData.clientAddress}`, 10, y);
+                y += 5;
+                doc.text(`Teléfono: ${sampleData.clientPhone}`, 10, y);
+                y += 5;
+                doc.text(`Correos: ${sampleData.clientEmails.join(', ')}`, 10, y);
+            }
 
             // Tabla de ítems
-            const tableData = sampleData.items.map(item => [
-                item.code || '-',
-                item.description,
-                item.quantity.toString(),
-                formatCurrency(item.price),
-                formatCurrency(item.subtotal)
-            ]);
+            y += 10;
             doc.autoTable({
                 head: [['Código', 'Descripción', 'Cantidad', 'Precio Unitario (Bs)', 'Subtotal (Bs)']],
-                body: tableData,
+                body: sampleData.items.map(item => [
+                    item.code || '-',
+                    item.description,
+                    item.quantity,
+                    formatCurrency(item.price),
+                    formatCurrency(item.subtotal)
+                ]),
                 startY: y,
                 theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 60 }, 2: { cellWidth: 20 }, 3: { cellWidth: 30 }, 4: { cellWidth: 30 } },
-                margin: { top: margin },
-                avoidPageSplit: true
+                styles: { fontSize: 8 }
             });
             y = doc.lastAutoTable.finalY + 5;
 
-            // Tabla de totales
-            const totalTableData = [
-                ['Subtotal', formatCurrency(sampleData.subtotalBs), formatCurrency(sampleData.subtotalUsd)],
-                ['Monto exento', formatCurrency(sampleData.exemptAmountBs), formatCurrency(sampleData.exemptAmountUsd)],
-                ['Base imponible', formatCurrency(sampleData.taxableBaseBs), formatCurrency(sampleData.taxableBaseUsd)],
-                [`IVA (${sampleData.alicuota}%)`, formatCurrency(sampleData.taxBs), formatCurrency(sampleData.taxUsd)],
-                ['IGTF (3%)', formatCurrency(sampleData.igtfBs), formatCurrency(sampleData.igtfUsd)],
-                ['Total', formatCurrency(sampleData.totalBs), formatCurrency(sampleData.totalUsd)]
-            ];
+            // Totales
             doc.autoTable({
                 head: [['', 'Bs', 'USD']],
-                body: totalTableData,
+                body: [
+                    ['Subtotal', formatCurrency(sampleData.subtotalBs), formatCurrency(sampleData.subtotalUsd)],
+                    ['Monto exento', formatCurrency(sampleData.exemptAmountBs), formatCurrency(sampleData.exemptAmountUsd)],
+                    ['Base imponible', formatCurrency(sampleData.taxableBaseBs), formatCurrency(sampleData.taxableBaseUsd)],
+                    [`IVA (${sampleData.alicuota}%)`, formatCurrency(sampleData.taxBs), formatCurrency(sampleData.taxUsd)],
+                    ['IGTF (3%)', formatCurrency(sampleData.igtfBs), formatCurrency(sampleData.igtfUsd)],
+                    ['Total', formatCurrency(sampleData.totalBs), formatCurrency(sampleData.totalUsd)]
+                ],
                 startY: y,
                 theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 40 }, 2: { cellWidth: 40 } },
-                margin: { left: doc.internal.pageSize.getWidth() - 90 - margin },
-                avoidPageSplit: true
+                styles: { fontSize: 8 },
+                margin: { left: 120 }
             });
             y = doc.lastAutoTable.finalY + 5;
 
-            // Método de pago y tasa de cambio
-            y = addText(`Método de Pago: ${sampleData.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`, margin, y);
-            y = addText(`Tasa de cambio: ${sampleData.exchangeRate} Bs/USD`, margin, y);
+            // Método de pago y footer
+            doc.text(`Método de Pago: ${sampleData.paymentMethod}`, 10, y);
             y += 5;
+            doc.text(`Tasa de cambio: ${sampleData.exchangeRate} Bs/USD`, 10, y);
+            y += 10;
+            doc.setFontSize(8);
+            doc.text(sampleData.footerText, 105, doc.internal.pageSize.height - 10, { align: 'center' });
 
-            // Footer
-            if (sampleData.footerText) {
-                doc.setFontSize(8);
-                doc.setTextColor(100);
-                y = addText(sampleData.footerText, margin, y, { align: 'center' });
-            }
-
-            // Numeración de páginas
-            const totalPages = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= totalPages; i++) {
-                doc.setPage(i);
-                doc.setFontSize(8);
-                doc.text(`Página ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-            }
-
-            // Mostrar el PDF en el iframe
+            // Mostrar en iframe
             const pdfDataUri = doc.output('datauristring');
-            const iframe = document.getElementById('invoicePreview');
-            if (iframe) {
-                iframe.src = pdfDataUri;
-                document.getElementById('previewModal').style.display = 'flex';
-            } else {
-                console.error('Iframe no encontrado');
-            }
-        }
-
-        function getDocTypeText(docType) {
-            switch (docType) {
-                case 'factura': return 'Factura';
-                case 'nota-credito': return 'Nota de Crédito';
-                case 'nota-debito': return 'Nota de Débito';
-                default: return docType;
-            }
+            document.getElementById('invoicePreview').src = pdfDataUri;
+            document.getElementById('previewModal').style.display = 'flex';
         }
 
         // Inicialización
@@ -566,12 +488,10 @@
             const currentUser = loadUserData();
             if (!currentUser) return;
 
-            // Aplicar modo oscuro si está activado
             if (currentUser.darkTheme) {
                 document.body.classList.add('dark-theme');
             }
 
-            // Actualizar imágenes de plantillas al cargar la página
             updateTemplateImages();
 
             document.getElementById('backToDashboard').addEventListener('click', () => {
@@ -584,8 +504,7 @@
 
             document.getElementById('modalClose').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
-                const iframe = document.getElementById('invoicePreview');
-                if (iframe) iframe.src = ''; // Limpiar el iframe al cerrar
+                document.getElementById('invoicePreview').src = '';
             });
         });
     </script>
