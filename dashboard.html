@@ -228,13 +228,6 @@
         .btn-primary:hover {
             background: #218838;
         }
-        .btn-email {
-            background: #ffc107;
-            color: #333;
-        }
-        .btn-email:hover {
-            background: #e0a800;
-        }
         .action-bar {
             display: flex;
             justify-content: flex-end;
@@ -428,24 +421,49 @@
         </div>
     </div>
     <div class="container">
-        <h2 class="section-title">Panel de control - Mis facturas</h2>
+        <h2 class="section-title">Panel de control - Mis documentos</h2>
         <div class="stats-bar">
             <div class="stat-card">
-                <h4>Facturas usadas</h4>
-                <p id="usedInvoices">0</p>
+                <h4>Documentos consumidos</h4>
+                <p id="usedDocuments">0</p>
             </div>
             <div class="stat-card">
-                <h4>Facturas disponibles</h4>
-                <p id="availableInvoices">100</p>
+                <h4>Documentos disponibles</h4>
+                <p id="availableDocuments">100</p>
             </div>
             <div class="stat-card">
                 <h4>Último número de control</h4>
-                <p id="lastControlNumber">CTRL-00000000</p>
+                <p id="lastControlNumber">00-00000000</p>
             </div>
         </div>
         <div class="action-bar">
-            <button class="btn btn-primary" id="generateInvoiceButton">Generar Factura</button>
+            <button class="btn btn-primary" id="generateOrderButton">Generar pedido</button>
         </div>
+
+        <!-- Sección de Pedidos sin confirmar -->
+        <h2 class="section-title">Pedidos sin confirmar</h2>
+        <table class="invoices-table">
+            <thead>
+                <tr>
+                    <th>Tipo de Documento</th>
+                    <th>Nº Documento</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Total (Bs)</th>
+                    <th>Total (USD)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="pendingOrdersTableBody"></tbody>
+        </table>
+        <div class="pagination" id="pendingPagination">
+            <button class="btn btn-secondary" id="prevPendingPage" disabled>Anterior</button>
+            <span id="pendingPageInfo">Página 1</span>
+            <button class="btn btn-secondary" id="nextPendingPage">Siguiente</button>
+        </div>
+
+        <!-- Sección de Facturas emitidas -->
+        <h2 class="section-title">Facturas emitidas</h2>
         <table class="invoices-table">
             <thead>
                 <tr>
@@ -461,7 +479,7 @@
             </thead>
             <tbody id="invoicesTableBody"></tbody>
         </table>
-        <div class="pagination">
+        <div class="pagination" id="invoicesPagination">
             <button class="btn btn-secondary" id="prevPage" disabled>Anterior</button>
             <span id="pageInfo">Página 1</span>
             <button class="btn btn-secondary" id="nextPage">Siguiente</button>
@@ -471,9 +489,8 @@
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
             <div class="invoice-details" id="invoiceDetails"></div>
-            <div style="text-align: right; margin-top: 10px;">
-                <button class="btn btn-secondary" id="downloadPdfBtn">Descargar (PDF)</button>
-                <button class="btn btn-email" id="emailBtn">Enviar</button>
+            <div style="text-align: right; margin-top: 10px;" id="modalActions">
+                <!-- Los botones se generarán dinámicamente según el estado -->
             </div>
         </div>
     </div>
@@ -484,9 +501,10 @@
 
     <script>
         // Variables globales
-        const FACTURAS_PER_PAGE = 3;
-        const MAX_FACTURAS = 100;
-        let currentPage = 1;
+        const ORDERS_PER_PAGE = 3;
+        const MAX_DOCUMENTS = 100;
+        let currentPendingPage = 1;
+        let currentInvoicesPage = 1;
 
         // Funciones de utilidad
         function formatCurrency(amount) {
@@ -518,16 +536,17 @@
         }
 
         function loadStats(userOrders, currentUser) {
-            const usedInvoices = userOrders.length;
-            const availableInvoices = MAX_FACTURAS - usedInvoices;
-            const lastControlNumber = usedInvoices > 0 ? userOrders[userOrders.length - 1].controlNumber : `00-${String(0).padStart(8, '0')}`;
-            document.getElementById('usedInvoices').textContent = usedInvoices;
-            document.getElementById('availableInvoices').textContent = availableInvoices > 0 ? availableInvoices : '0 (Límite alcanzado)';
+            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+            const usedDocuments = invoicedOrders.length;
+            const availableDocuments = MAX_DOCUMENTS - usedDocuments;
+            const lastControlNumber = usedDocuments > 0 ? invoicedOrders[invoicedOrders.length - 1].controlNumber : `00-${String(0).padStart(8, '0')}`;
+            document.getElementById('usedDocuments').textContent = usedDocuments;
+            document.getElementById('availableDocuments').textContent = availableDocuments > 0 ? availableDocuments : '0 (Límite alcanzado)';
             document.getElementById('lastControlNumber').textContent = lastControlNumber;
-            if (availableInvoices <= 0) {
-                showAlert('Has alcanzado el límite de 100 facturas. Contacta soporte para adquirir más.', 'warning');
+            if (availableDocuments <= 0) {
+                showAlert('Has alcanzado el límite de 100 documentos. Contacta soporte para adquirir más.', 'warning');
             }
-            return availableInvoices;
+            return availableDocuments;
         }
 
         function getDocTypeText(docType) {
@@ -538,12 +557,48 @@
             }
         }
 
-        function loadOrdersTable(userOrders) {
+        function loadPendingOrdersTable(userOrders) {
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const tbody = document.getElementById('pendingOrdersTableBody');
+            tbody.innerHTML = '';
+            const start = (currentPendingPage - 1) * ORDERS_PER_PAGE;
+            const end = start + ORDERS_PER_PAGE;
+            const paginatedOrders = pendingOrders.slice(start, end);
+
+            paginatedOrders.forEach((order, index) => {
+                const globalIndex = start + index;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${getDocTypeText(order.docType)}</td>
+                    <td>${order.docNumber}</td>
+                    <td>${order.clientName}</td>
+                    <td>${order.date}</td>
+                    <td>${formatCurrency(order.totalBs)}</td>
+                    <td>${formatCurrency(order.totalUsd)}</td>
+                    <td>
+                        <button class="btn" onclick="showOrderDetails(${globalIndex}, 'pending')">Ver</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updatePendingPagination(pendingOrders.length);
+        }
+
+        function updatePendingPagination(totalOrders) {
+            const totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
+            document.getElementById('pendingPageInfo').textContent = `Página ${currentPendingPage} de ${totalPages || 1}`;
+            document.getElementById('prevPendingPage').disabled = currentPendingPage === 1;
+            document.getElementById('nextPendingPage').disabled = currentPendingPage === totalPages || totalPages === 0;
+        }
+
+        function loadInvoicesTable(userOrders) {
+            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
             const tbody = document.getElementById('invoicesTableBody');
             tbody.innerHTML = '';
-            const start = (currentPage - 1) * FACTURAS_PER_PAGE;
-            const end = start + FACTURAS_PER_PAGE;
-            const paginatedOrders = userOrders.slice(start, end);
+            const start = (currentInvoicesPage - 1) * ORDERS_PER_PAGE;
+            const end = start + ORDERS_PER_PAGE;
+            const paginatedOrders = invoicedOrders.slice(start, end);
 
             paginatedOrders.forEach((order, index) => {
                 const globalIndex = start + index;
@@ -557,29 +612,31 @@
                     <td>${formatCurrency(order.totalBs)}</td>
                     <td>${formatCurrency(order.totalUsd)}</td>
                     <td>
-                        <button class="btn" onclick="showOrderDetails(${globalIndex})">Ver</button>
-                        <button class="btn btn-secondary" onclick="downloadOrderAsPdf(${globalIndex})">Descargar (PDF)</button>
-                        <button class="btn btn-email" onclick="sendOrderByEmail(${globalIndex})">Enviar</button>
+                        <button class="btn" onclick="showOrderDetails(${globalIndex}, 'invoiced')">Ver</button>
+                        <button class="btn btn-secondary" onclick="downloadOrderAsPdf(${globalIndex}, 'invoiced')">Descargar (PDF)</button>
+                        <button class="btn" onclick="sendOrderByEmail(${globalIndex}, 'invoiced')">Enviar</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
 
-            updatePagination(userOrders.length);
+            updateInvoicesPagination(invoicedOrders.length);
         }
 
-        function updatePagination(totalOrders) {
-            const totalPages = Math.ceil(totalOrders / FACTURAS_PER_PAGE);
-            document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages || 1}`;
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+        function updateInvoicesPagination(totalOrders) {
+            const totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
+            document.getElementById('pageInfo').textContent = `Página ${currentInvoicesPage} de ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentInvoicesPage === 1;
+            document.getElementById('nextPage').disabled = currentInvoicesPage === totalPages || totalPages === 0;
         }
 
-        function showOrderDetails(index) {
+        function showOrderDetails(index, type) {
             const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
-            const order = userOrders[index];
+            const orders = type === 'pending' ? userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed') : userOrders.filter(order => order.status === 'invoiced');
+            const order = orders[index];
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const details = document.getElementById('invoiceDetails');
+            const modalActions = document.getElementById('modalActions');
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
             let templateHtml = '';
@@ -597,7 +654,7 @@
                         <h3>${getDocTypeText(order.docType)}</h3>
                         <p>Tipo: ${getDocTypeText(order.docType)}</p>
                         <p>Nº Doc: ${order.docNumber}</p>
-                        <p>Nº Ctrl: ${order.controlNumber}</p>
+                        ${order.status === 'invoiced' ? `<p>Nº Ctrl: ${order.controlNumber}</p>` : ''}
                         <p>Fecha: ${order.date}</p>
                         <div class="invoice-details">
                             <h3>Cliente</h3>
@@ -621,7 +678,7 @@
                                 <h3>${getDocTypeText(order.docType)}</h3>
                                 <p>Tipo: ${getDocTypeText(order.docType)}</p>
                                 <p>Nº Doc: ${order.docNumber}</p>
-                                <p>Nº Ctrl: ${order.controlNumber}</p>
+                                ${order.status === 'invoiced' ? `<p>Nº Ctrl: ${order.controlNumber}</p>` : ''}
                                 <p>Fecha: ${order.date}</p>
                             </div>
                         </div>
@@ -647,7 +704,7 @@
                         <h3>${getDocTypeText(order.docType)}</h3>
                         <p>Tipo: ${getDocTypeText(order.docType)}</p>
                         <p>Nº Doc: ${order.docNumber}</p>
-                        <p>Nº Ctrl: ${order.controlNumber}</p>
+                        ${order.status === 'invoiced' ? `<p>Nº Ctrl: ${order.controlNumber}</p>` : ''}
                         <p>Fecha: ${order.date}</p>
                         <div class="invoice-details">
                             <h3>Cliente</h3>
@@ -702,13 +759,80 @@
                 </table>
                 <p>Mét. Pago: ${order.paymentMethod}</p>
                 <p>Tasa: ${order.exchangeRate} Bs/USD</p>
-                <div class="invoice-footer">
-                    <p>Providencia SNAT/2024/000102 (17/10/2024), SOLUCIONES LASER, CA (RIF: J-003629162), Control: ${order.controlNumber}, Fecha: ${order.date}</p>
-                </div>
+                ${order.status === 'invoiced' ? `
+                    <div class="invoice-footer">
+                        <p>Providencia SNAT/2024/000102 (17/10/2024), SOLUCIONES LASER, CA (RIF: J-003629162), Control: ${order.controlNumber}, Fecha: ${order.date}</p>
+                    </div>
+                ` : ''}
             </div>`;
 
             details.innerHTML = templateHtml;
+
+            // Generar botones según el estado
+            if (type === 'pending') {
+                if (order.status === 'pending') {
+                    modalActions.innerHTML = `
+                        <button class="btn" onclick="confirmPayment(${index})">Confirmar pago</button>
+                        <button class="btn btn-secondary" onclick="editOrder(${index})">Editar pedido</button>
+                    `;
+                } else if (order.status === 'confirmed') {
+                    modalActions.innerHTML = `
+                        <button class="btn btn-primary" onclick="generateInvoice(${index})">Generar factura</button>
+                    `;
+                }
+            } else {
+                modalActions.innerHTML = `
+                    <button class="btn btn-secondary" onclick="downloadOrderAsPdf(${index}, 'invoiced')">Descargar (PDF)</button>
+                    <button class="btn" onclick="sendOrderByEmail(${index}, 'invoiced')">Enviar</button>
+                `;
+            }
+
             document.getElementById('detailsModal').style.display = 'flex';
+        }
+
+        function confirmPayment(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = pendingOrders[index];
+            const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+            const globalIndex = allOrders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
+
+            allOrders[globalIndex].status = 'confirmed';
+            localStorage.setItem('orders', JSON.stringify(allOrders));
+
+            showOrderDetails(index, 'pending');
+            loadPendingOrdersTable(userOrders);
+        }
+
+        function editOrder(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = pendingOrders[index];
+            localStorage.setItem('editOrder', JSON.stringify(order));
+            window.location.href = `new-invoice.html?edit=${order.docNumber}`;
+        }
+
+        function generateInvoice(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = pendingOrders[index];
+            const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+            const globalIndex = allOrders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
+
+            // Generar número de control
+            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+            const nextControlNumber = invoicedOrders.length + 1;
+            const controlNumber = `00-${String(nextControlNumber).padStart(8, '0')}`;
+
+            allOrders[globalIndex].status = 'invoiced';
+            allOrders[globalIndex].controlNumber = controlNumber;
+            localStorage.setItem('orders', JSON.stringify(allOrders));
+
+            document.getElementById('detailsModal').style.display = 'none';
+            loadStats(userOrders, JSON.parse(localStorage.getItem('currentUser')));
+            loadPendingOrdersTable(userOrders);
+            loadInvoicesTable(userOrders);
+            showAlert('Factura generada exitosamente.', 'info');
         }
 
         async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
@@ -762,9 +886,10 @@
             }
         }
 
-        async function downloadOrderAsPdf(index) {
+        async function downloadOrderAsPdf(index, type) {
             const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
-            const order = userOrders[index];
+            const orders = type === 'invoiced' ? userOrders.filter(order => order.status === 'invoiced') : userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = orders[index];
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
@@ -821,14 +946,18 @@
                 doc.setFontSize(8);
                 y = addText(`Tipo: ${docTitle}`, pageWidth + margin, 'right');
                 y = addText(`Nº Doc: ${order.docNumber}`, pageWidth + margin, 'right');
-                y = addText(`Nº Ctrl: ${order.controlNumber}`, pageWidth + margin, 'right');
+                if (order.status === 'invoiced') {
+                    y = addText(`Nº Ctrl: ${order.controlNumber}`, pageWidth + margin, 'right');
+                }
                 y = addText(`Fecha: ${order.date}`, pageWidth + margin, 'right');
             } else {
                 y = addText(docTitle, margin, 'left');
                 doc.setFontSize(8);
                 y = addText(`Tipo: ${docTitle}`, margin, 'left');
                 y = addText(`Nº Doc: ${order.docNumber}`, margin, 'left');
-                y = addText(`Nº Ctrl: ${order.controlNumber}`, margin, 'left');
+                if (order.status === 'invoiced') {
+                    y = addText(`Nº Ctrl: ${order.controlNumber}`, margin, 'left');
+                }
                 y = addText(`Fecha: ${order.date}`, margin, 'left');
             }
             y += 3;
@@ -887,12 +1016,14 @@
             y = addText(`Tasa: ${order.exchangeRate} Bs/USD`, margin, 'left');
             y += 3;
 
-            doc.setFontSize(7);
-            doc.setTextColor(100);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth + margin, y);
-            y += 3;
-            y = addText(`Providencia SNAT/2024/000102 (17/10/2024), SOLUCIONES LASER, CA (RIF: J-003629162), Control: ${order.controlNumber}, Fecha: ${order.date}`, (pageWidth / 2) + margin, 'center');
+            if (order.status === 'invoiced') {
+                doc.setFontSize(7);
+                doc.setTextColor(100);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth + margin, y);
+                y += 3;
+                y = addText(`Providencia SNAT/2024/000102 (17/10/2024), SOLUCIONES LASER, CA (RIF: J-003629162), Control: ${order.controlNumber}, Fecha: ${order.date}`, (pageWidth / 2) + margin, 'center');
+            }
 
             const totalPages = doc.internal.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
@@ -904,10 +1035,11 @@
             doc.save(`Factura_${order.docNumber}.pdf`);
         }
 
-        function sendOrderByEmail(index) {
+        function sendOrderByEmail(index, type) {
             const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
-            const order = userOrders[index];
-            showOrderDetails(index);
+            const orders = type === 'invoiced' ? userOrders.filter(order => order.status === 'invoiced') : userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = orders[index];
+            showOrderDetails(index, type);
             const subject = encodeURIComponent(`Factura ${order.docNumber} - ${order.clientName}`);
             const body = encodeURIComponent(document.getElementById('invoiceDetails').innerText);
             const clientEmails = order.clientEmails.length > 0 ? order.clientEmails.join(',') : 'cliente@ejemplo.com';
@@ -924,7 +1056,7 @@
             }
 
             const userOrders = getUserOrders(currentUser);
-            const availableInvoices = loadStats(userOrders, currentUser);
+            const availableDocuments = loadStats(userOrders, currentUser);
 
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
@@ -939,18 +1071,35 @@
                 window.location.href = 'mi-factura-digital.html';
             });
 
+            document.getElementById('prevPendingPage').addEventListener('click', () => {
+                if (currentPendingPage > 1) {
+                    currentPendingPage--;
+                    loadPendingOrdersTable(userOrders);
+                }
+            });
+
+            document.getElementById('nextPendingPage').addEventListener('click', () => {
+                const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+                const totalPages = Math.ceil(pendingOrders.length / ORDERS_PER_PAGE);
+                if (currentPendingPage < totalPages) {
+                    currentPendingPage++;
+                    loadPendingOrdersTable(userOrders);
+                }
+            });
+
             document.getElementById('prevPage').addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    loadOrdersTable(userOrders);
+                if (currentInvoicesPage > 1) {
+                    currentInvoicesPage--;
+                    loadInvoicesTable(userOrders);
                 }
             });
 
             document.getElementById('nextPage').addEventListener('click', () => {
-                const totalPages = Math.ceil(userOrders.length / FACTURAS_PER_PAGE);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    loadOrdersTable(userOrders);
+                const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+                const totalPages = Math.ceil(invoicedOrders.length / ORDERS_PER_PAGE);
+                if (currentInvoicesPage < totalPages) {
+                    currentInvoicesPage++;
+                    loadInvoicesTable(userOrders);
                 }
             });
 
@@ -958,11 +1107,11 @@
                 document.getElementById('detailsModal').style.display = 'none';
             });
 
-            document.getElementById('generateInvoiceButton').addEventListener('click', () => {
-                if (availableInvoices > 0) {
+            document.getElementById('generateOrderButton').addEventListener('click', () => {
+                if (availableDocuments > 0) {
                     window.location.href = 'new-invoice.html';
                 } else {
-                    showAlert('No puedes generar más facturas. Has alcanzado el límite de 100. Contacta soporte.', 'warning');
+                    showAlert('No puedes generar más documentos. Has alcanzado el límite de 100. Contacta soporte.', 'warning');
                 }
             });
 
@@ -970,19 +1119,8 @@
                 window.location.href = 'index.html';
             });
 
-            document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-                const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
-                const index = userOrders.findIndex(order => order.controlNumber === document.querySelector('#invoiceDetails p:nth-child(5)').textContent.split(': ')[1]);
-                if (index !== -1) downloadOrderAsPdf(index);
-            });
-
-            document.getElementById('emailBtn').addEventListener('click', () => {
-                const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
-                const index = userOrders.findIndex(order => order.controlNumber === document.querySelector('#invoiceDetails p:nth-child(5)').textContent.split(': ')[1]);
-                if (index !== -1) sendOrderByEmail(index);
-            });
-
-            loadOrdersTable(userOrders);
+            loadPendingOrdersTable(userOrders);
+            loadInvoicesTable(userOrders);
         });
     </script>
 </body>
