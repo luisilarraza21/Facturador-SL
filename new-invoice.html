@@ -465,6 +465,11 @@
         </div>
 
         <div class="form-group">
+            <label for="igtfBs">IGTF (3% sobre pagos en USD) (Bs)</label>
+            <input type="text" id="igtfBs" readonly value="0.00">
+        </div>
+
+        <div class="form-group">
             <label for="totalBs">Total (Bs)</label>
             <input type="text" id="totalBs" readonly value="0.00">
         </div>
@@ -480,6 +485,7 @@
         </div>
 
         <div class="form-group">
+            <h3 class="section-title">Detalles de Pago</h3>
             <label for="paymentMethod">Método de Pago</label>
             <select id="paymentMethod" required>
                 <option value="Pago Móvil">Pago Móvil</option>
@@ -487,7 +493,21 @@
                 <option value="Efectivo Dólares">Efectivo Dólares</option>
                 <option value="Transferencia Bolívares">Transferencia Bolívares</option>
                 <option value="Transferencia Dólares">Transferencia Dólares</option>
+                <option value="Mixto">Pago Mixto (Bs y USD)</option>
             </select>
+        </div>
+
+        <div class="form-group" id="mixedPaymentFields" style="display: none;">
+            <div class="form-row">
+                <div style="flex: 1;">
+                    <label for="amountBs">Monto en Bolívares (Bs)</label>
+                    <input type="number" id="amountBs" min="0" step="0.01" value="0">
+                </div>
+                <div style="flex: 1;">
+                    <label for="amountUsd">Monto en Dólares (USD)</label>
+                    <input type="number" id="amountUsd" min="0" step="0.01" value="0">
+                </div>
+            </div>
         </div>
 
         <div class="button-group">
@@ -513,7 +533,8 @@
     </div>
 
     <script>
-        // Funciones de utilidad
+        // ---- Funciones de Utilidad ----
+        // Muestra una alerta temporal en la pantalla
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
@@ -522,10 +543,12 @@
             setTimeout(() => alertDiv.remove(), 3000);
         }
 
+        // Formatea un número como moneda con separadores de miles
         function formatCurrency(amount) {
             return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
 
+        // Carga los datos del usuario actual desde localStorage
         function loadUserData() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
@@ -535,6 +558,7 @@
             return currentUser;
         }
 
+        // Agrega una entrada al historial de actividad del usuario
         function addActivityEntry(currentUser, message) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const timestamp = new Date().toLocaleString('es-ES');
@@ -543,6 +567,7 @@
             localStorage.setItem(`activity_${currentUser.rif}`, JSON.stringify(activityLog));
         }
 
+        // Genera un número de documento único basado en los pedidos existentes
         function generateDocNumber() {
             const orders = JSON.parse(localStorage.getItem('orders')) || [];
             const userOrders = orders.filter(order => order.userRif === loadUserData().rif);
@@ -550,6 +575,7 @@
             return String(orderCount).padStart(8, '0');
         }
 
+        // Formatea el ID del cliente según el tipo (Cédula, RIF, Extranjero)
         function formatClientId(type, number) {
             const cleanNumber = number.replace(/[^0-9]/g, '');
             if (cleanNumber.length < 7 || cleanNumber.length > 8) {
@@ -566,10 +592,12 @@
             return null;
         }
 
+        // ---- Cálculo de Totales incluyendo IGTF ----
         function calculateTotals() {
             const items = Array.from(document.querySelectorAll('#itemTableBody tr'));
             let subtotalBs = 0;
 
+            // Calcula el subtotal en Bolívares basado en los ítems
             items.forEach(item => {
                 const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
                 const price = parseFloat(item.querySelector('.item-price').value) || 0;
@@ -578,38 +606,61 @@
                 subtotalBs += subtotal;
             });
 
-            const taxBs = subtotalBs * 0.16;
-            const totalBs = subtotalBs + taxBs;
+            const taxBs = subtotalBs * 0.16; // IVA del 16%
             const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
-            const totalUsd = totalBs / exchangeRate;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            let igtfBs = 0;
+            let totalBs = 0;
+            let totalUsd = 0;
 
+            // Si el pago involucra dólares, calcula el IGTF (3%)
+            if (paymentMethod.includes('Dólares') || paymentMethod === 'Mixto') {
+                const amountUsd = parseFloat(document.getElementById('amountUsd').value) || 0;
+                const amountUsdInBs = amountUsd * exchangeRate;
+                igtfBs = amountUsdInBs * 0.03; // IGTF del 3% sobre el monto en USD
+            }
+
+            totalBs = subtotalBs + taxBs + igtfBs;
+            totalUsd = totalBs / exchangeRate;
+
+            // Actualiza los campos en la interfaz
             document.getElementById('subtotalBs').value = formatCurrency(subtotalBs);
             document.getElementById('taxBs').value = formatCurrency(taxBs);
+            document.getElementById('igtfBs').value = formatCurrency(igtfBs);
             document.getElementById('totalBs').value = formatCurrency(totalBs);
             document.getElementById('totalUsd').value = formatCurrency(totalUsd);
 
-            return { subtotalBs, taxBs, totalBs, totalUsd };
+            return { subtotalBs, taxBs, igtfBs, totalBs, totalUsd };
         }
 
+        // ---- Validación del Formulario ----
         function validateForm() {
             const clientIdType = document.getElementById('clientIdType').value;
             const clientIdNumber = document.getElementById('clientIdNumber').value.trim();
             const clientPhone = document.getElementById('clientPhone').value.trim();
             const clientEmails = document.getElementById('clientEmails').value.trim();
             const items = Array.from(document.querySelectorAll('#itemTableBody tr'));
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const totalBs = parseFloat(document.getElementById('totalBs').value.replace(/,/g, '')) || 0;
+            const amountBs = parseFloat(document.getElementById('amountBs').value) || 0;
+            const amountUsd = parseFloat(document.getElementById('amountUsd').value) || 0;
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
 
+            // Valida el ID del cliente
             const formattedId = formatClientId(clientIdType, clientIdNumber);
             if (!formattedId) {
                 showAlert('El número de identificación debe tener entre 7 y 8 dígitos numéricos.', 'error');
                 return false;
             }
 
+            // Valida el teléfono
             const phoneRegex = /^(\+58|0)[0-9]{10}$/;
             if (!phoneRegex.test(clientPhone)) {
                 showAlert('El teléfono debe tener un formato válido, ej. +584121234567.', 'error');
                 return false;
             }
 
+            // Valida los correos electrónicos
             const emailArray = clientEmails.split(',').map(email => email.trim()).filter(email => email);
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             for (const email of emailArray) {
@@ -623,11 +674,13 @@
                 return false;
             }
 
+            // Valida que haya al menos un ítem
             if (items.length === 0) {
                 showAlert('Debe agregar al menos un ítem al documento.', 'error');
                 return false;
             }
 
+            // Valida los ítems individuales
             for (const item of items) {
                 const description = item.querySelector('.item-description').value.trim();
                 const quantity = parseFloat(item.querySelector('.item-quantity').value);
@@ -647,9 +700,26 @@
                 }
             }
 
+            // Valida los montos de pago mixto
+            if (paymentMethod === 'Mixto') {
+                const totalUsdEquivalent = totalBs / exchangeRate;
+                const amountBsInUsd = amountBs / exchangeRate;
+                const totalPaidInUsd = amountBsInUsd + amountUsd;
+
+                if (amountBs < 0 || amountUsd < 0) {
+                    showAlert('Los montos de pago no pueden ser negativos.', 'error');
+                    return false;
+                }
+                if (totalPaidInUsd < totalUsdEquivalent - 0.01 || totalPaidInUsd > totalUsdEquivalent + 0.01) {
+                    showAlert('El total pagado en Bs y USD no coincide con el total del documento.', 'error');
+                    return false;
+                }
+            }
+
             return true;
         }
 
+        // ---- Guardar el Pedido ----
         function saveOrder(status) {
             if (!validateForm()) return;
 
@@ -669,6 +739,15 @@
             const clientIdNumber = document.getElementById('clientIdNumber').value.trim();
             const formattedClientId = formatClientId(clientIdType, clientIdNumber);
             const clientEmails = document.getElementById('clientEmails').value.split(',').map(email => email.trim()).filter(email => email);
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value);
+
+            // Detalles de pago mixto
+            const paymentDetails = {
+                method: paymentMethod,
+                amountBs: paymentMethod === 'Mixto' ? parseFloat(document.getElementById('amountBs').value) : (paymentMethod.includes('Bolívares') ? totals.totalBs : 0),
+                amountUsd: paymentMethod === 'Mixto' ? parseFloat(document.getElementById('amountUsd').value) : (paymentMethod.includes('Dólares') ? totals.totalUsd : 0)
+            };
 
             const order = {
                 docType: document.getElementById('docType').value,
@@ -681,20 +760,20 @@
                 clientEmails: clientEmails,
                 items: items,
                 subtotalBs: totals.subtotalBs,
-                subtotalUsd: totals.subtotalBs / parseFloat(document.getElementById('exchangeRate').value),
+                subtotalUsd: totals.subtotalBs / exchangeRate,
                 exemptAmountBs: 0,
                 exemptAmountUsd: 0,
                 taxableBaseBs: totals.subtotalBs,
-                taxableBaseUsd: totals.subtotalBs / parseFloat(document.getElementById('exchangeRate').value),
+                taxableBaseUsd: totals.subtotalBs / exchangeRate,
                 taxBs: totals.taxBs,
-                taxUsd: totals.taxBs / parseFloat(document.getElementById('exchangeRate').value),
-                igtfBs: 0,
-                igtfUsd: 0,
+                taxUsd: totals.taxBs / exchangeRate,
+                igtfBs: totals.igtfBs,
+                igtfUsd: totals.igtfBs / exchangeRate,
                 totalBs: totals.totalBs,
                 totalUsd: totals.totalUsd,
                 alicuota: 16,
-                paymentMethod: document.getElementById('paymentMethod').value,
-                exchangeRate: parseFloat(document.getElementById('exchangeRate').value),
+                paymentDetails: paymentDetails,
+                exchangeRate: exchangeRate,
                 status: status,
                 userRif: currentUser.rif
             };
@@ -720,6 +799,7 @@
             }
         }
 
+        // ---- Cargar Pedido para Edición ----
         function loadOrderForEdit() {
             const urlParams = new URLSearchParams(window.location.search);
             const editDocNumber = urlParams.get('edit');
@@ -740,7 +820,7 @@
                     document.getElementById('clientPhone').value = editOrder.clientPhone;
                     document.getElementById('clientEmails').value = editOrder.clientEmails.join(', ');
                     document.getElementById('exchangeRate').value = editOrder.exchangeRate;
-                    document.getElementById('paymentMethod').value = editOrder.paymentMethod;
+                    document.getElementById('paymentMethod').value = editOrder.paymentDetails.method;
 
                     const tbody = document.getElementById('itemTableBody');
                     tbody.innerHTML = '';
@@ -765,27 +845,38 @@
                         tbody.appendChild(newRow);
                     });
 
+                    // Carga los detalles de pago mixto si aplica
+                    if (editOrder.paymentDetails.method === 'Mixto') {
+                        document.getElementById('mixedPaymentFields').style.display = 'block';
+                        document.getElementById('amountBs').value = editOrder.paymentDetails.amountBs;
+                        document.getElementById('amountUsd').value = editOrder.paymentDetails.amountUsd;
+                    }
+
                     calculateTotals();
                 }
             }
         }
 
-        // Inicialización
+        // ---- Inicialización y Eventos ----
         document.addEventListener('DOMContentLoaded', () => {
             const currentUser = loadUserData();
             if (!currentUser) return;
 
+            // Aplica el tema oscuro si está configurado
             if (currentUser.darkTheme) {
                 document.body.classList.add('dark-theme');
             }
 
+            // Carga un pedido para edición si existe
             loadOrderForEdit();
 
+            // Genera el número de documento si no es una edición
             if (!new URLSearchParams(window.location.search).get('edit')) {
                 document.getElementById('docNumber').value = generateDocNumber();
             }
             document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
+            // Evento para agregar un nuevo ítem
             document.getElementById('addItemButton').addEventListener('click', () => {
                 const tbody = document.getElementById('itemTableBody');
                 const newRow = document.createElement('tr');
@@ -809,6 +900,7 @@
                 calculateTotals();
             });
 
+            // Evento para eliminar un ítem
             document.getElementById('itemTableBody').addEventListener('click', (e) => {
                 if (e.target.closest('.btn-remove-item')) {
                     const row = e.target.closest('tr');
@@ -821,40 +913,55 @@
                 }
             });
 
+            // Evento para recalcular totales al cambiar cantidad o precio
             document.getElementById('itemTableBody').addEventListener('input', (e) => {
                 if (e.target.classList.contains('item-quantity') || e.target.classList.contains('item-price')) {
                     calculateTotals();
                 }
             });
 
+            // Evento para recalcular totales al cambiar la tasa de cambio
             document.getElementById('exchangeRate').addEventListener('input', calculateTotals);
 
-            document.getElementById('saveDraftButton').addEventListener('click', () => {
-                saveOrder('draft');
-            });
+            // Evento para mostrar/ocultar campos de pago mixto
+            document.getElementById('paymentMethod').addEventListener('change', (e) => {
+                const mixedPaymentFields = document.getElementById('mixedPaymentFields');
+                mixedPaymentFields.style.display = e.target.value === 'Mixto' ? 'block' : 'none';
+                calculateTotals();
 
-            document.getElementById('sendOrderButton').addEventListener('click', () => {
-                saveOrder('pending');
-            });
-
-            document.getElementById('backButton').addEventListener('click', () => {
-                window.location.href = 'index.html';
-            });
-
-            document.getElementById('backButtonDashboard').addEventListener('click', () => {
-                window.location.href = 'dashboard.html';
-            });
-
-            document.getElementById('paymentMethod').addEventListener('change', () => {
                 const docNumber = document.getElementById('docNumber').value;
                 let orders = JSON.parse(localStorage.getItem('orders')) || [];
                 const orderIndex = orders.findIndex(o => o.docNumber === docNumber && o.userRif === currentUser.rif);
                 if (orderIndex !== -1) {
-                    orders[orderIndex].paymentMethod = document.getElementById('paymentMethod').value;
+                    orders[orderIndex].paymentDetails.method = e.target.value;
                     localStorage.setItem('orders', JSON.stringify(orders));
                     addActivityEntry(currentUser, `Método de pago actualizado para el documento ${docNumber}`);
                     showAlert('Método de pago actualizado.', 'success');
                 }
+            });
+
+            // Evento para recalcular IGTF al cambiar montos de pago mixto
+            document.getElementById('amountBs').addEventListener('input', calculateTotals);
+            document.getElementById('amountUsd').addEventListener('input', calculateTotals);
+
+            // Evento para guardar como borrador
+            document.getElementById('saveDraftButton').addEventListener('click', () => {
+                saveOrder('draft');
+            });
+
+            // Evento para enviar el documento
+            document.getElementById('sendOrderButton').addEventListener('click', () => {
+                saveOrder('pending');
+            });
+
+            // Evento para regresar al índice
+            document.getElementById('backButton').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+
+            // Evento para regresar al dashboard
+            document.getElementById('backButtonDashboard').addEventListener('click', () => {
+                window.location.href = 'dashboard.html';
             });
         });
     </script>
