@@ -175,31 +175,31 @@
         .dark-theme .stat-card p {
             color: #4a90e2;
         }
-        .invoices-table {
+        .orders-table, .invoices-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-        .invoices-table th, .invoices-table td {
+        .orders-table th, .orders-table td, .invoices-table th, .invoices-table td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-        .dark-theme .invoices-table th, .dark-theme .invoices-table td {
+        .dark-theme .orders-table th, .dark-theme .orders-table td, .dark-theme .invoices-table th, .dark-theme .invoices-table td {
             border-bottom-color: #666;
         }
-        .invoices-table th {
+        .orders-table th, .invoices-table th {
             background: #f8f9fa;
             font-weight: 600;
         }
-        .dark-theme .invoices-table th {
+        .dark-theme .orders-table th, .dark-theme .invoices-table th {
             background: #555;
         }
-        .invoices-table tr:hover {
+        .orders-table tr:hover, .invoices-table tr:hover {
             background-color: #f1f3f5;
             cursor: pointer;
         }
-        .dark-theme .invoices-table tr:hover {
+        .dark-theme .orders-table tr:hover, .dark-theme .invoices-table tr:hover {
             background-color: #444;
         }
         .btn {
@@ -292,72 +292,72 @@
         .modal-close:hover {
             background: #c82333;
         }
-        .invoice-details {
-            font-size: 12px; /* Reducido para vista previa compacta */
+        .document-details {
+            font-size: 10px; /* Reducido de 12px a 10px para evitar desborde */
         }
-        .invoice-details h3 {
-            margin-bottom: 10px;
+        .document-details h3 {
+            margin-bottom: 8px;
             color: #333;
         }
-        .dark-theme .invoice-details h3 {
+        .dark-theme .document-details h3 {
             color: #f5f5f5;
         }
-        .invoice-details table {
+        .document-details table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
-            font-size: 12px; /* Reducido */
+            margin-bottom: 8px;
+            font-size: 10px; /* Reducido */
         }
-        .invoice-details th, .invoice-details td {
-            padding: 5px; /* Reducido */
+        .document-details th, .document-details td {
+            padding: 4px; /* Reducido */
             border: 1px solid #ddd;
             text-align: left;
         }
-        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
+        .dark-theme .document-details th, .dark-theme .document-details td {
             border-color: #666;
         }
         .two-column-table {
             width: 50%;
             margin-left: auto;
             border-collapse: collapse;
-            font-size: 12px; /* Reducido */
+            font-size: 10px; /* Reducido */
         }
         .two-column-table th, .two-column-table td {
-            padding: 5px; /* Reducido */
+            padding: 4px; /* Reducido */
             border: 1px solid #ddd;
             text-align: right;
         }
         .dark-theme .two-column-table th, .dark-theme .two-column-table td {
             border-color: #666;
         }
-        .invoice-header {
-            margin-bottom: 10px; /* Reducido */
+        .document-header {
+            margin-bottom: 8px; /* Reducido */
         }
-        .template-1 .invoice-header {
+        .template-1 .document-header {
             text-align: center;
         }
-        .template-2 .invoice-header {
+        .template-2 .document-header {
             display: flex;
             justify-content: space-between;
         }
-        .template-3 .invoice-header {
+        .template-3 .document-header {
             background: #f8f9fa;
-            padding: 5px; /* Reducido */
+            padding: 4px; /* Reducido */
             border-radius: 4px;
             text-align: center;
         }
-        .dark-theme .template-3 .invoice-header {
+        .dark-theme .template-3 .document-header {
             background: #555;
         }
-        .invoice-footer {
-            margin-top: 10px; /* Reducido */
-            font-size: 10px; /* Reducido */
+        .document-footer {
+            margin-top: 8px; /* Reducido */
+            font-size: 8px; /* Reducido */
             color: #666;
             text-align: center;
             border-top: 1px solid #ddd;
-            padding-top: 5px; /* Reducido */
+            padding-top: 4px; /* Reducido */
         }
-        .dark-theme .invoice-footer {
+        .dark-theme .document-footer {
             color: #ddd;
             border-top-color: #666;
         }
@@ -395,7 +395,7 @@
             .stats-bar {
                 flex-direction: column;
             }
-            .invoices-table, .two-column-table {
+            .orders-table, .invoices-table, .two-column-table {
                 width: 100%;
             }
             .pagination {
@@ -428,15 +428,15 @@
         </div>
     </div>
     <div class="container">
-        <h2 class="section-title">Panel de control - Mis facturas</h2>
+        <h2 class="section-title">Panel de control - Mis documentos</h2>
         <div class="stats-bar">
             <div class="stat-card">
-                <h4>Facturas usadas</h4>
-                <p id="usedInvoices">0</p>
+                <h4>Documentos consumidos</h4>
+                <p id="usedDocuments">0</p>
             </div>
             <div class="stat-card">
-                <h4>Facturas disponibles</h4>
-                <p id="availableInvoices">100</p>
+                <h4>Documentos disponibles</h4>
+                <p id="availableDocuments">100</p>
             </div>
             <div class="stat-card">
                 <h4>Último número de control</h4>
@@ -444,8 +444,29 @@
             </div>
         </div>
         <div class="action-bar">
-            <button class="btn btn-primary" id="generateInvoiceButton">Generar Factura</button>
+            <button class="btn btn-primary" id="createOrderButton">Crear Pedido</button>
         </div>
+        <h3 class="section-title">Pedidos</h3>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Nº Pedido</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total (Bs)</th>
+                    <th>Total (USD)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody"></tbody>
+        </table>
+        <div class="pagination" id="ordersPagination">
+            <button class="btn btn-secondary" id="prevOrdersPage" disabled>Anterior</button>
+            <span id="ordersPageInfo">Página 1</span>
+            <button class="btn btn-secondary" id="nextOrdersPage">Siguiente</button>
+        </div>
+        <h3 class="section-title">Facturas</h3>
         <table class="invoices-table">
             <thead>
                 <tr>
@@ -461,16 +482,16 @@
             </thead>
             <tbody id="invoicesTableBody"></tbody>
         </table>
-        <div class="pagination">
-            <button class="btn btn-secondary" id="prevPage" disabled>Anterior</button>
-            <span id="pageInfo">Página 1</span>
-            <button class="btn btn-secondary" id="nextPage">Siguiente</button>
+        <div class="pagination" id="invoicesPagination">
+            <button class="btn btn-secondary" id="prevInvoicesPage" disabled>Anterior</button>
+            <span id="invoicesPageInfo">Página 1</span>
+            <button class="btn btn-secondary" id="nextInvoicesPage">Siguiente</button>
         </div>
     </div>
     <div class="modal" id="detailsModal">
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
-            <div class="invoice-details" id="invoiceDetails"></div>
+            <div class="document-details" id="documentDetails"></div>
             <div style="text-align: right; margin-top: 10px;">
                 <button class="btn btn-secondary" id="downloadPdfBtn">Descargar (PDF)</button>
                 <button class="btn btn-email" id="emailBtn">Enviar vía Email</button>
@@ -478,15 +499,17 @@
         </div>
     </div>
 
-    <!-- Incluir jsPDF para generación de PDFs desde el repositorio local -->
     <script src="./jspdf.umd.min.js"></script>
     <script src="./jspdf.plugin.autotable.min.js"></script>
 
     <script>
         // Variables globales
-        const FACTURAS_PER_PAGE = 3;
-        const MAX_FACTURAS = 100;
-        let currentPage = 1;
+        const ITEMS_PER_PAGE = 3;
+        const MAX_DOCUMENTS = 100;
+        let currentOrdersPage = 1;
+        let currentInvoicesPage = 1;
+        let currentDocumentType = null;
+        let currentDocumentIndex = null;
 
         // Funciones de utilidad
         function formatCurrency(amount) {
@@ -512,22 +535,27 @@
             return currentUser;
         }
 
+        function getUserOrders(currentUser) {
+            const userOrdersKey = `orders_${currentUser.rif}`;
+            return JSON.parse(localStorage.getItem(userOrdersKey) || '[]');
+        }
+
         function getUserInvoices(currentUser) {
             const userInvoicesKey = `invoices_${currentUser.rif}`;
             return JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
         }
 
         function loadStats(userInvoices, currentUser) {
-            const usedInvoices = userInvoices.length;
-            const availableInvoices = MAX_FACTURAS - usedInvoices;
-            const lastControlNumber = usedInvoices > 0 ? userInvoices[userInvoices.length - 1].controlNumber : `CTRL-${currentUser.rif}-00000000`;
-            document.getElementById('usedInvoices').textContent = usedInvoices;
-            document.getElementById('availableInvoices').textContent = availableInvoices > 0 ? availableInvoices : '0 (Límite alcanzado)';
+            const usedDocuments = userInvoices.length; // Solo facturas consumen el límite
+            const availableDocuments = MAX_DOCUMENTS - usedDocuments;
+            const lastControlNumber = usedDocuments > 0 ? userInvoices[userInvoices.length - 1].controlNumber : `CTRL-${currentUser.rif}-00000000`;
+            document.getElementById('usedDocuments').textContent = usedDocuments;
+            document.getElementById('availableDocuments').textContent = availableDocuments > 0 ? availableDocuments : '0 (Límite alcanzado)';
             document.getElementById('lastControlNumber').textContent = lastControlNumber;
-            if (availableInvoices <= 0) {
-                showAlert('Has alcanzado el límite de 100 facturas. Contacta soporte para adquirir más.', 'warning');
+            if (availableDocuments <= 0) {
+                showAlert('Has alcanzado el límite de 100 documentos. Contacta soporte para adquirir más.', 'warning');
             }
-            return availableInvoices;
+            return availableDocuments;
         }
 
         function getDocTypeText(docType) {
@@ -543,11 +571,41 @@
             return parseInt(docNumber, 10).toString();
         }
 
+        function loadOrdersTable(userOrders) {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+            const start = (currentOrdersPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const paginatedOrders = userOrders.slice(start, end);
+
+            paginatedOrders.forEach((order, index) => {
+                const globalIndex = start + index;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.orderNumber}</td>
+                    <td>${order.clientName}</td>
+                    <td>${order.orderDate}</td>
+                    <td>${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</td>
+                    <td>${formatCurrency(order.totalBs)}</td>
+                    <td>${formatCurrency(order.totalUsd)}</td>
+                    <td>
+                        <button class="btn" onclick="showDocumentDetails('order', ${globalIndex})">Ver</button>
+                        ${order.status === 'draft' ? `<button class="btn btn-primary" onclick="editOrder(${globalIndex})">Editar</button>` : ''}
+                        <button class="btn btn-secondary" onclick="downloadDocumentAsPdf('order', ${globalIndex})">Descargar (PDF)</button>
+                        <button class="btn btn-email" onclick="sendDocumentByEmail('order', ${globalIndex})">Enviar vía Email</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updatePagination('orders', userOrders.length);
+        }
+
         function loadInvoicesTable(userInvoices) {
             const tbody = document.getElementById('invoicesTableBody');
             tbody.innerHTML = '';
-            const start = (currentPage - 1) * FACTURAS_PER_PAGE;
-            const end = start + FACTURAS_PER_PAGE;
+            const start = (currentInvoicesPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
             const paginatedInvoices = userInvoices.slice(start, end);
 
             paginatedInvoices.forEach((invoice, index) => {
@@ -558,115 +616,128 @@
                     <td>${extractDocNumber(invoice.docNumber)}</td>
                     <td>${invoice.controlNumber}</td>
                     <td>${invoice.clientName}</td>
-                    <td>${invoice.date}</td>
+                    <td>${invoice.orderDate}</td>
                     <td>${formatCurrency(invoice.totalBs)}</td>
                     <td>${formatCurrency(invoice.totalUsd)}</td>
                     <td>
-                        <button class="btn" onclick="showInvoiceDetails(${globalIndex})">Ver</button>
-                        <button class="btn btn-secondary" onclick="downloadInvoiceAsPdf(${globalIndex})">Descargar (PDF)</button>
-                        <button class="btn btn-email" onclick="sendInvoiceByEmail(${globalIndex})">Enviar vía Email</button>
+                        <button class="btn" onclick="showDocumentDetails('invoice', ${globalIndex})">Ver</button>
+                        <button class="btn btn-secondary" onclick="downloadDocumentAsPdf('invoice', ${globalIndex})">Descargar (PDF)</button>
+                        <button class="btn btn-email" onclick="sendDocumentByEmail('invoice', ${globalIndex})">Enviar vía Email</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
 
-            updatePagination(userInvoices.length);
+            updatePagination('invoices', userInvoices.length);
         }
 
-        function updatePagination(totalInvoices) {
-            const totalPages = Math.ceil(totalInvoices / FACTURAS_PER_PAGE);
-            document.getElementById('pageInfo').textContent = `Página ${currentPage} de ${totalPages || 1}`;
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+        function updatePagination(type, totalItems) {
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            if (type === 'orders') {
+                document.getElementById('ordersPageInfo').textContent = `Página ${currentOrdersPage} de ${totalPages || 1}`;
+                document.getElementById('prevOrdersPage').disabled = currentOrdersPage === 1;
+                document.getElementById('nextOrdersPage').disabled = currentOrdersPage === totalPages || totalPages === 0;
+            } else {
+                document.getElementById('invoicesPageInfo').textContent = `Página ${currentInvoicesPage} de ${totalPages || 1}`;
+                document.getElementById('prevInvoicesPage').disabled = currentInvoicesPage === 1;
+                document.getElementById('nextInvoicesPage').disabled = currentInvoicesPage === totalPages || totalPages === 0;
+            }
         }
 
-        function showInvoiceDetails(index) {
-            const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
-            const invoice = userInvoices[index];
+        function showDocumentDetails(type, index) {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const details = document.getElementById('invoiceDetails');
+            const userOrders = getUserOrders(currentUser);
+            const userInvoices = getUserInvoices(currentUser);
+            const document = type === 'order' ? userOrders[index] : userInvoices[index];
+            currentDocumentType = type;
+            currentDocumentIndex = index;
+            const details = document.getElementById('documentDetails');
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
             let templateHtml = '';
 
+            const isOrder = type === 'order';
+            const title = isOrder ? 'Resumen de Pedido' : getDocTypeText(document.docType);
+            const docNumberLabel = isOrder ? 'Nº Pedido' : 'Nº Doc';
+            const docNumber = isOrder ? document.orderNumber : extractDocNumber(document.docNumber);
+            const date = document.orderDate;
+            const controlNumber = document.controlNumber || '-';
+
             if (selectedTemplate === '1') {
                 templateHtml = `
                     <div class="template-1">
-                        <div class="invoice-header">
+                        <div class="document-header">
                             <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
                             <h2>${currentUser.companyName}</h2>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Direc: ${currentUser.address || '-'}</p>
                             <p>Tel: ${currentUser.phone || '-'}</p>
                         </div>
-                        <h3>${getDocTypeText(invoice.docType)}</h3>
-                        <p>Tipo: ${getDocTypeText(invoice.docType)}</p>
-                        <p>Nº Doc: ${extractDocNumber(invoice.docNumber)}</p>
-                        <p>Nº Ctrl: ${invoice.controlNumber}</p>
-                        <p>Fecha: ${invoice.date}</p>
-                        <div class="invoice-details">
+                        <h3>${title}</h3>
+                        <p>${docNumberLabel}: ${docNumber}</p>
+                        ${!isOrder ? `<p>Nº Ctrl: ${controlNumber}</p>` : ''}
+                        <p>Fecha: ${date}</p>
+                        <div class="document-details">
                             <h3>Cliente</h3>
-                            <p>Nombre: ${invoice.clientName}</p>
-                            <p>RIF/Céd: ${invoice.clientId}</p>
-                            <p>Direc: ${invoice.clientAddress || '-'}</p>
-                            <p>Tel: ${invoice.clientPhone || '-'}</p>
-                            <p>Correos: ${invoice.clientEmails.length > 0 ? invoice.clientEmails.join(', ') : '-'}</p>
+                            <p>Nombre: ${document.clientName}</p>
+                            <p>RIF/Céd: ${document.clientId}</p>
+                            <p>Direc: ${document.clientAddress || '-'}</p>
+                            <p>Tel: ${document.clientPhone || '-'}</p>
+                            <p>Correos: ${document.clientEmails.length > 0 ? document.clientEmails.join(', ') : '-'}</p>
                         </div>
                 `;
             } else if (selectedTemplate === '2') {
                 templateHtml = `
                     <div class="template-2">
-                        <div class="invoice-header">
+                        <div class="document-header">
                             <div>
                                 <img src="${logo}" alt="Logo" style="width: 40px; height: 40px; float: left; margin-right: 5px;">
                                 <h2>${currentUser.companyName}</h2>
                                 <p>RIF: ${currentUser.rif}</p>
                             </div>
                             <div>
-                                <h3>${getDocTypeText(invoice.docType)}</h3>
-                                <p>Tipo: ${getDocTypeText(invoice.docType)}</p>
-                                <p>Nº Doc: ${extractDocNumber(invoice.docNumber)}</p>
-                                <p>Nº Ctrl: ${invoice.controlNumber}</p>
-                                <p>Fecha: ${invoice.date}</p>
+                                <h3>${title}</h3>
+                                <p>${docNumberLabel}: ${docNumber}</p>
+                                ${!isOrder ? `<p>Nº Ctrl: ${controlNumber}</p>` : ''}
+                                <p>Fecha: ${date}</p>
                             </div>
                         </div>
-                        <div class="invoice-details">
+                        <div class="document-details">
                             <h3>Cliente</h3>
-                            <p>Nombre: ${invoice.clientName}</p>
-                            <p>RIF/Céd: ${invoice.clientId}</p>
-                            <p>Direc: ${invoice.clientAddress || '-'}</p>
-                            <p>Tel: ${invoice.clientPhone || '-'}</p>
-                            <p>Correos: ${invoice.clientEmails.length > 0 ? invoice.clientEmails.join(', ') : '-'}</p>
+                            <p>Nombre: ${document.clientName}</p>
+                            <p>RIF/Céd: ${document.clientId}</p>
+                            <p>Direc: ${document.clientAddress || '-'}</p>
+                            <p>Tel: ${document.clientPhone || '-'}</p>
+                            <p>Correos: ${document.clientEmails.length > 0 ? document.clientEmails.join(', ') : '-'}</p>
                         </div>
                 `;
-            } else if (selectedTemplate === '3') {
+            } else {
                 templateHtml = `
                     <div class="template-3">
-                        <div class="invoice-header">
+                        <div class="document-header">
                             <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
                             <h2>${currentUser.companyName}</h2>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Direc: ${currentUser.address || '-'}</p>
                             <p>Tel: ${currentUser.phone || '-'}</p>
                         </div>
-                        <h3>${getDocTypeText(invoice.docType)}</h3>
-                        <p>Tipo: ${getDocTypeText(invoice.docType)}</p>
-                        <p>Nº Doc: ${extractDocNumber(invoice.docNumber)}</p>
-                        <p>Nº Ctrl: ${invoice.controlNumber}</p>
-                        <p>Fecha: ${invoice.date}</p>
-                        <div class="invoice-details">
+                        <h3>${title}</h3>
+                        <p>${docNumberLabel}: ${docNumber}</p>
+                        ${!isOrder ? `<p>Nº Ctrl: ${controlNumber}</p>` : ''}
+                        <p>Fecha: ${date}</p>
+                        <div class="document-details">
                             <h3>Cliente</h3>
-                            <p>Nombre: ${invoice.clientName}</p>
-                            <p>RIF/Céd: ${invoice.clientId}</p>
-                            <p>Direc: ${invoice.clientAddress || '-'}</p>
-                            <p>Tel: ${invoice.clientPhone || '-'}</p>
-                            <p>Correos: ${invoice.clientEmails.length > 0 ? invoice.clientEmails.join(', ') : '-'}</p>
+                            <p>Nombre: ${document.clientName}</p>
+                            <p>RIF/Céd: ${document.clientId}</p>
+                            <p>Direc: ${document.clientAddress || '-'}</p>
+                            <p>Tel: ${document.clientPhone || '-'}</p>
+                            <p>Correos: ${document.clientEmails.length > 0 ? document.clientEmails.join(', ') : '-'}</p>
                         </div>
                 `;
             }
 
             templateHtml += `
-                <table class="invoice-details">
+                <table class="document-details">
                     <thead>
                         <tr>
                             <th>Cód.</th>
@@ -677,7 +748,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        ${invoice.items.map(item => `
+                        ${document.items.map(item => `
                             <tr>
                                 <td>${item.code || '-'}</td>
                                 <td>${item.description}</td>
@@ -697,17 +768,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><th>Subtotal</th><td>${formatCurrency(invoice.subtotalBs)}</td><td>${formatCurrency(invoice.subtotalUsd)}</td></tr>
-                        <tr><th>Mto. Exento</th><td>${formatCurrency(invoice.exemptAmountBs)}</td><td>${formatCurrency(invoice.exemptAmountUsd)}</td></tr>
-                        <tr><th>Base Imp.</th><td>${formatCurrency(invoice.taxableBaseBs)}</td><td>${formatCurrency(invoice.taxableBaseUsd)}</td></tr>
-                        <tr><th>IVA (${invoice.alicuota}%)</th><td>${formatCurrency(invoice.taxBs)}</td><td>${formatCurrency(invoice.taxUsd)}</td></tr>
-                        <tr><th>IGTF (3%)</th><td>${formatCurrency(invoice.igtfBs)}</td><td>${formatCurrency(invoice.igtfUsd)}</td></tr>
-                        <tr><th>Total</th><td>${formatCurrency(invoice.totalBs)}</td><td>${formatCurrency(invoice.totalUsd)}</td></tr>
+                        <tr><th>Subtotal</th><td>${formatCurrency(document.subtotalBs)}</td><td>${formatCurrency(document.subtotalUsd)}</td></tr>
+                        ${!isOrder ? `
+                            <tr><th>Mto. Exento</th><td>${formatCurrency(document.exemptAmountBs)}</td><td>${formatCurrency(document.exemptAmountUsd)}</td></tr>
+                            <tr><th>Base Imp.</th><td>${formatCurrency(document.taxableBaseBs)}</td><td>${formatCurrency(document.taxableBaseUsd)}</td></tr>
+                            <tr><th>IVA (${document.alicuota}%)</th><td>${formatCurrency(document.taxBs)}</td><td>${formatCurrency(document.taxUsd)}</td></tr>
+                            <tr><th>IGTF (3%)</th><td>${formatCurrency(document.igtfBs)}</td><td>${formatCurrency(document.igtfUsd)}</td></tr>
+                        ` : ''}
+                        <tr><th>Total</th><td>${formatCurrency(document.totalBs)}</td><td>${formatCurrency(document.totalUsd)}</td></tr>
                     </tbody>
                 </table>
-                <p>Mét. Pago: ${invoice.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
-                <p>Tasa: ${invoice.exchangeRate} Bs/USD</p>
-                ${invoice.footerText ? `<div class="invoice-footer"><p>${invoice.footerText}</p></div>` : ''}
+                ${!isOrder ? `
+                    <p>Mét. Pago: ${document.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                    <p>Tasa: ${document.exchangeRate || 'N/A'} Bs/USD</p>
+                    ${document.footerText ? `<div class="document-footer"><p>${document.footerText}</p></div>` : ''}
+                ` : ''}
             </div>`;
 
             details.innerHTML = templateHtml;
@@ -757,7 +832,7 @@
 
         async function loadImageAsBase64(url) {
             try {
-                const base64 = await resizeImage(url, 20, 20, 0.7); // Reducido a 20x20 mm
+                const base64 = await resizeImage(url, 20, 20, 0.7);
                 return base64;
             } catch (error) {
                 console.error('Error al cargar y redimensionar la imagen:', error);
@@ -765,10 +840,11 @@
             }
         }
 
-        async function downloadInvoiceAsPdf(index) {
-            const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
-            const invoice = userInvoices[index];
+        async function downloadDocumentAsPdf(type, index) {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userOrders = getUserOrders(currentUser);
+            const userInvoices = getUserInvoices(currentUser);
+            const document = type === 'order' ? userOrders[index] : userInvoices[index];
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
             const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
 
@@ -784,7 +860,7 @@
                 compress: true
             });
 
-            const margin = 5; // Reducido a 5 mm
+            const margin = 5;
             const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
             let y = margin;
 
@@ -796,62 +872,61 @@
                         y = margin;
                     }
                     doc.text(line, x, y, { align: align });
-                    y += 3; // Espaciado reducido
+                    y += 3;
                 });
                 return y;
             }
 
-            // Agregar logo
             if (logoBase64) {
-                const imgWidth = 20; // Reducido a 20 mm
-                const imgHeight = 20; // Reducido a 20 mm
+                const imgWidth = 20;
+                const imgHeight = 20;
                 let logoX = selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin - (imgWidth / 2) : margin;
                 doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
                 y += imgHeight + 3;
             }
 
-            // Información de la empresa
-            doc.setFontSize(12); // Reducido a 12px
+            doc.setFontSize(12);
             y = addText(currentUser.companyName, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
-            doc.setFontSize(8); // Reducido a 8px
+            doc.setFontSize(8);
             y = addText(`RIF: ${currentUser.rif}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
             y = addText(`Direc: ${currentUser.address || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
             y = addText(`Tel: ${currentUser.phone || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
             y += 3;
 
-            // Información de la factura
+            const isOrder = type === 'order';
+            const title = isOrder ? 'Resumen de Pedido' : getDocTypeText(document.docType);
+            const docNumberLabel = isOrder ? 'Nº Pedido' : 'Nº Doc';
+            const docNumber = isOrder ? document.orderNumber : extractDocNumber(document.docNumber);
+            const date = document.orderDate;
+            const controlNumber = document.controlNumber || '-';
+
             doc.setFontSize(12);
-            const docTitle = getDocTypeText(invoice.docType);
             if (selectedTemplate === '2') {
-                y = addText(docTitle, pageWidth + margin, 'right');
+                y = addText(title, pageWidth + margin, 'right');
                 doc.setFontSize(8);
-                y = addText(`Tipo: ${docTitle}`, pageWidth + margin, 'right');
-                y = addText(`Nº Doc: ${extractDocNumber(invoice.docNumber)}`, pageWidth + margin, 'right');
-                y = addText(`Nº Ctrl: ${invoice.controlNumber}`, pageWidth + margin, 'right');
-                y = addText(`Fecha: ${invoice.date}`, pageWidth + margin, 'right');
+                y = addText(`${docNumberLabel}: ${docNumber}`, pageWidth + margin, 'right');
+                if (!isOrder) y = addText(`Nº Ctrl: ${controlNumber}`, pageWidth + margin, 'right');
+                y = addText(`Fecha: ${date}`, pageWidth + margin, 'right');
             } else {
-                y = addText(docTitle, margin, 'left');
+                y = addText(title, margin, 'left');
                 doc.setFontSize(8);
-                y = addText(`Tipo: ${docTitle}`, margin, 'left');
-                y = addText(`Nº Doc: ${extractDocNumber(invoice.docNumber)}`, margin, 'left');
-                y = addText(`Nº Ctrl: ${invoice.controlNumber}`, margin, 'left');
-                y = addText(`Fecha: ${invoice.date}`, margin, 'left');
+                y = addText(`${docNumberLabel}: ${docNumber}`, margin, 'left');
+                if (!isOrder) y = addText(`Nº Ctrl: ${controlNumber}`, margin, 'left');
+                y = addText(`Fecha: ${date}`, margin, 'left');
             }
             y += 3;
 
-            // Información del cliente
             doc.setFontSize(12);
             y = addText('Cliente', margin, 'left');
             doc.setFontSize(8);
-            y = addText(`Nombre: ${invoice.clientName}`, margin, 'left');
-            y = addText(`RIF/Céd: ${invoice.clientId}`, margin, 'left');
-            y = addText(`Direc: ${invoice.clientAddress || '-'}`, margin, 'left');
-            y = addText(`Tel: ${invoice.clientPhone || '-'}`, margin, 'left');
-            y = addText(`Correos: ${invoice.clientEmails.length > 0 ? invoice.clientEmails.join(', ') : '-'}`, margin, 'left');
+            y = addText(`Nombre: ${document.clientName}`, margin, 'left');
+            y = addText(`RIF/Céd: ${document.clientId}`, margin, 'left');
+            y = addText(`Direc: ${document.clientAddress || '-'}`, margin, 'left');
+            y = addText(`Tel: ${document.clientPhone || '-'}`, margin, 'left');
+            y = addText(`Correos: ${document.clientEmails.length > 0 ? document.clientEmails.join(', ') : '-'}`, margin, 'left');
             y += 3;
 
-            // Tabla de ítems (optimizada para 10 ítems)
-            const itemsTableData = invoice.items.map(item => [
+            const itemsTableData = document.items.map(item => [
                 item.code || '-',
                 item.description,
                 item.quantity.toString(),
@@ -870,15 +945,19 @@
             });
             y = doc.lastAutoTable.finalY + 3;
 
-            // Tabla de totales
             const totalTableData = [
-                ['Subtotal', formatCurrency(invoice.subtotalBs), formatCurrency(invoice.subtotalUsd)],
-                ['Mto. Exento', formatCurrency(invoice.exemptAmountBs), formatCurrency(invoice.exemptAmountUsd)],
-                ['Base Imp.', formatCurrency(invoice.taxableBaseBs), formatCurrency(invoice.taxableBaseUsd)],
-                [`IVA (${invoice.alicuota}%)`, formatCurrency(invoice.taxBs), formatCurrency(invoice.taxUsd)],
-                ['IGTF (3%)', formatCurrency(invoice.igtfBs), formatCurrency(invoice.igtfUsd)],
-                ['Total', formatCurrency(invoice.totalBs), formatCurrency(invoice.totalUsd)]
+                ['Subtotal', formatCurrency(document.subtotalBs), formatCurrency(document.subtotalUsd)]
             ];
+            if (!isOrder) {
+                totalTableData.push(
+                    ['Mto. Exento', formatCurrency(document.exemptAmountBs), formatCurrency(document.exemptAmountUsd)],
+                    ['Base Imp.', formatCurrency(document.taxableBaseBs), formatCurrency(document.taxableBaseUsd)],
+                    [`IVA (${document.alicuota}%)`, formatCurrency(document.taxBs), formatCurrency(document.taxUsd)],
+                    ['IGTF (3%)', formatCurrency(document.igtfBs), formatCurrency(document.igtfUsd)]
+                );
+            }
+            totalTableData.push(['Total', formatCurrency(document.totalBs), formatCurrency(document.totalUsd)]);
+
             doc.autoTable({
                 head: [['', 'Bs', 'USD']],
                 body: totalTableData,
@@ -891,23 +970,22 @@
             });
             y = doc.lastAutoTable.finalY + 3;
 
-            // Método de pago y tasa de cambio
-            doc.setFontSize(8);
-            y = addText(`Mét. Pago: ${invoice.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`, margin, 'left');
-            y = addText(`Tasa: ${invoice.exchangeRate} Bs/USD`, margin, 'left');
-            y += 3;
-
-            // Footer
-            if (invoice.footerText) {
-                doc.setFontSize(7);
-                doc.setTextColor(100);
-                doc.setLineWidth(0.5);
-                doc.line(margin, y, pageWidth + margin, y);
+            if (!isOrder) {
+                doc.setFontSize(8);
+                y = addText(`Mét. Pago: ${document.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`, margin, 'left');
+                y = addText(`Tasa: ${document.exchangeRate || 'N/A'} Bs/USD`, margin, 'left');
                 y += 3;
-                y = addText(invoice.footerText, (pageWidth / 2) + margin, 'center');
+
+                if (document.footerText) {
+                    doc.setFontSize(7);
+                    doc.setTextColor(100);
+                    doc.setLineWidth(0.5);
+                    doc.line(margin, y, pageWidth + margin, y);
+                    y += 3;
+                    y = addText(document.footerText, (pageWidth / 2) + margin, 'center');
+                }
             }
 
-            // Numeración de páginas
             const totalPages = doc.internal.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
                 doc.setPage(i);
@@ -915,17 +993,27 @@
                 doc.text(`Pg. ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 5, { align: 'center' });
             }
 
-            doc.save(`Factura_${extractDocNumber(invoice.docNumber)}.pdf`);
+            doc.save(`${isOrder ? 'Pedido' : 'Factura'}_${docNumber}.pdf`);
         }
 
-        function sendInvoiceByEmail(index) {
-            const userInvoices = getUserInvoices(JSON.parse(localStorage.getItem('currentUser')));
-            const invoice = userInvoices[index];
-            showInvoiceDetails(index);
-            const subject = encodeURIComponent(`Factura ${extractDocNumber(invoice.docNumber)} - ${invoice.clientName}`);
-            const body = encodeURIComponent(document.getElementById('invoiceDetails').innerText);
-            const clientEmails = invoice.clientEmails.length > 0 ? invoice.clientEmails.join(',') : 'cliente@ejemplo.com';
+        function sendDocumentByEmail(type, index) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userOrders = getUserOrders(currentUser);
+            const userInvoices = getUserInvoices(currentUser);
+            const document = type === 'order' ? userOrders[index] : userInvoices[index];
+            showDocumentDetails(type, index);
+            const docNumber = type === 'order' ? document.orderNumber : extractDocNumber(document.docNumber);
+            const subject = encodeURIComponent(`${type === 'order' ? 'Pedido' : 'Factura'} ${docNumber} - ${document.clientName}`);
+            const body = encodeURIComponent(document.getElementById('documentDetails').innerText);
+            const clientEmails = document.clientEmails.length > 0 ? document.clientEmails.join(',') : 'cliente@ejemplo.com';
             window.location.href = `mailto:${clientEmails}?subject=${subject}&body=${body}`;
+        }
+
+        function editOrder(index) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userOrders = getUserOrders(currentUser);
+            const order = userOrders[index];
+            window.location.href = `new-invoice.html?orderId=${order.orderNumber}`;
         }
 
         function getDefaultFooterText(controlNumber, invoiceDate) {
@@ -941,8 +1029,9 @@
                 document.body.classList.add('dark-theme');
             }
 
+            const userOrders = getUserOrders(currentUser);
             const userInvoices = getUserInvoices(currentUser);
-            const availableInvoices = loadStats(userInvoices, currentUser);
+            const availableDocuments = loadStats(userInvoices, currentUser);
 
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
@@ -957,17 +1046,32 @@
                 window.location.href = 'mi-factura-digital.html';
             });
 
-            document.getElementById('prevPage').addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
+            document.getElementById('prevOrdersPage').addEventListener('click', () => {
+                if (currentOrdersPage > 1) {
+                    currentOrdersPage--;
+                    loadOrdersTable(userOrders);
+                }
+            });
+
+            document.getElementById('nextOrdersPage').addEventListener('click', () => {
+                const totalPages = Math.ceil(userOrders.length / ITEMS_PER_PAGE);
+                if (currentOrdersPage < totalPages) {
+                    currentOrdersPage++;
+                    loadOrdersTable(userOrders);
+                }
+            });
+
+            document.getElementById('prevInvoicesPage').addEventListener('click', () => {
+                if (currentInvoicesPage > 1) {
+                    currentInvoicesPage--;
                     loadInvoicesTable(userInvoices);
                 }
             });
 
-            document.getElementById('nextPage').addEventListener('click', () => {
-                const totalPages = Math.ceil(userInvoices.length / FACTURAS_PER_PAGE);
-                if (currentPage < totalPages) {
-                    currentPage++;
+            document.getElementById('nextInvoicesPage').addEventListener('click', () => {
+                const totalPages = Math.ceil(userInvoices.length / ITEMS_PER_PAGE);
+                if (currentInvoicesPage < totalPages) {
+                    currentInvoicesPage++;
                     loadInvoicesTable(userInvoices);
                 }
             });
@@ -976,11 +1080,11 @@
                 document.getElementById('detailsModal').style.display = 'none';
             });
 
-            document.getElementById('generateInvoiceButton').addEventListener('click', () => {
-                if (availableInvoices > 0) {
+            document.getElementById('createOrderButton').addEventListener('click', () => {
+                if (availableDocuments > 0) {
                     window.location.href = 'new-invoice.html';
                 } else {
-                    showAlert('No puedes generar más facturas. Has alcanzado el límite de 100. Contacta soporte.', 'warning');
+                    showAlert('No puedes generar más documentos. Has alcanzado el límite de 100. Contacta soporte.', 'warning');
                 }
             });
 
@@ -989,15 +1093,18 @@
             });
 
             document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:nth-child(5)').textContent.split(': ')[1]);
-                if (index !== -1) downloadInvoiceAsPdf(index);
+                if (currentDocumentType && currentDocumentIndex !== null) {
+                    downloadDocumentAsPdf(currentDocumentType, currentDocumentIndex);
+                }
             });
 
             document.getElementById('emailBtn').addEventListener('click', () => {
-                const index = userInvoices.findIndex(inv => inv.controlNumber === document.querySelector('#invoiceDetails p:nth-child(5)').textContent.split(': ')[1]);
-                if (index !== -1) sendInvoiceByEmail(index);
+                if (currentDocumentType && currentDocumentIndex !== null) {
+                    sendDocumentByEmail(currentDocumentType, currentDocumentIndex);
+                }
             });
 
+            loadOrdersTable(userOrders);
             loadInvoicesTable(userInvoices);
         });
     </script>
