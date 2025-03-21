@@ -28,35 +28,35 @@
 
         /* Navbar */
         .navbar {
-            background: #058DF3;
-            padding: 1.5rem 2rem;
+            background: #034f9e; /* Azul dos tonos más oscuro */
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 8px 20px rgba(5, 141, 243, 0.15);
+            box-shadow: 0 6px 15px rgba(3, 79, 158, 0.15);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
         .dark-theme .navbar {
-            background: #034f9e;
-            box-shadow: 0 8px 20px rgba(3, 79, 158, 0.2);
+            background: #023e8a;
+            box-shadow: 0 6px 15px rgba(2, 62, 138, 0.2);
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .back-btn {
             background: #258D19;
             color: #fff;
             border: none;
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            font-size: 1rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -64,12 +64,12 @@
 
         .back-btn:hover {
             background: #1e7214;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(37, 141, 25, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
         }
 
         .logo img {
-            height: 45px;
+            height: 40px;
             transition: transform 0.3s ease;
         }
 
@@ -80,16 +80,16 @@
         .nav-user {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             color: #fff;
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
 
         .dark-theme .user-info {
@@ -97,11 +97,11 @@
         }
 
         .user-pic {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #fff;
+            border: 2px solid #fff;
             transition: border 0.3s ease;
         }
 
@@ -111,26 +111,26 @@
 
         .nav-btn {
             background: #fff;
-            color: #058DF3;
+            color: #034f9e;
             border: none;
-            padding: 0.75rem 1.25rem;
-            border-radius: 10px;
-            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .dark-theme .nav-btn {
-            background: #034f9e;
+            background: #023e8a;
             color: #fff;
         }
 
         .nav-btn:hover {
             background: #e6f0ff;
-            color: #0477d3;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(5, 141, 243, 0.2);
+            color: #023e8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(3, 79, 158, 0.2);
         }
 
         .dark-theme .nav-btn:hover {
@@ -140,29 +140,29 @@
         /* Main Container */
         .dashboard {
             max-width: 1300px;
-            margin: 2rem auto;
-            padding: 2rem;
+            margin: 1.5rem auto;
+            padding: 1.5rem;
             background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
             animation: slideUp 0.5s ease-out;
         }
 
         .dark-theme .dashboard {
             background: #2c3e50;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .section-title {
-            font-size: 1.75rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            color: #058DF3;
-            margin-bottom: 1.5rem;
+            color: #034f9e;
+            margin-bottom: 1rem;
             position: relative;
             display: inline-block;
         }
@@ -170,10 +170,10 @@
         .section-title::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: -4px;
             left: 0;
             width: 40%;
-            height: 4px;
+            height: 3px;
             background: #258D19;
             border-radius: 2px;
         }
@@ -185,35 +185,35 @@
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .stat-box {
             background: #f8faff;
-            padding: 1.5rem;
-            border-radius: 15px;
+            padding: 1rem;
+            border-radius: 10px;
             text-align: center;
             transition: all 0.3s ease;
             border: 1px solid #e6f0ff;
         }
 
         .stat-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(5, 141, 243, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(3, 79, 158, 0.15);
         }
 
         .dark-theme .stat-box {
             background: #34495e;
-            border-color: #058DF3;
+            border-color: #034f9e;
         }
 
         .stat-box h4 {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #6b7280;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .dark-theme .stat-box h4 {
@@ -221,9 +221,9 @@
         }
 
         .stat-box p {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #058DF3;
+            color: #034f9e;
         }
 
         .dark-theme .stat-box p {
@@ -234,26 +234,26 @@
         .action-bar {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 2rem;
-            gap: 1rem;
+            margin-bottom: 1.5rem;
+            gap: 0.75rem;
         }
 
         .btn {
-            background: #058DF3;
+            background: #034f9e;
             color: #fff;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .btn:hover {
-            background: #0477d3;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(5, 141, 243, 0.25);
+            background: #023e8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(3, 79, 158, 0.25);
         }
 
         .btn-primary {
@@ -262,7 +262,7 @@
 
         .btn-primary:hover {
             background: #1e7214;
-            box-shadow: 0 6px 15px rgba(37, 141, 25, 0.25);
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
         }
 
         .btn-secondary {
@@ -271,23 +271,23 @@
 
         .btn-secondary:hover {
             background: #1e7214;
-            box-shadow: 0 6px 15px rgba(37, 141, 25, 0.25);
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
         }
 
         /* Filter Bar */
         .filter-container {
             display: flex;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
             background: #f8faff;
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
         }
 
         .dark-theme .filter-container {
             background: #34495e;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .filter-item {
@@ -295,11 +295,11 @@
         }
 
         .filter-item label {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             font-weight: 500;
             color: #6b7280;
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
         }
 
         .dark-theme .filter-item label {
@@ -308,16 +308,16 @@
 
         .filter-item input, .filter-item select {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.5rem;
             border: 1px solid #e6f0ff;
-            border-radius: 8px;
-            font-size: 0.9rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
             transition: all 0.3s ease;
         }
 
         .filter-item input:focus, .filter-item select:focus {
-            border-color: #058DF3;
-            box-shadow: 0 0 8px rgba(5, 141, 243, 0.2);
+            border-color: #034f9e;
+            box-shadow: 0 0 6px rgba(3, 79, 158, 0.2);
             outline: none;
         }
 
@@ -331,38 +331,39 @@
         .data-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 0.75rem;
+            border-spacing: 0 0.5rem;
         }
 
         .data-table th, .data-table td {
-            padding: 1rem 1.25rem;
+            padding: 0.5rem 0.75rem;
             text-align: left;
+            font-size: 0.75rem; /* Tamaño de fuente reducido */
         }
 
         .data-table th {
-            background: #058DF3;
+            background: #034f9e;
             color: #fff;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .dark-theme .data-table th {
-            background: #034f9e;
+            background: #023e8a;
         }
 
         .data-table tr {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
         }
 
         .data-table tr:hover {
             background: #f8faff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(5, 141, 243, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(3, 79, 158, 0.1);
         }
 
         .dark-theme .data-table tr {
@@ -378,9 +379,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            font-size: 0.95rem;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
         }
 
         /* Modal */
@@ -399,13 +400,13 @@
 
         .modal-content {
             background: #fff;
-            padding: 2rem;
-            border-radius: 20px;
+            padding: 1.5rem;
+            border-radius: 15px;
             width: 90%;
-            max-width: 950px;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             animation: zoomIn 0.3s ease-out;
         }
 
@@ -420,31 +421,31 @@
 
         .modal-close {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 40px;
-            height: 40px;
-            background: #058DF3;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 32px;
+            height: 32px;
+            background: #034f9e;
             color: #fff;
             border: none;
             border-radius: 50%;
-            font-size: 1.5rem;
-            line-height: 40px;
+            font-size: 1.2rem;
+            line-height: 32px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .modal-close:hover {
-            background: #0477d3;
+            background: #023e8a;
             transform: rotate(180deg);
         }
 
         .invoice-details h3 {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #058DF3;
-            margin-bottom: 1rem;
+            color: #034f9e;
+            margin-bottom: 0.75rem;
         }
 
         .dark-theme .invoice-details h3 {
@@ -454,12 +455,12 @@
         .invoice-details table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
         }
 
         .invoice-details th, .invoice-details td {
-            padding: 0.75rem;
+            padding: 0.5rem;
             border: 1px solid #e6f0ff;
         }
 
@@ -470,15 +471,15 @@
         .two-column-table {
             width: 50%;
             margin-left: auto;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
         }
 
         .invoice-header {
             background: #f8faff;
-            padding: 1rem;
-            border-radius: 12px;
+            padding: 0.75rem;
+            border-radius: 8px;
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .dark-theme .invoice-header {
@@ -486,11 +487,11 @@
         }
 
         .invoice-footer {
-            margin-top: 1.5rem;
-            font-size: 0.8rem;
+            margin-top: 1rem;
+            font-size: 0.7rem;
             color: #6b7280;
             text-align: center;
-            padding-top: 1rem;
+            padding-top: 0.75rem;
             border-top: 1px solid #e6f0ff;
         }
 
@@ -502,14 +503,14 @@
         /* Alerts */
         .alert {
             position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
             z-index: 1001;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             animation: slideInRight 0.3s ease-out;
         }
 
@@ -519,7 +520,7 @@
         }
 
         .alert-info {
-            background: #058DF3;
+            background: #034f9e;
             color: #fff;
         }
 
@@ -538,27 +539,27 @@
 
         /* Activity Log */
         .activity-section {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
         }
 
         .activity-section details {
             background: #f8faff;
-            border-radius: 15px;
-            padding: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border-radius: 10px;
+            padding: 0.75rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
         }
 
         .dark-theme .activity-section details {
             background: #34495e;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .activity-section summary {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: #058DF3;
+            color: #034f9e;
             cursor: pointer;
-            padding: 0.5rem;
+            padding: 0.3rem;
         }
 
         .dark-theme .activity-section summary {
@@ -566,11 +567,11 @@
         }
 
         .activity-section ul {
-            max-height: 250px;
+            max-height: 200px;
             overflow-y: auto;
-            margin-top: 1rem;
-            padding: 0.75rem;
-            border-radius: 8px;
+            margin-top: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 6px;
             background: #fff;
         }
 
@@ -579,8 +580,8 @@
         }
 
         .activity-section li {
-            padding: 0.75rem;
-            font-size: 0.9rem;
+            padding: 0.5rem;
+            font-size: 0.75rem;
             color: #6b7280;
             border-bottom: 1px solid #e6f0ff;
             transition: all 0.3s ease;
@@ -588,7 +589,7 @@
 
         .activity-section li:hover {
             background: #e6f0ff;
-            color: #058DF3;
+            color: #034f9e;
         }
 
         .dark-theme .activity-section li {
@@ -612,11 +613,11 @@
             }
             .nav-user {
                 flex-direction: column;
-                gap: 0.75rem;
+                gap: 0.5rem;
             }
             .data-table th, .data-table td {
-                font-size: 0.8rem;
-                padding: 0.75rem;
+                font-size: 0.65rem;
+                padding: 0.4rem;
             }
             .two-column-table {
                 width: 100%;
@@ -755,7 +756,7 @@
         <div class="modal-content">
             <button class="modal-close" id="modalClose">×</button>
             <div class="invoice-details" id="invoiceDetails"></div>
-            <div style="text-align: right; margin-top: 1rem;" id="modalActions"></div>
+            <div style="text-align: right; margin-top: 0.75rem;" id="modalActions"></div>
         </div>
     </div>
 
