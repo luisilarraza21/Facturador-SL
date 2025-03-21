@@ -262,6 +262,11 @@
             background: #dc3545;
             color: #fff;
         }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
         @media (max-width: 768px) {
             .container {
                 margin: 15px;
@@ -273,6 +278,10 @@
             .item-table th, .item-table td {
                 padding: 8px;
                 font-size: 14px;
+            }
+            .form-row {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>
@@ -314,8 +323,21 @@
         </div>
 
         <div class="form-group">
-            <label for="clientId">RIF/Cédula del Cliente</label>
-            <input type="text" id="clientId" required placeholder="Ejemplo: V-12345678">
+            <label>Tipo de Identificación del Cliente</label>
+            <div class="form-row">
+                <div style="flex: 1;">
+                    <label for="clientIdType">Tipo</label>
+                    <select id="clientIdType" required>
+                        <option value="cedula">Cédula</option>
+                        <option value="rif">RIF</option>
+                        <option value="extranjero">Extranjero</option>
+                    </select>
+                </div>
+                <div style="flex: 2;">
+                    <label for="clientIdNumber">Número</label>
+                    <input type="text" id="clientIdNumber" required placeholder="Ejemplo: 12345678">
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
@@ -329,8 +351,8 @@
         </div>
 
         <div class="form-group">
-            <label for="clientEmail">Correo del Cliente</label>
-            <input type="email" id="clientEmail" required>
+            <label for="clientEmails">Correos del Cliente (separados por comas)</label>
+            <input type="text" id="clientEmails" required placeholder="correo1@ejemplo.com, correo2@ejemplo.com">
         </div>
 
         <div class="form-group">
@@ -401,9 +423,11 @@
         <div class="form-group">
             <label for="paymentMethod">Método de Pago</label>
             <select id="paymentMethod" required disabled>
-                <option value="Bolívares Efectivo">Bolívares Efectivo</option>
-                <option value="Transferencia">Transferencia</option>
-                <option value="Dólares Efectivo">Dólares Efectivo</option>
+                <option value="Pago Móvil">Pago Móvil</option>
+                <option value="Efectivo Bolívares">Efectivo Bolívares</option>
+                <option value="Efectivo Dólares">Efectivo Dólares</option>
+                <option value="Transferencia Bolívares">Transferencia Bolívares</option>
+                <option value="Transferencia Dólares">Transferencia Dólares</option>
             </select>
         </div>
 
@@ -480,11 +504,11 @@
             <h3>Generar Factura</h3>
             <p>¿Desea generar la factura para este pedido? Esta acción cambiará el estado del pedido a "Finalizado".</p>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" id="cancelGenerateInvoice">
+                <button class="btn btn-secondary" id="continueEditing">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                     </svg>
-                    Cancelar
+                    Seguir Editando Pedido
                 </button>
                 <button class="btn" id="confirmGenerateInvoice">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -544,6 +568,22 @@
             return `00-${String(orderCount).padStart(8, '0')}`;
         }
 
+        function formatClientId(type, number) {
+            const cleanNumber = number.replace(/[^0-9]/g, '');
+            if (cleanNumber.length < 7 || cleanNumber.length > 8) {
+                return null;
+            }
+            const checkDigit = Math.floor(Math.random() * 10); // Simulación de dígito verificador
+            if (type === 'cedula') {
+                return `V-${cleanNumber}-${checkDigit}`;
+            } else if (type === 'rif') {
+                return `J-${cleanNumber}-${checkDigit}`;
+            } else if (type === 'extranjero') {
+                return `E-${cleanNumber}-${checkDigit}`;
+            }
+            return null;
+        }
+
         function calculateTotals() {
             const items = Array.from(document.querySelectorAll('#itemTableBody tr'));
             let subtotalBs = 0;
@@ -570,29 +610,41 @@
         }
 
         function validateForm() {
-            const clientId = document.getElementById('clientId').value.trim();
+            const clientIdType = document.getElementById('clientIdType').value;
+            const clientIdNumber = document.getElementById('clientIdNumber').value.trim();
             const clientPhone = document.getElementById('clientPhone').value.trim();
-            const clientEmail = document.getElementById('clientEmail').value.trim();
+            const clientEmails = document.getElementById('clientEmails').value.trim();
             const items = Array.from(document.querySelectorAll('#itemTableBody tr'));
 
-            const clientIdRegex = /^[VEPGJ]-[0-9]{7,8}-[0-9]$/;
-            if (!clientIdRegex.test(clientId)) {
-                showAlert('El RIF/Cédula del cliente debe tener el formato V-12345678-9.', 'error');
+            // Validar número de identificación
+            const formattedId = formatClientId(clientIdType, clientIdNumber);
+            if (!formattedId) {
+                showAlert('El número de identificación debe tener entre 7 y 8 dígitos numéricos.', 'error');
                 return false;
             }
 
+            // Validar teléfono
             const phoneRegex = /^(\+58|0)[0-9]{10}$/;
             if (!phoneRegex.test(clientPhone)) {
                 showAlert('El teléfono debe tener un formato válido, ej. +584121234567.', 'error');
                 return false;
             }
 
+            // Validar correos electrónicos
+            const emailArray = clientEmails.split(',').map(email => email.trim()).filter(email => email);
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(clientEmail)) {
-                showAlert('Por favor ingresa un correo electrónico válido.', 'error');
+            for (const email of emailArray) {
+                if (!emailRegex.test(email)) {
+                    showAlert(`El correo "${email}" no es válido.`, 'error');
+                    return false;
+                }
+            }
+            if (emailArray.length === 0) {
+                showAlert('Debe ingresar al menos un correo electrónico válido.', 'error');
                 return false;
             }
 
+            // Validar ítems
             if (items.length === 0) {
                 showAlert('Debe agregar al menos un ítem al pedido.', 'error');
                 return false;
@@ -635,6 +687,11 @@
                 subtotal: parseFloat(item.querySelector('.item-subtotal').value.replace(/,/g, ''))
             }));
 
+            const clientIdType = document.getElementById('clientIdType').value;
+            const clientIdNumber = document.getElementById('clientIdNumber').value.trim();
+            const formattedClientId = formatClientId(clientIdType, clientIdNumber);
+            const clientEmails = document.getElementById('clientEmails').value.split(',').map(email => email.trim()).filter(email => email);
+
             const order = {
                 id: document.getElementById('docNumber').value,
                 docType: document.getElementById('docType').value,
@@ -642,10 +699,10 @@
                 controlNumber: document.getElementById('controlNumber').value,
                 date: document.getElementById('date').value,
                 clientName: document.getElementById('clientName').value.trim(),
-                clientId: document.getElementById('clientId').value.trim(),
+                clientId: formattedClientId,
                 clientAddress: document.getElementById('clientAddress').value.trim(),
                 clientPhone: document.getElementById('clientPhone').value.trim(),
-                clientEmails: [document.getElementById('clientEmail').value.trim()],
+                clientEmails: clientEmails,
                 items: items,
                 subtotalBs: totals.subtotalBs,
                 subtotalUsd: totals.subtotalBs / parseFloat(document.getElementById('exchangeRate').value),
@@ -683,8 +740,8 @@
             } else if (status === 'Enviado') {
                 showAlert('Pedido enviado exitosamente.', 'success');
                 document.getElementById('confirmPaymentButton').disabled = false;
-                document.getElementById('paymentMethod').disabled = false; // Habilitar edición del método de pago
-                document.getElementById('sendOrderModal').style.display = 'flex'; // Mostrar modal
+                document.getElementById('paymentMethod').disabled = false;
+                document.getElementById('sendOrderModal').style.display = 'flex';
             } else if (status === 'Pagado') {
                 showAlert('Pago confirmado.', 'success');
                 document.getElementById('generateInvoiceButton').disabled = false;
@@ -693,6 +750,9 @@
                 showAlert('Factura generada. Pedido finalizado.', 'success');
                 document.getElementById('generateInvoiceButton').disabled = true;
                 document.getElementById('confirmPaymentButton').disabled = true;
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
             }
         }
 
@@ -930,7 +990,7 @@
                 generateInvoice();
             });
 
-            document.getElementById('cancelGenerateInvoice').addEventListener('click', () => {
+            document.getElementById('continueEditing').addEventListener('click', () => {
                 document.getElementById('generateInvoiceModal').style.display = 'none';
             });
 
@@ -955,7 +1015,6 @@
                 window.location.href = 'dashboard.html';
             });
 
-            // Actualizar método de pago
             document.getElementById('paymentMethod').addEventListener('change', () => {
                 const orderId = document.getElementById('docNumber').value;
                 let orders = JSON.parse(localStorage.getItem('orders')) || [];
