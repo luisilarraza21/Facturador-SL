@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakal Blitz - Mi Factura Digital</title>
+    <title>E-Facture - Mi Factura Digital</title>
     <style>
         * {
             margin: 0;
@@ -40,20 +40,18 @@
             background-color: #153e7e;
         }
         .logo {
-            font-weight: bold;
-            font-size: 24px;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .logo span {
-            font-size: 14px;
-            font-weight: normal;
-            display: block;
-            color: #ddd;
+        .logo img {
+            height: 32px;
+            width: auto;
+            max-width: 150px;
+            transition: transform 0.3s ease;
         }
-        .dark-theme .logo {
-            color: #ddd;
+        .logo img:hover {
+            transform: scale(1.1);
         }
         .container {
             max-width: 1200px;
@@ -231,7 +229,9 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">Wakal Blitz<span>by: Soluciones Láser</span></div>
+        <div class="logo">
+            <img src="Logo E-facture-02.png" alt="Logo E-Facture">
+        </div>
     </div>
     <div class="container">
         <h2 class="section-title">Mi Factura Digital - Selección de Plantilla para Facturas</h2>
