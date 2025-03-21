@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakal Blitz - Nuevo Pedido</title>
+    <title>Wakal Blitz - Nuevo Documento</title>
     <style>
         * {
             margin: 0;
@@ -148,7 +148,7 @@
             border-radius: 4px;
         }
         .btn {
-            background: linear-gradient(90deg, #2968c8, #28a745);
+            background: #2968c8;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -161,7 +161,7 @@
             font-weight: 500;
         }
         .btn:hover {
-            background: linear-gradient(90deg, #1d4f9e, #218838);
+            background: #1d4f9e;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
             transform: translateY(-1px);
         }
@@ -182,56 +182,6 @@
             gap: 15px;
             justify-content: flex-end;
             flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            text-align: center;
-        }
-        .dark-theme .modal-content {
-            background: #3a3a3a;
-        }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            text-align: center;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .modal-close:hover {
-            background: #c82333;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
             margin-top: 20px;
         }
         .alert {
@@ -292,7 +242,7 @@
     </div>
 
     <div class="container">
-        <h2 class="section-title">Nuevo Pedido</h2>
+        <h2 class="section-title" id="pageTitle">Nuevo Documento</h2>
 
         <div class="form-group">
             <label for="docType">Tipo de Documento</label>
@@ -305,11 +255,6 @@
         <div class="form-group">
             <label for="docNumber">Nº Documento</label>
             <input type="text" id="docNumber" required readonly value="Generado automáticamente">
-        </div>
-
-        <div class="form-group">
-            <label for="controlNumber">Nº Control</label>
-            <input type="text" id="controlNumber" required readonly value="Generado automáticamente">
         </div>
 
         <div class="form-group">
@@ -356,7 +301,7 @@
         </div>
 
         <div class="form-group">
-            <h3 class="section-title">Ítems del Pedido</h3>
+            <h3 class="section-title">Ítems del Documento</h3>
             <table class="item-table" id="itemTable">
                 <thead>
                     <tr>
@@ -422,22 +367,12 @@
 
         <div class="form-group">
             <label for="paymentMethod">Método de Pago</label>
-            <select id="paymentMethod" required disabled>
+            <select id="paymentMethod" required>
                 <option value="Pago Móvil">Pago Móvil</option>
                 <option value="Efectivo Bolívares">Efectivo Bolívares</option>
                 <option value="Efectivo Dólares">Efectivo Dólares</option>
                 <option value="Transferencia Bolívares">Transferencia Bolívares</option>
                 <option value="Transferencia Dólares">Transferencia Dólares</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="orderStatus">Estado del Pedido</label>
-            <select id="orderStatus" disabled>
-                <option value="Borrador">Borrador</option>
-                <option value="Enviado">Enviado</option>
-                <option value="Pagado">Pagado</option>
-                <option value="Finalizado">Finalizado</option>
             </select>
         </div>
 
@@ -458,74 +393,12 @@
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.893-1.405L12.53 2.88l1.6-.304Zm-3.404 3.404-1.405-.893 7.485-7.485-.304 1.6Z"/>
                 </svg>
-                Enviar Pedido
-            </button>
-            <button class="btn" id="confirmPaymentButton" disabled>
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
-                </svg>
-                Confirmar Pago
-            </button>
-            <button class="btn" id="generateInvoiceButton" disabled>
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zM2.5 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5h-11z"/>
-                    <path d="M4 4.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
-                </svg>
-                Generar Factura
+                Enviar Documento
             </button>
         </div>
     </div>
-
-    <div class="modal" id="sendOrderModal">
-        <div class="modal-content">
-            <span class="modal-close" id="sendOrderModalClose">×</span>
-            <h3>Pedido Enviado</h3>
-            <p>El pedido ha sido enviado exitosamente. Ahora puedes confirmar el pago o regresar al dashboard.</p>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" id="backToDashboardFromModal">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-                    </svg>
-                    Volver al Dashboard
-                </button>
-                <button class="btn" id="continueToPayment">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
-                    </svg>
-                    Continuar a Confirmar Pago
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="generateInvoiceModal">
-        <div class="modal-content">
-            <span class="modal-close" id="generateInvoiceModalClose">×</span>
-            <h3>Generar Factura</h3>
-            <p>¿Desea generar la factura para este pedido? Esta acción cambiará el estado del pedido a "Finalizado".</p>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" id="continueEditing">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-                    </svg>
-                    Seguir Editando Pedido
-                </button>
-                <button class="btn" id="confirmGenerateInvoice">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
-                    </svg>
-                    Generar Factura
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="./jspdf.umd.min.js"></script>
-    <script src="./jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        const { jsPDF } = window.jspdf;
-
         // Funciones de utilidad
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
@@ -558,14 +431,9 @@
 
         function generateDocNumber() {
             const orders = JSON.parse(localStorage.getItem('orders')) || [];
-            const orderCount = orders.length + 1;
+            const userOrders = orders.filter(order => order.userRif === loadUserData().rif);
+            const orderCount = userOrders.length + 1;
             return String(orderCount).padStart(8, '0');
-        }
-
-        function generateControlNumber() {
-            const orders = JSON.parse(localStorage.getItem('orders')) || [];
-            const orderCount = orders.length + 1;
-            return `00-${String(orderCount).padStart(8, '0')}`;
         }
 
         function formatClientId(type, number) {
@@ -573,13 +441,13 @@
             if (cleanNumber.length < 7 || cleanNumber.length > 8) {
                 return null;
             }
-            const checkDigit = Math.floor(Math.random() * 10); // Simulación de dígito verificador
             if (type === 'cedula') {
-                return `V-${cleanNumber}-${checkDigit}`;
+                return `V-${cleanNumber}`;
             } else if (type === 'rif') {
+                const checkDigit = Math.floor(Math.random() * 10); // Simulación de dígito verificador
                 return `J-${cleanNumber}-${checkDigit}`;
             } else if (type === 'extranjero') {
-                return `E-${cleanNumber}-${checkDigit}`;
+                return `E-${cleanNumber}`;
             }
             return null;
         }
@@ -646,7 +514,7 @@
 
             // Validar ítems
             if (items.length === 0) {
-                showAlert('Debe agregar al menos un ítem al pedido.', 'error');
+                showAlert('Debe agregar al menos un ítem al documento.', 'error');
                 return false;
             }
 
@@ -693,10 +561,8 @@
             const clientEmails = document.getElementById('clientEmails').value.split(',').map(email => email.trim()).filter(email => email);
 
             const order = {
-                id: document.getElementById('docNumber').value,
                 docType: document.getElementById('docType').value,
                 docNumber: document.getElementById('docNumber').value,
-                controlNumber: document.getElementById('controlNumber').value,
                 date: document.getElementById('date').value,
                 clientName: document.getElementById('clientName').value.trim(),
                 clientId: formattedClientId,
@@ -724,7 +590,7 @@
             };
 
             let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            const existingOrderIndex = orders.findIndex(o => o.id === order.id);
+            const existingOrderIndex = orders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
             if (existingOrderIndex !== -1) {
                 orders[existingOrderIndex] = order;
             } else {
@@ -732,185 +598,68 @@
             }
             localStorage.setItem('orders', JSON.stringify(orders));
 
-            document.getElementById('orderStatus').value = status;
-            addActivityEntry(currentUser, `Pedido ${order.docNumber} - Estado: ${status}`);
+            addActivityEntry(currentUser, `Documento ${order.docNumber} - Estado: ${status}`);
 
-            if (status === 'Borrador') {
-                showAlert('Pedido guardado como borrador.', 'success');
-            } else if (status === 'Enviado') {
-                showAlert('Pedido enviado exitosamente.', 'success');
-                document.getElementById('confirmPaymentButton').disabled = false;
-                document.getElementById('paymentMethod').disabled = false;
-                document.getElementById('sendOrderModal').style.display = 'flex';
-            } else if (status === 'Pagado') {
-                showAlert('Pago confirmado.', 'success');
-                document.getElementById('generateInvoiceButton').disabled = false;
-                document.getElementById('generateInvoiceModal').style.display = 'flex';
-            } else if (status === 'Finalizado') {
-                showAlert('Factura generada. Pedido finalizado.', 'success');
-                document.getElementById('generateInvoiceButton').disabled = true;
-                document.getElementById('confirmPaymentButton').disabled = true;
+            if (status === 'draft') {
+                showAlert('Documento guardado como borrador.', 'success');
+            } else if (status === 'pending') {
+                showAlert('Documento enviado exitosamente.', 'success');
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 1000);
             }
         }
 
-        function generateInvoice() {
-            const currentUser = loadUserData();
-            if (!currentUser) return;
+        function loadOrderForEdit() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const editDocNumber = urlParams.get('edit');
+            if (editDocNumber) {
+                const editOrder = JSON.parse(localStorage.getItem('editOrder'));
+                if (editOrder && editOrder.docNumber === editDocNumber) {
+                    document.getElementById('pageTitle').textContent = 'Editar Documento';
+                    document.getElementById('docType').value = editOrder.docType;
+                    document.getElementById('docNumber').value = editOrder.docNumber;
+                    document.getElementById('date').value = editOrder.date;
+                    document.getElementById('clientName').value = editOrder.clientName;
 
-            const order = JSON.parse(localStorage.getItem('orders')).find(o => o.id === document.getElementById('docNumber').value);
-            if (!order) {
-                showAlert('No se encontró el pedido para generar la factura.', 'error');
-                return;
+                    // Extraer el tipo y número de identificación
+                    const [idPrefix, idNumber] = editOrder.clientId.split('-');
+                    document.getElementById('clientIdType').value = idPrefix === 'V' ? 'cedula' : idPrefix === 'J' ? 'rif' : 'extranjero';
+                    document.getElementById('clientIdNumber').value = idNumber;
+
+                    document.getElementById('clientAddress').value = editOrder.clientAddress;
+                    document.getElementById('clientPhone').value = editOrder.clientPhone;
+                    document.getElementById('clientEmails').value = editOrder.clientEmails.join(', ');
+                    document.getElementById('exchangeRate').value = editOrder.exchangeRate;
+                    document.getElementById('paymentMethod').value = editOrder.paymentMethod;
+
+                    // Cargar ítems
+                    const tbody = document.getElementById('itemTableBody');
+                    tbody.innerHTML = '';
+                    editOrder.items.forEach(item => {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td><input type="text" class="item-code" value="${item.code || ''}" placeholder="001"></td>
+                            <td><input type="text" class="item-description" value="${item.description}" required></td>
+                            <td><input type="number" class="item-quantity" value="${item.quantity}" required min="1"></td>
+                            <td><input type="number" class="item-price" value="${item.price}" required min="0" step="0.01"></td>
+                            <td><input type="text" class="item-subtotal" readonly value="${formatCurrency(item.subtotal)}"></td>
+                            <td>
+                                <button class="btn btn-danger btn-remove-item">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
+                                    Eliminar
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(newRow);
+                    });
+
+                    calculateTotals();
+                }
             }
-
-            const templateId = localStorage.getItem('selectedTemplate') || 1;
-            const doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
-                putOnlyUsedFonts: true,
-                floatPrecision: 16,
-                compress: true
-            });
-            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
-            const margin = 5;
-            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
-            let y = margin;
-
-            function addText(text, x, align = 'left') {
-                const lines = doc.splitTextToSize(text, pageWidth - 10);
-                lines.forEach(line => {
-                    if (y > doc.internal.pageSize.getHeight() - 10) {
-                        doc.addPage();
-                        y = margin;
-                    }
-                    doc.text(line, x, y, { align: align });
-                    y += 3;
-                });
-                return y;
-            }
-
-            if (templateId == 1) {
-                doc.addImage(logo, 'JPEG', (pageWidth / 2) + margin - 15, y, 30, 30, undefined, 'FAST');
-                y += 35;
-                doc.setFontSize(12);
-                y = addText(currentUser.companyName, (pageWidth / 2) + margin, 'center');
-                doc.setFontSize(8);
-                y = addText(`RIF: ${currentUser.rif}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Dirección: ${currentUser.address}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Teléfono: ${currentUser.phone}`, (pageWidth / 2) + margin, 'center');
-                y += 5;
-                doc.setFontSize(12);
-                y = addText('Factura', margin, 'left');
-                doc.setFontSize(8);
-                y = addText(`Nº Documento: ${order.docNumber}`, margin, 'left');
-                y = addText(`Nº Control: ${order.controlNumber}`, margin, 'left');
-                y = addText(`Fecha: ${order.date}`, margin, 'left');
-                y += 5;
-                y = addText(`Cliente: ${order.clientName}`, margin, 'left');
-                y = addText(`RIF/Cédula: ${order.clientId}`, margin, 'left');
-                y = addText(`Dirección: ${order.clientAddress}`, margin, 'left');
-                y = addText(`Teléfono: ${order.clientPhone}`, margin, 'left');
-                y = addText(`Correos: ${order.clientEmails.join(', ')}`, margin, 'left');
-            } else if (templateId == 2) {
-                doc.addImage(logo, 'JPEG', margin, y, 30, 30, undefined, 'FAST');
-                doc.setFontSize(12);
-                y = addText(currentUser.companyName, margin + 35, 'left');
-                doc.setFontSize(8);
-                y = addText(`RIF: ${currentUser.rif}`, margin + 35, 'left');
-                y += 5;
-                doc.setFontSize(12);
-                y = addText('Factura', pageWidth + margin, 'right');
-                doc.setFontSize(8);
-                y = addText(`Nº Documento: ${order.docNumber}`, pageWidth + margin, 'right');
-                y = addText(`Nº Control: ${order.controlNumber}`, pageWidth + margin, 'right');
-                y = addText(`Fecha: ${order.date}`, pageWidth + margin, 'right');
-                y += 5;
-                y = addText(`Cliente: ${order.clientName}`, margin, 'left');
-                y = addText(`RIF/Cédula: ${order.clientId}`, margin, 'left');
-                y = addText(`Dirección: ${order.clientAddress}`, margin, 'left');
-                y = addText(`Teléfono: ${order.clientPhone}`, margin, 'left');
-                y = addText(`Correos: ${order.clientEmails.join(', ')}`, margin, 'left');
-            } else if (templateId == 3) {
-                doc.addImage(logo, 'JPEG', (pageWidth / 2) + margin - 15, y, 30, 30, undefined, 'FAST');
-                y += 35;
-                doc.setFontSize(12);
-                y = addText(currentUser.companyName, (pageWidth / 2) + margin, 'center');
-                doc.setFontSize(8);
-                y = addText(`RIF: ${currentUser.rif}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Dirección: ${currentUser.address}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Teléfono: ${currentUser.phone}`, (pageWidth / 2) + margin, 'center');
-                y += 5;
-                doc.setFontSize(12);
-                y = addText('Factura', margin, 'left');
-                doc.setFontSize(8);
-                y = addText(`Nº Documento: ${order.docNumber}`, margin, 'left');
-                y = addText(`Nº Control: ${order.controlNumber}`, margin, 'left');
-                y = addText(`Fecha: ${order.date}`, margin, 'left');
-                y += 5;
-                y = addText(`Cliente: ${order.clientName}`, margin, 'left');
-                y = addText(`RIF/Cédula: ${order.clientId}`, margin, 'left');
-                y = addText(`Dirección: ${order.clientAddress}`, margin, 'left');
-                y = addText(`Teléfono: ${order.clientPhone}`, margin, 'left');
-                y = addText(`Correos: ${order.clientEmails.join(', ')}`, margin, 'left');
-            }
-
-            y += 5;
-            doc.autoTable({
-                head: [['Código', 'Descripción', 'Cantidad', 'Precio Unitario (Bs)', 'Subtotal (Bs)']],
-                body: order.items.map(item => [
-                    item.code || '-',
-                    item.description,
-                    item.quantity,
-                    formatCurrency(item.price),
-                    formatCurrency(item.subtotal)
-                ]),
-                startY: y,
-                theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 50 }, 2: { cellWidth: 15 }, 3: { cellWidth: 25 }, 4: { cellWidth: 25 } },
-                margin: { top: margin },
-                didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
-            });
-            y = doc.lastAutoTable.finalY + 3;
-
-            const totalTableData = [
-                ['Subtotal', formatCurrency(order.subtotalBs), formatCurrency(order.subtotalUsd)],
-                ['Monto exento', formatCurrency(order.exemptAmountBs), formatCurrency(order.exemptAmountUsd)],
-                ['Base imponible', formatCurrency(order.taxableBaseBs), formatCurrency(order.taxableBaseUsd)],
-                [`IVA (${order.alicuota}%)`, formatCurrency(order.taxBs), formatCurrency(order.taxUsd)],
-                ['IGTF (3%)', formatCurrency(order.igtfBs), formatCurrency(order.igtfUsd)],
-                ['Total', formatCurrency(order.totalBs), formatCurrency(order.totalUsd)]
-            ];
-
-            doc.autoTable({
-                head: [['', 'Bs', 'USD']],
-                body: totalTableData,
-                startY: y,
-                theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 } },
-                margin: { left: pageWidth - 90 + margin },
-                didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
-            });
-            y = doc.lastAutoTable.finalY + 3;
-
-            doc.setFontSize(8);
-            y = addText(`Método de Pago: ${order.paymentMethod}`, margin, 'left');
-            y = addText(`Tasa de cambio: ${order.exchangeRate} Bs/USD`, margin, 'left');
-            y += 5;
-            doc.setFontSize(7);
-            doc.setTextColor(100);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth + margin, y);
-            y += 3;
-            y = addText(`Este documento se emite bajo la Providencia Administrativa SNAT/2024/000102 de fecha 17/10/2024 SOLUCIONES LASER, CA, RIF: J-003629162.`, (pageWidth / 2) + margin, 'center');
-
-            doc.save(`Factura_${order.docNumber}.pdf`);
-            saveOrder('Finalizado');
         }
 
         // Inicialización
@@ -922,8 +671,13 @@
                 document.body.classList.add('dark-theme');
             }
 
-            document.getElementById('docNumber').value = generateDocNumber();
-            document.getElementById('controlNumber').value = generateControlNumber();
+            // Cargar pedido para edición si existe
+            loadOrderForEdit();
+
+            // Generar número de documento si no se está editando
+            if (!new URLSearchParams(window.location.search).get('edit')) {
+                document.getElementById('docNumber').value = generateDocNumber();
+            }
             document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
             document.getElementById('addItemButton').addEventListener('click', () => {
@@ -956,7 +710,7 @@
                         row.remove();
                         calculateTotals();
                     } else {
-                        showAlert('Debe haber al menos un ítem en el pedido.', 'error');
+                        showAlert('Debe haber al menos un ítem en el documento.', 'error');
                     }
                 }
             });
@@ -970,45 +724,11 @@
             document.getElementById('exchangeRate').addEventListener('input', calculateTotals);
 
             document.getElementById('saveDraftButton').addEventListener('click', () => {
-                saveOrder('Borrador');
+                saveOrder('draft');
             });
 
             document.getElementById('sendOrderButton').addEventListener('click', () => {
-                saveOrder('Enviado');
-            });
-
-            document.getElementById('confirmPaymentButton').addEventListener('click', () => {
-                saveOrder('Pagado');
-            });
-
-            document.getElementById('generateInvoiceButton').addEventListener('click', () => {
-                document.getElementById('generateInvoiceModal').style.display = 'flex';
-            });
-
-            document.getElementById('confirmGenerateInvoice').addEventListener('click', () => {
-                document.getElementById('generateInvoiceModal').style.display = 'none';
-                generateInvoice();
-            });
-
-            document.getElementById('continueEditing').addEventListener('click', () => {
-                document.getElementById('generateInvoiceModal').style.display = 'none';
-            });
-
-            document.getElementById('generateInvoiceModalClose').addEventListener('click', () => {
-                document.getElementById('generateInvoiceModal').style.display = 'none';
-            });
-
-            document.getElementById('sendOrderModalClose').addEventListener('click', () => {
-                document.getElementById('sendOrderModal').style.display = 'none';
-            });
-
-            document.getElementById('backToDashboardFromModal').addEventListener('click', () => {
-                window.location.href = 'dashboard.html';
-            });
-
-            document.getElementById('continueToPayment').addEventListener('click', () => {
-                document.getElementById('sendOrderModal').style.display = 'none';
-                saveOrder('Pagado');
+                saveOrder('pending');
             });
 
             document.getElementById('backButton').addEventListener('click', () => {
@@ -1016,13 +736,13 @@
             });
 
             document.getElementById('paymentMethod').addEventListener('change', () => {
-                const orderId = document.getElementById('docNumber').value;
+                const docNumber = document.getElementById('docNumber').value;
                 let orders = JSON.parse(localStorage.getItem('orders')) || [];
-                const orderIndex = orders.findIndex(o => o.id === orderId);
+                const orderIndex = orders.findIndex(o => o.docNumber === docNumber && o.userRif === currentUser.rif);
                 if (orderIndex !== -1) {
                     orders[orderIndex].paymentMethod = document.getElementById('paymentMethod').value;
                     localStorage.setItem('orders', JSON.stringify(orders));
-                    addActivityEntry(currentUser, `Método de pago actualizado para el pedido ${orderId}`);
+                    addActivityEntry(currentUser, `Método de pago actualizado para el documento ${docNumber}`);
                     showAlert('Método de pago actualizado.', 'success');
                 }
             });
