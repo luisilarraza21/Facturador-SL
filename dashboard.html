@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakal Blitz - Dashboard</title>
+    <title>E-Facture - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -64,19 +64,13 @@
             gap: 10px;
         }
         .logo img {
-            height: 32px; /* Ajustado a la altura original del logo (32px) */
+            height: 32px;
             width: auto;
             max-width: 150px;
             transition: transform 0.3s ease;
         }
         .logo img:hover {
             transform: scale(1.1);
-        }
-        .logo span {
-            font-size: 14px;
-            font-weight: normal;
-            color: #ddd;
-            display: block;
         }
         .nav-user {
             display: flex;
@@ -416,7 +410,6 @@
             color: #fff;
             border-color: #c69500;
         }
-        /* Estilos para los filtros */
         .filter-bar {
             display: flex;
             gap: 15px;
@@ -455,7 +448,6 @@
             color: #fff;
             border-color: #777;
         }
-        /* Estilos para el registro de actividades (lista desplegable) */
         .activity-log {
             margin-top: 30px;
         }
@@ -538,8 +530,7 @@
         <div class="logo-section">
             <button class="back-btn" id="backButton">←</button>
             <div class="logo">
-                <img src="Logotipo E-facture-02.png" alt="Logo Wakal Blitz">
-                <span>by: Soluciones Láser</span>
+                <img src="Logo E-facture-02.png" alt="Logo E-Facture">
             </div>
         </div>
         <div class="nav-user">
@@ -865,7 +856,7 @@
                 templateHtml = `
                     <div class="template-1">
                         <div class="invoice-header">
-                            <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <img src="${logo}" alt="Logo Cliente" style="width: 50px; height: 50px; border-radius: 50%;">
                             <h2>${currentUser.companyName}</h2>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Direc: ${currentUser.address || '-'}</p>
@@ -890,7 +881,7 @@
                     <div class="template-2">
                         <div class="invoice-header">
                             <div>
-                                <img src="${logo}" alt="Logo" style="width: 40px; height: 40px; float: left; margin-right: 5px;">
+                                <img src="${logo}" alt="Logo Cliente" style="width: 40px; height: 40px; float: left; margin-right: 5px;">
                                 <h2>${currentUser.companyName}</h2>
                                 <p>RIF: ${currentUser.rif}</p>
                             </div>
@@ -915,7 +906,7 @@
                 templateHtml = `
                     <div class="template-3">
                         <div class="invoice-header">
-                            <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <img src="${logo}" alt="Logo Cliente" style="width: 50px; height: 50px; border-radius: 50%;">
                             <h2>${currentUser.companyName}</h2>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Direc: ${currentUser.address || '-'}</p>
@@ -1062,7 +1053,7 @@
             addActivityEntry(currentUser, `Generó factura para el documento ${order.docNumber}, Nº Control: ${controlNumber}`);
         }
 
-        async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
+        async function resizeImage(url, maxWidth, maxHeight, quality = 0.9) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.crossOrigin = 'Anonymous';
@@ -1091,7 +1082,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    const dataUrl = canvas.toDataURL('image/png', quality);
                     const base64 = dataUrl.split(',')[1];
                     resolve(base64);
                 };
@@ -1105,7 +1096,7 @@
 
         async function loadImageAsBase64(url) {
             try {
-                const base64 = await resizeImage(url, 20, 20, 0.7);
+                const base64 = await resizeImage(url, 50, 50, 0.9); // Aumentamos las dimensiones y la calidad
                 return base64;
             } catch (error) {
                 console.error('Error al cargar y redimensionar la imagen:', error);
@@ -1150,11 +1141,12 @@
                 return y;
             }
 
+            // Solo mostramos el logo del cliente en el PDF
             if (logoBase64) {
                 const imgWidth = 20;
                 const imgHeight = 20;
                 let logoX = selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin - (imgWidth / 2) : margin;
-                doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
+                doc.addImage(logoBase64, 'PNG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
                 y += imgHeight + 3;
             }
 
