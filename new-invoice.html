@@ -3,231 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakal Blitz - Nuevo Documento</title>
+    <title>E-Facture - Nuevo Documento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8;
-            color: #333;
-            line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(120deg, #f6f9fc 0%, #ffffff 100%);
+            color: #1a1a1a;
+            line-height: 1.5;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
+
         body.dark-theme {
-            background-color: #2a2a2a;
-            color: #e0e0e0;
+            background: linear-gradient(120deg, #1f2a44 0%, #2c3e50 100%);
+            color: #d1d8e0;
         }
+
+        /* Navbar */
         .navbar {
-            background-color: #2968c8;
-            padding: 15px 20px;
+            background: #034f9e;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+            box-shadow: 0 6px 15px rgba(3, 79, 158, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background 0.3s ease;
         }
+
         .dark-theme .navbar {
-            background-color: #1d4f9e;
+            background: #023e8a;
+            box-shadow: 0 6px 15px rgba(2, 62, 138, 0.2);
         }
-        .navbar:hover {
-            background-color: #1d4f9e;
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        .dark-theme .navbar:hover {
-            background-color: #153e7e;
-        }
-        .logo {
-            font-weight: bold;
-            font-size: 24px;
+
+        .back-btn {
+            background: #258D19;
             color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .logo span {
-            font-size: 14px;
-            font-weight: normal;
-            display: block;
-            color: #ddd;
+
+        .back-btn:hover {
+            background: #1e7214;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
         }
+
+        .logo img {
+            height: 40px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Main Container */
         .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 25px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e0e0e0;
+            max-width: 1300px;
+            margin: 1.5rem auto;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.5s ease-out;
         }
+
         .dark-theme .container {
-            background: #3a3a3a;
-            border-color: #555;
+            background: #2c3e50;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .section-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            color: #2968c8;
+            font-size: 1.25rem;
             font-weight: 600;
+            color: #034f9e;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
         }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40%;
+            height: 3px;
+            background: #258D19;
+            border-radius: 2px;
+        }
+
         .dark-theme .section-title {
-            color: #4a90e2;
-            border-bottom-color: #666;
+            color: #4aafff;
         }
+
+        /* Form Styles */
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 1.5rem;
         }
+
         label {
             display: block;
-            margin-bottom: 8px;
+            font-size: 0.75rem;
             font-weight: 500;
-            color: #444;
+            color: #6b7280;
+            margin-bottom: 0.3rem;
         }
+
         .dark-theme label {
-            color: #ccc;
+            color: #a1a1aa;
         }
+
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 0.5rem;
+            border: 1px solid #e6f0ff;
             border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background: #f9f9f9;
+            font-size: 0.75rem;
+            background: #f8faff;
+            transition: all 0.3s ease;
         }
+
         .dark-theme input, .dark-theme select, .dark-theme textarea {
-            background: #4a4a4a;
-            border-color: #666;
-            color: #e0e0e0;
+            background: #34495e;
+            border-color: #34495e;
+            color: #d1d8e0;
         }
+
         input:focus, select:focus, textarea:focus {
+            border-color: #034f9e;
+            box-shadow: 0 0 6px rgba(3, 79, 158, 0.2);
             outline: none;
-            border-color: #28a745;
-            box-shadow: 0 0 6px rgba(40, 167, 69, 0.2);
         }
+
         textarea {
             resize: vertical;
             min-height: 100px;
         }
+
+        /* Table Styles */
         .item-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+            margin-bottom: 1rem;
         }
+
         .item-table th, .item-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 0.5rem 0.75rem;
             text-align: left;
+            font-size: 0.75rem;
         }
-        .dark-theme .item-table th, .dark-theme .item-table td {
-            border-color: #666;
-        }
+
         .item-table th {
-            background: #f1f1f1;
+            background: #034f9e;
+            color: #fff;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
+
         .dark-theme .item-table th {
-            background: #555;
+            background: #023e8a;
         }
+
+        .item-table tr {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .item-table tr:hover {
+            background: #f8faff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(3, 79, 158, 0.1);
+        }
+
+        .dark-theme .item-table tr {
+            background: #34495e;
+        }
+
+        .dark-theme .item-table tr:hover {
+            background: #3e5a75;
+        }
+
         .item-table input {
             width: 100%;
-            padding: 8px;
+            padding: 0.5rem;
             border: none;
             background: transparent;
+            font-size: 0.75rem;
+            color: #1a1a1a;
         }
+
         .dark-theme .item-table input {
-            color: #e0e0e0;
+            color: #d1d8e0;
         }
+
         .item-table input:focus {
-            outline: none;
-            border: 1px solid #28a745;
+            border: 1px solid #034f9e;
             border-radius: 4px;
+            outline: none;
         }
+
+        /* Buttons */
         .btn {
-            background: #2968c8;
-            color: white;
+            background: #034f9e;
+            color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-weight: 500;
+            gap: 0.5rem;
         }
+
         .btn:hover {
-            background: #1d4f9e;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-            transform: translateY(-1px);
+            background: #023e8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(3, 79, 158, 0.25);
         }
+
         .btn-secondary {
-            background: #6c757d;
+            background: #258D19;
         }
+
         .btn-secondary:hover {
-            background: #5a6268;
+            background: #1e7214;
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
         }
+
         .btn-danger {
             background: #dc3545;
         }
+
         .btn-danger:hover {
             background: #c82333;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.25);
         }
+
         .button-group {
             display: flex;
-            gap: 15px;
             justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
             flex-wrap: wrap;
-            margin-top: 20px;
         }
+
+        /* Alerts */
         .alert {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 6px;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
             z-index: 1001;
-            font-size: 15px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: slideInRight 0.3s ease-out;
         }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .dark-theme .alert-success {
-            background: #28a745;
+            background: #258D19;
             color: #fff;
         }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .dark-theme .alert-success {
+            background: #3db32e;
         }
-        .dark-theme .alert-error {
+
+        .alert-error {
             background: #dc3545;
             color: #fff;
         }
+
+        .dark-theme .alert-error {
+            background: #e04b59;
+        }
+
+        /* Form Row */
         .form-row {
             display: flex;
-            gap: 15px;
+            gap: 1rem;
             align-items: flex-end;
         }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
-                margin: 15px;
-                padding: 20px;
+                margin: 1rem;
+                padding: 1rem;
             }
             .button-group {
                 justify-content: center;
             }
             .item-table th, .item-table td {
-                padding: 8px;
-                font-size: 14px;
+                padding: 0.4rem;
+                font-size: 0.65rem;
             }
             .form-row {
                 flex-direction: column;
@@ -237,9 +346,14 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">Wakal Blitz<span>by: Soluciones Láser</span></div>
-    </div>
+    <header class="navbar">
+        <div class="logo-section">
+            <button class="back-btn" id="backButton">←</button>
+            <div class="logo">
+                <img src="Logo E-facture-02.png" alt="Logo E-Facture">
+            </div>
+        </div>
+    </header>
 
     <div class="container">
         <h2 class="section-title" id="pageTitle">Nuevo Documento</h2>
@@ -377,7 +491,7 @@
         </div>
 
         <div class="button-group">
-            <button class="btn btn-secondary" id="backButton">
+            <button class="btn btn-secondary" id="backButtonDashboard">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
                 </svg>
@@ -444,7 +558,7 @@
             if (type === 'cedula') {
                 return `V-${cleanNumber}`;
             } else if (type === 'rif') {
-                const checkDigit = Math.floor(Math.random() * 10); // Simulación de dígito verificador
+                const checkDigit = Math.floor(Math.random() * 10);
                 return `J-${cleanNumber}-${checkDigit}`;
             } else if (type === 'extranjero') {
                 return `E-${cleanNumber}`;
@@ -464,7 +578,7 @@
                 subtotalBs += subtotal;
             });
 
-            const taxBs = subtotalBs * 0.16; // IVA 16%
+            const taxBs = subtotalBs * 0.16;
             const totalBs = subtotalBs + taxBs;
             const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
             const totalUsd = totalBs / exchangeRate;
@@ -484,21 +598,18 @@
             const clientEmails = document.getElementById('clientEmails').value.trim();
             const items = Array.from(document.querySelectorAll('#itemTableBody tr'));
 
-            // Validar número de identificación
             const formattedId = formatClientId(clientIdType, clientIdNumber);
             if (!formattedId) {
                 showAlert('El número de identificación debe tener entre 7 y 8 dígitos numéricos.', 'error');
                 return false;
             }
 
-            // Validar teléfono
             const phoneRegex = /^(\+58|0)[0-9]{10}$/;
             if (!phoneRegex.test(clientPhone)) {
                 showAlert('El teléfono debe tener un formato válido, ej. +584121234567.', 'error');
                 return false;
             }
 
-            // Validar correos electrónicos
             const emailArray = clientEmails.split(',').map(email => email.trim()).filter(email => email);
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             for (const email of emailArray) {
@@ -512,7 +623,6 @@
                 return false;
             }
 
-            // Validar ítems
             if (items.length === 0) {
                 showAlert('Debe agregar al menos un ítem al documento.', 'error');
                 return false;
@@ -622,7 +732,6 @@
                     document.getElementById('date').value = editOrder.date;
                     document.getElementById('clientName').value = editOrder.clientName;
 
-                    // Extraer el tipo y número de identificación
                     const [idPrefix, idNumber] = editOrder.clientId.split('-');
                     document.getElementById('clientIdType').value = idPrefix === 'V' ? 'cedula' : idPrefix === 'J' ? 'rif' : 'extranjero';
                     document.getElementById('clientIdNumber').value = idNumber;
@@ -633,7 +742,6 @@
                     document.getElementById('exchangeRate').value = editOrder.exchangeRate;
                     document.getElementById('paymentMethod').value = editOrder.paymentMethod;
 
-                    // Cargar ítems
                     const tbody = document.getElementById('itemTableBody');
                     tbody.innerHTML = '';
                     editOrder.items.forEach(item => {
@@ -671,10 +779,8 @@
                 document.body.classList.add('dark-theme');
             }
 
-            // Cargar pedido para edición si existe
             loadOrderForEdit();
 
-            // Generar número de documento si no se está editando
             if (!new URLSearchParams(window.location.search).get('edit')) {
                 document.getElementById('docNumber').value = generateDocNumber();
             }
@@ -732,6 +838,10 @@
             });
 
             document.getElementById('backButton').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+
+            document.getElementById('backButtonDashboard').addEventListener('click', () => {
                 window.location.href = 'dashboard.html';
             });
 
