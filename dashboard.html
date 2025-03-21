@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Plataforma</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <title>Wakal Blitz - Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -14,14 +12,15 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8;
+            background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
         body.dark-theme {
-            background-color: #2a2a2a;
-            color: #e0e0e0;
+            background-color: #333;
+            color: #f5f5f5;
         }
         .navbar {
             background-color: #2968c8;
@@ -29,7 +28,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease;
         }
         .dark-theme .navbar {
@@ -41,131 +40,234 @@
         .dark-theme .navbar:hover {
             background-color: #153e7e;
         }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background: #5a6268;
+        }
         .logo {
             display: flex;
-            flex-direction: column;
             align-items: center;
+            gap: 10px;
         }
-        .logo-image {
+        .logo img {
             height: 40px;
             width: auto;
             max-width: 150px;
+            transition: transform 0.3s ease;
+        }
+        .logo img:hover {
+            transform: scale(1.1);
         }
         .logo span {
             font-size: 14px;
             font-weight: normal;
             color: #ddd;
-            margin-top: 5px;
+            display: block;
         }
-        .user-info {
+        .nav-user {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+        }
+        .user-info {
+            margin-right: 15px;
+            font-size: 16px;
             color: #fff;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dark-theme .user-info {
+            color: #ddd;
+        }
+        .user-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s ease;
+        }
+        .dark-theme .user-pic {
+            border-color: #666;
+        }
+        .logout-btn, .user-btn, .digital-btn {
+            background: #fff;
+            color: #2968c8;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dark-theme .logout-btn, .dark-theme .user-btn, .dark-theme .digital-btn {
+            background: #ddd;
+            color: #1d4f9e;
+        }
+        .logout-btn:hover, .user-btn:hover, .digital-btn:hover {
+            background: #e6e6e6;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .dark-theme .logout-btn:hover, .dark-theme .user-btn:hover, .dark-theme .digital-btn:hover {
+            background: #ccc;
         }
         .container {
             max-width: 1200px;
-            margin: 30px auto;
-            padding: 25px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e0e0e0;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #ddd;
+            animation: fadeIn 0.5s ease-in-out;
         }
         .dark-theme .container {
-            background: #3a3a3a;
+            background: #444;
             border-color: #555;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .section-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            color: #2968c8;
-            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            color: #333;
+            transition: color 0.3s ease;
         }
         .dark-theme .section-title {
-            color: #4a90e2;
-            border-bottom-color: #666;
+            color: #f5f5f5;
+            border-bottom-color: #555;
         }
-        .stats {
+        .stats-bar {
             display: flex;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
         .stat-card {
-            background: #f9f9f9;
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             flex: 1;
             min-width: 200px;
             text-align: center;
-            border: 1px solid #ddd;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         .dark-theme .stat-card {
-            background: #4a4a4a;
-            border-color: #666;
+            background: #555;
         }
-        .stat-card h3 {
+        .stat-card h4 {
             font-size: 16px;
-            margin-bottom: 10px;
             color: #555;
+            margin-bottom: 10px;
         }
-        .dark-theme .stat-card h3 {
-            color: #ccc;
+        .dark-theme .stat-card h4 {
+            color: #ddd;
         }
         .stat-card p {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #2968c8;
         }
         .dark-theme .stat-card p {
             color: #4a90e2;
         }
-        table {
+        .invoices-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
+        .invoices-table th, .invoices-table td {
+            padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease;
         }
-        .dark-theme th, .dark-theme td {
-            border-color: #666;
+        .dark-theme .invoices-table th, .dark-theme .invoices-table td {
+            border-bottom-color: #666;
         }
-        th {
-            background: #f1f1f1;
-            font-weight: 500;
+        .invoices-table th {
+            background: #f8f9fa;
+            font-weight: 600;
         }
-        .dark-theme th {
+        .dark-theme .invoices-table th {
             background: #555;
+        }
+        .invoices-table tr:hover {
+            background-color: #f1f3f5;
+            cursor: pointer;
+        }
+        .dark-theme .invoices-table tr:hover {
+            background-color: #444;
         }
         .btn {
             background: #2968c8;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 8px 12px;
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
+            margin: 0 5px;
         }
         .btn:hover {
             background: #1d4f9e;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
         }
         .btn-secondary {
             background: #6c757d;
         }
         .btn-secondary:hover {
             background: #5a6268;
+        }
+        .btn-primary {
+            background: #28a745;
+        }
+        .btn-primary:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
         }
         .modal {
             display: none;
@@ -180,273 +282,398 @@
             align-items: center;
         }
         .modal-content {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            max-width: 90%;
-            max-height: 90vh;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
             overflow-y: auto;
             position: relative;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-in-out;
+        }
+        @keyframes slideIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
         .dark-theme .modal-content {
-            background: #3a3a3a;
+            background: #444;
         }
         .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 20px;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
             cursor: pointer;
-            color: #666;
+            z-index: 1001;
+            transition: all 0.3s ease;
         }
-        .dark-theme .modal-close {
-            color: #ccc;
+        .modal-close:hover {
+            background: #c82333;
         }
-        .modal-buttons {
+        .invoice-details {
+            font-size: 12px;
+        }
+        .invoice-details h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .dark-theme .invoice-details h3 {
+            color: #f5f5f5;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .invoice-details th, .invoice-details td {
+            padding: 5px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
+            border-color: #666;
+        }
+        .two-column-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .two-column-table th, .two-column-table td {
+            padding: 5px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+        .dark-theme .two-column-table th, .dark-theme .two-column-table td {
+            border-color: #666;
+        }
+        .invoice-header {
+            margin-bottom: 10px;
+        }
+        .template-1 .invoice-header {
+            text-align: center;
+        }
+        .template-2 .invoice-header {
             display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 20px;
-            flex-wrap: wrap;
+            justify-content: space-between;
         }
-        .modal-table {
-            margin: 20px 0;
+        .template-3 .invoice-header {
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .dark-theme .template-3 .invoice-header {
+            background: #555;
+        }
+        .invoice-footer {
+            margin-top: 10px;
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 5px;
+        }
+        .dark-theme .invoice-footer {
+            color: #ddd;
+            border-top-color: #666;
         }
         .alert {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 20px;
-            border-radius: 6px;
+            padding: 15px;
+            border-radius: 4px;
             z-index: 1001;
-            font-size: 15px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: slideInAlert 0.3s ease-in-out;
         }
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        @keyframes slideInAlert {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-        .dark-theme .alert-success {
-            background: #28a745;
+        .alert-info {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        .dark-theme .alert-info {
+            background: #4a90e2;
             color: #fff;
+            border-color: #357abd;
         }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
         }
-        .dark-theme .alert-error {
-            background: #dc3545;
+        .dark-theme .alert-warning {
+            background: #e0a800;
             color: #fff;
+            border-color: #c69500;
         }
+        /* Nuevos estilos para los filtros */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .dark-theme .filter-bar {
+            background: #555;
+            border-color: #666;
+        }
+        .filter-bar label {
+            font-size: 14px;
+            margin-right: 5px;
+            color: #555;
+        }
+        .dark-theme .filter-bar label {
+            color: #ddd;
+        }
+        .filter-bar input, .filter-bar select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        .filter-bar input:focus, .filter-bar select:focus {
+            border-color: #2968c8;
+            outline: none;
+        }
+        .dark-theme .filter-bar input, .dark-theme .filter-bar select {
+            background: #666;
+            color: #fff;
+            border-color: #777;
+        }
+        /* Estilos para el registro de actividades */
         .activity-log {
             margin-top: 30px;
         }
         .activity-log ul {
             list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .dark-theme .activity-log ul {
+            border-color: #666;
         }
         .activity-log li {
             padding: 8px 0;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
             font-size: 14px;
+            color: #555;
+            transition: background-color 0.3s ease;
+        }
+        .activity-log li:hover {
+            background-color: #f1f3f5;
         }
         .dark-theme .activity-log li {
-            border-bottom-color: #666;
+            color: #ddd;
+            border-bottom-color: #555;
+        }
+        .dark-theme .activity-log li:hover {
+            background-color: #444;
         }
         @media (max-width: 768px) {
-            .container {
-                margin: 15px;
-                padding: 20px;
-            }
-            .stats {
+            .stats-bar {
                 flex-direction: column;
-                gap: 15px;
             }
-            .stat-card {
-                min-width: 100%;
+            .invoices-table, .two-column-table {
+                width: 100%;
             }
-            table th, table td {
-                padding: 8px;
-                font-size: 14px;
+            .pagination {
+                flex-direction: column;
             }
-            .modal-content {
-                padding: 15px;
-                max-width: 95%;
-            }
-            .modal-buttons {
+            .action-bar {
                 justify-content: center;
+            }
+            .nav-user {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .filter-bar {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">
-            <img src="Logotipo E-facture-02.png" alt="Logo de la plataforma" class="logo-image">
-            <span>by: Soluciones Láser</span>
+        <div class="logo-section">
+            <button class="back-btn" id="backButton">←</button>
+            <div class="logo">
+                <img src="Logotipo E-facture-02.png" alt="Logo Wakal Blitz">
+                <span>by: Soluciones Láser</span>
+            </div>
         </div>
-        <div class="user-info">
-            <span id="userName"></span>
-            <button class="btn btn-secondary" id="logoutButton">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                </svg>
-                Cerrar Sesión
-            </button>
+        <div class="nav-user">
+            <div class="user-info">
+                <img src="https://via.placeholder.com/30" alt="Foto de perfil" class="user-pic" id="userPic">
+                <span id="userDisplayName">Cargando...</span>
+            </div>
+            <button class="digital-btn" id="digitalButton">Mi Factura Digital</button>
+            <button class="user-btn" id="userButton">Usuario</button>
+            <button class="logout-btn" id="logoutButton">Cerrar sesión</button>
         </div>
     </div>
-
     <div class="container">
-        <h2 class="section-title">Estadísticas</h2>
-        <div class="stats">
+        <h2 class="section-title">Panel de control - Mis documentos</h2>
+        <div class="stats-bar">
             <div class="stat-card">
-                <h3>Total de Documentos</h3>
-                <p id="totalDocs">0</p>
+                <h4>Documentos consumidos</h4>
+                <p id="usedDocuments">0</p>
             </div>
             <div class="stat-card">
-                <h3>Documentos Consumidos</h3>
-                <p id="consumedDocs">0</p>
+                <h4>Documentos disponibles</h4>
+                <p id="availableDocuments">100</p>
             </div>
             <div class="stat-card">
-                <h3>Documentos Disponibles</h3>
-                <p id="availableDocs">0</p>
+                <h4>Último número de control</h4>
+                <p id="lastControlNumber">00-00000000</p>
             </div>
         </div>
+        <div class="action-bar">
+            <button class="btn btn-primary" id="generateOrderButton">Generar pedido</button>
+        </div>
 
-        <h2 class="section-title">Pedidos sin Confirmar</h2>
-        <table>
+        <!-- Sección de Pedidos sin confirmar -->
+        <h2 class="section-title">Pedidos sin confirmar</h2>
+        <div class="filter-bar">
+            <div>
+                <label for="pendingDateFilter">Filtrar por fecha:</label>
+                <input type="date" id="pendingDateFilter">
+            </div>
+            <div>
+                <label for="pendingClientFilter">Filtrar por cliente:</label>
+                <input type="text" id="pendingClientFilter" placeholder="Nombre del cliente">
+            </div>
+            <div>
+                <label for="pendingDocTypeFilter">Tipo de documento:</label>
+                <select id="pendingDocTypeFilter">
+                    <option value="">Todos</option>
+                    <option value="factura">Factura</option>
+                    <option value="nota-entrega">Nota de Entrega</option>
+                </select>
+            </div>
+        </div>
+        <table class="invoices-table">
             <thead>
                 <tr>
+                    <th>Tipo de Documento</th>
                     <th>Nº Documento</th>
                     <th>Cliente</th>
                     <th>Fecha</th>
                     <th>Total (Bs)</th>
                     <th>Total (USD)</th>
-                    <th>Acción</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody id="pendingOrdersBody"></tbody>
+            <tbody id="pendingOrdersTableBody"></tbody>
         </table>
+        <div class="pagination" id="pendingPagination">
+            <button class="btn btn-secondary" id="prevPendingPage" disabled>Anterior</button>
+            <span id="pendingPageInfo">Página 1</span>
+            <button class="btn btn-secondary" id="nextPendingPage">Siguiente</button>
+        </div>
 
-        <h2 class="section-title">Facturas Emitidas</h2>
-        <table>
+        <!-- Sección de Facturas emitidas -->
+        <h2 class="section-title">Facturas emitidas</h2>
+        <div class="filter-bar">
+            <div>
+                <label for="invoicesDateFilter">Filtrar por fecha:</label>
+                <input type="date" id="invoicesDateFilter">
+            </div>
+            <div>
+                <label for="invoicesClientFilter">Filtrar por cliente:</label>
+                <input type="text" id="invoicesClientFilter" placeholder="Nombre del cliente">
+            </div>
+            <div>
+                <label for="invoicesDocTypeFilter">Tipo de documento:</label>
+                <select id="invoicesDocTypeFilter">
+                    <option value="">Todos</option>
+                    <option value="factura">Factura</option>
+                    <option value="nota-entrega">Nota de Entrega</option>
+                </select>
+            </div>
+        </div>
+        <table class="invoices-table">
             <thead>
                 <tr>
+                    <th>Tipo de Documento</th>
                     <th>Nº Documento</th>
                     <th>Nº Control</th>
                     <th>Cliente</th>
                     <th>Fecha</th>
                     <th>Total (Bs)</th>
                     <th>Total (USD)</th>
-                    <th>Acción</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody id="invoicesBody"></tbody>
+            <tbody id="invoicesTableBody"></tbody>
         </table>
-
-        <div class="button-group">
-            <button class="btn" id="newOrderButton">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                </svg>
-                Nuevo Documento
-            </button>
+        <div class="pagination" id="invoicesPagination">
+            <button class="btn btn-secondary" id="prevPage" disabled>Anterior</button>
+            <span id="pageInfo">Página 1</span>
+            <button class="btn btn-secondary" id="nextPage">Siguiente</button>
         </div>
 
+        <!-- Sección de Registro de Actividades -->
         <div class="activity-log">
             <h2 class="section-title">Registro de Actividades</h2>
             <ul id="activityList"></ul>
         </div>
     </div>
-
-    <div class="modal" id="viewModal">
+    <div class="modal" id="detailsModal">
         <div class="modal-content">
-            <button class="modal-close" id="viewModalClose">&times;</button>
-            <h2 class="section-title">Detalles del Documento</h2>
-            <p><strong>Nº Documento:</strong> <span id="modalDocNumber"></span></p>
-            <p><strong>Cliente:</strong> <span id="modalClientName"></span></p>
-            <p><strong>RIF/Cédula:</strong> <span id="modalClientId"></span></p>
-            <p><strong>Dirección:</strong> <span id="modalClientAddress"></span></p>
-            <p><strong>Teléfono:</strong> <span id="modalClientPhone"></span></p>
-            <p><strong>Correos:</strong> <span id="modalClientEmails"></span></p>
-            <p><strong>Fecha:</strong> <span id="modalDate"></span></p>
-            <p><strong>Subtotal (Bs):</strong> <span id="modalSubtotalBs"></span></p>
-            <p><strong>IVA (Bs):</strong> <span id="modalTaxBs"></span></p>
-            <p><strong>Total (Bs):</strong> <span id="modalTotalBs"></span></p>
-            <p><strong>Total (USD):</strong> <span id="modalTotalUsd"></span></p>
-            <p><strong>Método de Pago:</strong> <span id="modalPaymentMethod"></span></p>
-            <table class="modal-table">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Descripción</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario (Bs)</th>
-                        <th>Subtotal (Bs)</th>
-                    </tr>
-                </thead>
-                <tbody id="modalItemsBody"></tbody>
-            </table>
-            <div class="modal-buttons">
-                <button class="btn" id="editOrderButton">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                    </svg>
-                    Editar Documento
-                </button>
-                <button class="btn" id="confirmPaymentButton">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
-                    </svg>
-                    Confirmar Pago
-                </button>
-                <button class="btn" id="generateInvoiceButton">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3z"/>
-                    </svg>
-                    Generar Factura
-                </button>
+            <span class="modal-close" id="modalClose">×</span>
+            <div class="invoice-details" id="invoiceDetails"></div>
+            <div style="text-align: right; margin-top: 10px;" id="modalActions">
+                <!-- Los botones se generarán dinámicamente según el estado -->
             </div>
         </div>
     </div>
 
-    <div class="modal" id="generateInvoiceModal">
-        <div class="modal-content">
-            <button class="modal-close" id="generateInvoiceModalClose">&times;</button>
-            <h2 class="section-title">Confirmar Generación de Factura</h2>
-            <p>¿Está seguro de que desea generar la factura para este documento? Esta acción no se puede deshacer.</p>
-            <div class="modal-buttons">
-                <button class="btn btn-secondary" id="continueEditing">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-                    </svg>
-                    Continuar Editando
-                </button>
-                <button class="btn" id="confirmGenerateInvoice">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3z"/>
-                    </svg>
-                    Generar Factura
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Incluir jsPDF para generación de PDFs desde el repositorio local -->
+    <script src="./jspdf.umd.min.js"></script>
+    <script src="./jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        const { jsPDF } = window.jspdf;
+        // Variables globales
+        const ORDERS_PER_PAGE = 3;
+        const MAX_DOCUMENTS = 100;
+        let currentPendingPage = 1;
+        let currentInvoicesPage = 1;
+
+        // Funciones de utilidad
+        function formatCurrency(amount) {
+            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
 
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
             alertDiv.textContent = message;
             document.body.appendChild(alertDiv);
-            setTimeout(() => alertDiv.remove(), 3000);
+            setTimeout(() => alertDiv.remove(), 5000);
         }
 
         function loadUserData() {
@@ -455,96 +682,450 @@
                 window.location.href = 'index.html';
                 return null;
             }
+            document.getElementById('userDisplayName').textContent = currentUser.companyName;
+            document.getElementById('userPic').src = currentUser.profilePic || 'https://via.placeholder.com/30';
             return currentUser;
         }
 
+        function getUserOrders(currentUser) {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            return orders.filter(order => order.userRif === currentUser.rif);
+        }
+
+        function loadStats(userOrders, currentUser) {
+            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+            const usedDocuments = invoicedOrders.length;
+            const availableDocuments = MAX_DOCUMENTS - usedDocuments;
+            const lastControlNumber = usedDocuments > 0 ? invoicedOrders[invoicedOrders.length - 1].controlNumber : `00-${String(0).padStart(8, '0')}`;
+            document.getElementById('usedDocuments').textContent = usedDocuments;
+            document.getElementById('availableDocuments').textContent = availableDocuments > 0 ? availableDocuments : '0 (Límite alcanzado)';
+            document.getElementById('lastControlNumber').textContent = lastControlNumber;
+            if (availableDocuments <= 0) {
+                showAlert('Has alcanzado el límite de 100 documentos. Contacta soporte para adquirir más.', 'warning');
+            }
+            return availableDocuments;
+        }
+
+        function getDocTypeText(docType) {
+            switch (docType) {
+                case 'factura': return 'Factura';
+                case 'nota-entrega': return 'Nota de Entrega';
+                default: return docType;
+            }
+        }
+
+        // Nueva función para agregar entradas al registro de actividades
         function addActivityEntry(currentUser, message) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const timestamp = new Date().toLocaleString('es-ES');
             activityLog.unshift(`${timestamp}: ${message}`);
-            if (activityLog.length > 10) activityLog.pop();
+            if (activityLog.length > 20) activityLog.pop();
             localStorage.setItem(`activity_${currentUser.rif}`, JSON.stringify(activityLog));
+            renderActivityLog(currentUser);
         }
 
-        function renderPendingOrders(orders, currentUser) {
-            const pendingOrdersBody = document.getElementById('pendingOrdersBody');
-            pendingOrdersBody.innerHTML = '';
-            const pendingOrders = orders.filter(order => order.status === 'pending' && order.userRif === currentUser.rif);
-            pendingOrders.forEach(order => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${order.docNumber}</td>
-                    <td>${order.clientName}</td>
-                    <td>${order.date}</td>
-                    <td>${order.totalBs.toFixed(2)} Bs</td>
-                    <td>${order.totalUsd.toFixed(2)} USD</td>
-                    <td>
-                        <button class="btn btn-view" data-id="${order.docNumber}">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                            </svg>
-                            Ver
-                        </button>
-                    </td>
-                `;
-                pendingOrdersBody.appendChild(row);
+        // Nueva función para renderizar el registro de actividades
+        function renderActivityLog(currentUser) {
+            const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+            activityLog.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = entry;
+                activityList.appendChild(li);
             });
         }
 
-        function renderInvoices(orders, currentUser) {
-            const invoicesBody = document.getElementById('invoicesBody');
-            invoicesBody.innerHTML = '';
-            const invoices = orders.filter(order => order.status === 'invoiced' && order.userRif === currentUser.rif);
-            invoices.forEach(order => {
+        // Nueva función para filtrar pedidos
+        function filterOrders(orders, dateFilter, clientFilter, docTypeFilter) {
+            return orders.filter(order => {
+                const matchesDate = dateFilter ? order.date === dateFilter : true;
+                const matchesClient = clientFilter ? order.clientName.toLowerCase().includes(clientFilter.toLowerCase()) : true;
+                const matchesDocType = docTypeFilter ? order.docType === docTypeFilter : true;
+                return matchesDate && matchesClient && matchesDocType;
+            });
+        }
+
+        function loadPendingOrdersTable(userOrders) {
+            const dateFilter = document.getElementById('pendingDateFilter').value;
+            const clientFilter = document.getElementById('pendingClientFilter').value;
+            const docTypeFilter = document.getElementById('pendingDocTypeFilter').value;
+
+            let pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            pendingOrders = filterOrders(pendingOrders, dateFilter, clientFilter, docTypeFilter);
+
+            const tbody = document.getElementById('pendingOrdersTableBody');
+            tbody.innerHTML = '';
+            const start = (currentPendingPage - 1) * ORDERS_PER_PAGE;
+            const end = start + ORDERS_PER_PAGE;
+            const paginatedOrders = pendingOrders.slice(start, end);
+
+            paginatedOrders.forEach((order, index) => {
+                const globalIndex = start + index;
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>${getDocTypeText(order.docType)}</td>
+                    <td>${order.docNumber}</td>
+                    <td>${order.clientName}</td>
+                    <td>${order.date}</td>
+                    <td>${formatCurrency(order.totalBs)}</td>
+                    <td>${formatCurrency(order.totalUsd)}</td>
+                    <td>
+                        <button class="btn" onclick="showOrderDetails(${globalIndex}, 'pending')">Ver</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updatePendingPagination(pendingOrders.length);
+        }
+
+        function updatePendingPagination(totalOrders) {
+            const totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
+            document.getElementById('pendingPageInfo').textContent = `Página ${currentPendingPage} de ${totalPages || 1}`;
+            document.getElementById('prevPendingPage').disabled = currentPendingPage === 1;
+            document.getElementById('nextPendingPage').disabled = currentPendingPage === totalPages || totalPages === 0;
+        }
+
+        function loadInvoicesTable(userOrders) {
+            const dateFilter = document.getElementById('invoicesDateFilter').value;
+            const clientFilter = document.getElementById('invoicesClientFilter').value;
+            const docTypeFilter = document.getElementById('invoicesDocTypeFilter').value;
+
+            let invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+            invoicedOrders = filterOrders(invoicedOrders, dateFilter, clientFilter, docTypeFilter);
+
+            const tbody = document.getElementById('invoicesTableBody');
+            tbody.innerHTML = '';
+            const start = (currentInvoicesPage - 1) * ORDERS_PER_PAGE;
+            const end = start + ORDERS_PER_PAGE;
+            const paginatedOrders = invoicedOrders.slice(start, end);
+
+            paginatedOrders.forEach((order, index) => {
+                const globalIndex = start + index;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${getDocTypeText(order.docType)}</td>
                     <td>${order.docNumber}</td>
                     <td>${order.controlNumber}</td>
                     <td>${order.clientName}</td>
                     <td>${order.date}</td>
-                    <td>${order.totalBs.toFixed(2)} Bs</td>
-                    <td>${order.totalUsd.toFixed(2)} USD</td>
+                    <td>${formatCurrency(order.totalBs)}</td>
+                    <td>${formatCurrency(order.totalUsd)}</td>
                     <td>
-                        <button class="btn btn-view" data-id="${order.docNumber}">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                            </svg>
-                            Ver
-                        </button>
+                        <button class="btn" onclick="showOrderDetails(${globalIndex}, 'invoiced')">Ver</button>
+                        <button class="btn btn-secondary" onclick="downloadOrderAsPdf(${globalIndex}, 'invoiced')">Descargar (PDF)</button>
+                        <button class="btn" onclick="sendOrderByEmail(${globalIndex}, 'invoiced')">Enviar</button>
                     </td>
                 `;
-                invoicesBody.appendChild(row);
+                tbody.appendChild(row);
+            });
+
+            updateInvoicesPagination(invoicedOrders.length);
+        }
+
+        function updateInvoicesPagination(totalOrders) {
+            const totalPages = Math.ceil(totalOrders / ORDERS_PER_PAGE);
+            document.getElementById('pageInfo').textContent = `Página ${currentInvoicesPage} de ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentInvoicesPage === 1;
+            document.getElementById('nextPage').disabled = currentInvoicesPage === totalPages || totalPages === 0;
+        }
+
+        function showOrderDetails(index, type) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const orders = type === 'pending' ? userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed') : userOrders.filter(order => order.status === 'invoiced');
+            const order = orders[index];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const details = document.getElementById('invoiceDetails');
+            const modalActions = document.getElementById('modalActions');
+            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
+            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
+            let templateHtml = '';
+
+            if (selectedTemplate === '1') {
+                templateHtml = `
+                    <div class="template-1">
+                        <div class="invoice-header">
+                            <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <h2>${currentUser.companyName}</h2>
+                            <p>RIF: ${currentUser.rif}</p>
+                            <p>Direc: ${currentUser.address || '-'}</p>
+                            <p>Tel: ${currentUser.phone || '-'}</p>
+                        </div>
+                        <h3>${getDocTypeText(order.docType)}</h3>
+                        <p>Tipo: ${getDocTypeText(order.docType)}</p>
+                        <p>Nº Doc: ${order.docNumber}</p>
+                        ${order.status === 'invoiced' ? `<p>Nº Ctrl: ${order.controlNumber}</p>` : ''}
+                        <p>Fecha: ${order.date}</p>
+                        <div class="invoice-details">
+                            <h3>Cliente</h3>
+                            <p>Nombre: ${order.clientName}</p>
+                            <p>RIF/Céd: ${order.clientId}</p>
+                            <p>Direc: ${order.clientAddress || '-'}</p>
+                            <p>Tel: ${order.clientPhone || '-'}</p>
+                            <p>Correos: ${order.clientEmails.length > 0 ? order.clientEmails.join(', ') : '-'}</p>
+                        </div>
+                `;
+            } else if (selectedTemplate === '2') {
+                templateHtml = `
+                    <div class="template-2">
+                        <div class="invoice-header">
+                            <div>
+                                <img src="${logo}" alt="Logo" style="width: 40px; height: 40px; float: left; margin-right: 5px;">
+                                <h2>${currentUser.companyName}</h2>
+                                <p>RIF: ${currentUser.rif}</p>
+                            </div>
+                            <div>
+                                <h3>${getDocTypeText(order.docType)}</h3>
+                                <p>Tipo: ${getDocTypeText(order.docType)}</p>
+                                <p>Nº Doc: ${order.docNumber}</p>
+                                ${order.status === 'invoiced' ? `<p>Nº Ctrl: ${order.controlNumber}</p>` : ''}
+                                <p>Fecha: ${order.date}</p>
+                            </div>
+                        </div>
+                        <div class="invoice-details">
+                            <h3>Cliente</h3>
+                            <p>Nombre: ${order.clientName}</p>
+                            <p>RIF/Céd: ${order.clientId}</p>
+                            <p>Direc: ${order.clientAddress || '-'}</p>
+                            <p>Tel: ${order.clientPhone || '-'}</p>
+                            <p>Correos: ${order.clientEmails.length > 0 ? order.clientEmails.join(', ') : '-'}</p>
+                        </div>
+                `;
+            } else if (selectedTemplate === '3') {
+                templateHtml = `
+                    <div class="template-3">
+                        <div class="invoice-header">
+                            <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <h2>${currentUser.companyName}</h2>
+                            <p>RIF: ${currentUser.rif}</p>
+                            <p>Direc: ${currentUser.address || '-'}</p>
+                            <p>Tel: ${currentUser.phone || '-'}</p>
+                        </div>
+                        <h3>${getDocTypeText(order.docType)}</h3>
+                        <p>Tipo: ${getDocTypeText(order.docType)}</p>
+                        <p>Nº Doc: ${order.docNumber}</p>
+                        ${order.status === 'invoiced' ? `<p>Nº Ctrl: ${order.controlNumber}</p>` : ''}
+                        <p>Fecha: ${order.date}</p>
+                        <div class="invoice-details">
+                            <h3>Cliente</h3>
+                            <p>Nombre: ${order.clientName}</p>
+                            <p>RIF/Céd: ${order.clientId}</p>
+                            <p>Direc: ${order.clientAddress || '-'}</p>
+                            <p>Tel: ${order.clientPhone || '-'}</p>
+                            <p>Correos: ${order.clientEmails.length > 0 ? order.clientEmails.join(', ') : '-'}</p>
+                        </div>
+                `;
+            }
+
+            templateHtml += `
+                <table class="invoice-details">
+                    <thead>
+                        <tr>
+                            <th>Cód.</th>
+                            <th>Desc.</th>
+                            <th>Cant.</th>
+                            <th>Prec. Unit. (Bs)</th>
+                            <th>Subtotal (Bs)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${order.items.map(item => `
+                            <tr>
+                                <td>${item.code || '-'}</td>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td>${formatCurrency(item.price)}</td>
+                                <td>${formatCurrency(item.subtotal)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <table class="two-column-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Bs</th>
+                            <th>USD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><th>Subtotal</th><td>${formatCurrency(order.subtotalBs)}</td><td>${formatCurrency(order.subtotalUsd)}</td></tr>
+                        <tr><th>Mto. Exento</th><td>${formatCurrency(order.exemptAmountBs)}</td><td>${formatCurrency(order.exemptAmountUsd)}</td></tr>
+                        <tr><th>Base Imp.</th><td>${formatCurrency(order.taxableBaseBs)}</td><td>${formatCurrency(order.taxableBaseUsd)}</td></tr>
+                        <tr><th>IVA (${order.alicuota}%)</th><td>${formatCurrency(order.taxBs)}</td><td>${formatCurrency(order.taxUsd)}</td></tr>
+                        <tr><th>IGTF (3%)</th><td>${formatCurrency(order.igtfBs)}</td><td>${formatCurrency(order.igtfUsd)}</td></tr>
+                        <tr><th>Total</th><td>${formatCurrency(order.totalBs)}</td><td>${formatCurrency(order.totalUsd)}</td></tr>
+                    </tbody>
+                </table>
+                <p>Mét. Pago: ${order.paymentMethod}</p>
+                <p>Tasa: ${order.exchangeRate} Bs/USD</p>
+                ${order.status === 'invoiced' ? `
+                    <div class="invoice-footer">
+                        <p>Providencia SNAT/2024/000102 (17/10/2024), SOLUCIONES LASER, CA (RIF: J-003629162), Control: ${order.controlNumber}, Fecha: ${order.date}</p>
+                    </div>
+                ` : ''}
+            </div>`;
+
+            details.innerHTML = templateHtml;
+
+            // Generar botones según el estado
+            if (type === 'pending') {
+                if (order.status === 'pending') {
+                    modalActions.innerHTML = `
+                        <button class="btn" onclick="confirmPayment(${index})">Confirmar pago</button>
+                        <button class="btn btn-secondary" onclick="editOrder(${index})">Editar pedido</button>
+                    `;
+                } else if (order.status === 'confirmed') {
+                    modalActions.innerHTML = `
+                        <button class="btn btn-primary" onclick="generateInvoice(${index})">Generar factura</button>
+                    `;
+                }
+            } else {
+                modalActions.innerHTML = `
+                    <button class="btn btn-secondary" onclick="downloadOrderAsPdf(${index}, 'invoiced')">Descargar (PDF)</button>
+                    <button class="btn" onclick="sendOrderByEmail(${index}, 'invoiced')">Enviar</button>
+                    <button class="btn btn-danger" onclick="cancelInvoice(${index})">Anular factura</button>
+                `;
+            }
+
+            document.getElementById('detailsModal').style.display = 'flex';
+            addActivityEntry(currentUser, `Visualizó detalles del documento ${order.docNumber} (${type === 'pending' ? 'pendiente' : 'factura emitida'})`);
+        }
+
+        function confirmPayment(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = pendingOrders[index];
+            const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+            const globalIndex = allOrders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            allOrders[globalIndex].status = 'confirmed';
+            localStorage.setItem('orders', JSON.stringify(allOrders));
+
+            showOrderDetails(index, 'pending');
+            loadPendingOrdersTable(userOrders);
+            addActivityEntry(currentUser, `Confirmó el pago del documento ${order.docNumber}`);
+        }
+
+        function editOrder(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = pendingOrders[index];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            localStorage.setItem('editOrder', JSON.stringify(order));
+            window.location.href = `new-invoice.html?edit=${order.docNumber}`;
+            addActivityEntry(currentUser, `Inició la edición del documento ${order.docNumber}`);
+        }
+
+        function generateInvoice(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = pendingOrders[index];
+            const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+            const globalIndex = allOrders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            // Generar número de control
+            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+            const nextControlNumber = invoicedOrders.length + 1;
+            const controlNumber = `00-${String(nextControlNumber).padStart(8, '0')}`;
+
+            allOrders[globalIndex].status = 'invoiced';
+            allOrders[globalIndex].controlNumber = controlNumber;
+            localStorage.setItem('orders', JSON.stringify(allOrders));
+
+            document.getElementById('detailsModal').style.display = 'none';
+            loadStats(userOrders, currentUser);
+            loadPendingOrdersTable(userOrders);
+            loadInvoicesTable(userOrders);
+            showAlert('Factura generada exitosamente.', 'info');
+            addActivityEntry(currentUser, `Generó factura para el documento ${order.docNumber}, Nº Control: ${controlNumber}`);
+        }
+
+        // Nueva función para anular facturas
+        function cancelInvoice(index) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+            const order = invoicedOrders[index];
+            const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
+            const globalIndex = allOrders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (confirm(`¿Está seguro de que desea anular la factura ${order.docNumber}? Esta acción no se puede deshacer.`)) {
+                allOrders[globalIndex].status = 'cancelled';
+                localStorage.setItem('orders', JSON.stringify(allOrders));
+                document.getElementById('detailsModal').style.display = 'none';
+                loadStats(userOrders, currentUser);
+                loadInvoicesTable(userOrders);
+                showAlert('Factura anulada exitosamente.', 'info');
+                addActivityEntry(currentUser, `Anuló la factura ${order.docNumber}, Nº Control: ${order.controlNumber}`);
+            }
+        }
+
+        async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.src = url;
+
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    const base64 = dataUrl.split(',')[1];
+                    resolve(base64);
+                };
+
+                img.onerror = (error) => {
+                    console.error('Error al cargar la imagen para redimensionar:', error);
+                    reject(error);
+                };
             });
         }
 
-        function generateControlNumber(orders, userRif) {
-            const userOrders = orders.filter(order => order.userRif === userRif && order.controlNumber);
-            const controlCount = userOrders.length + 1;
-            return `00-${String(controlCount).padStart(8, '0')}`;
-        }
-
-        function formatCurrency(amount) {
-            return amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-        }
-
-        function generateInvoice(docNumber) {
-            const currentUser = loadUserData();
-            if (!currentUser) return;
-
-            let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            const order = orders.find(o => o.docNumber === docNumber && o.userRif === currentUser.rif);
-            if (!order) {
-                showAlert('No se encontró el documento para generar la factura.', 'error');
-                return;
+        async function loadImageAsBase64(url) {
+            try {
+                const base64 = await resizeImage(url, 20, 20, 0.7);
+                return base64;
+            } catch (error) {
+                console.error('Error al cargar y redimensionar la imagen:', error);
+                return null;
             }
+        }
 
-            order.status = 'invoiced';
-            order.controlNumber = generateControlNumber(orders, currentUser.rif);
-            localStorage.setItem('orders', JSON.stringify(orders));
+        async function downloadOrderAsPdf(index, type) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const orders = type === 'invoiced' ? userOrders.filter(order => order.status === 'invoiced') : userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = orders[index];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
+            const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
 
-            const templateId = localStorage.getItem('selectedTemplate') || 1;
+            const logoBase64 = await loadImageAsBase64(logoUrl);
+
+            const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
@@ -553,7 +1134,7 @@
                 floatPrecision: 16,
                 compress: true
             });
-            const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
+
             const margin = 5;
             const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
             let y = margin;
@@ -571,84 +1152,68 @@
                 return y;
             }
 
-            if (templateId == 1) {
-                doc.addImage(logo, 'JPEG', (pageWidth / 2) + margin - 15, y, 30, 30, undefined, 'FAST');
-                y += 35;
-                doc.setFontSize(12);
-                y = addText(currentUser.companyName, (pageWidth / 2) + margin, 'center');
-                doc.setFontSize(8);
-                y = addText(`RIF: ${currentUser.rif}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Dirección: ${currentUser.address}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Teléfono: ${currentUser.phone}`, (pageWidth / 2) + margin, 'center');
-                y += 5;
-                doc.setFontSize(12);
-                y = addText('Factura', margin, 'left');
-                doc.setFontSize(8);
-                y = addText(`Nº Documento: ${order.docNumber}`, margin, 'left');
-                y = addText(`Nº Control: ${order.controlNumber}`, margin, 'left');
-                y = addText(`Fecha: ${order.date}`, margin, 'left');
-                y += 5;
-                y = addText(`Cliente: ${order.clientName}`, margin, 'left');
-                y = addText(`RIF/Cédula: ${order.clientId}`, margin, 'left');
-                y = addText(`Dirección: ${order.clientAddress}`, margin, 'left');
-                y = addText(`Teléfono: ${order.clientPhone}`, margin, 'left');
-                y = addText(`Correos: ${order.clientEmails.join(', ')}`, margin, 'left');
-            } else if (templateId == 2) {
-                doc.addImage(logo, 'JPEG', margin, y, 30, 30, undefined, 'FAST');
-                doc.setFontSize(12);
-                y = addText(currentUser.companyName, margin + 35, 'left');
-                doc.setFontSize(8);
-                y = addText(`RIF: ${currentUser.rif}`, margin + 35, 'left');
-                y += 5;
-                doc.setFontSize(12);
-                y = addText('Factura', pageWidth + margin, 'right');
-                doc.setFontSize(8);
-                y = addText(`Nº Documento: ${order.docNumber}`, pageWidth + margin, 'right');
-                y = addText(`Nº Control: ${order.controlNumber}`, pageWidth + margin, 'right');
-                y = addText(`Fecha: ${order.date}`, pageWidth + margin, 'right');
-                y += 5;
-                y = addText(`Cliente: ${order.clientName}`, margin, 'left');
-                y = addText(`RIF/Cédula: ${order.clientId}`, margin, 'left');
-                y = addText(`Dirección: ${order.clientAddress}`, margin, 'left');
-                y = addText(`Teléfono: ${order.clientPhone}`, margin, 'left');
-                y = addText(`Correos: ${order.clientEmails.join(', ')}`, margin, 'left');
-            } else if (templateId == 3) {
-                doc.addImage(logo, 'JPEG', (pageWidth / 2) + margin - 15, y, 30, 30, undefined, 'FAST');
-                y += 35;
-                doc.setFontSize(12);
-                y = addText(currentUser.companyName, (pageWidth / 2) + margin, 'center');
-                doc.setFontSize(8);
-                y = addText(`RIF: ${currentUser.rif}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Dirección: ${currentUser.address}`, (pageWidth / 2) + margin, 'center');
-                y = addText(`Teléfono: ${currentUser.phone}`, (pageWidth / 2) + margin, 'center');
-                y += 5;
-                doc.setFontSize(12);
-                y = addText('Factura', margin, 'left');
-                doc.setFontSize(8);
-                y = addText(`Nº Documento: ${order.docNumber}`, margin, 'left');
-                y = addText(`Nº Control: ${order.controlNumber}`, margin, 'left');
-                y = addText(`Fecha: ${order.date}`, margin, 'left');
-                y += 5;
-                y = addText(`Cliente: ${order.clientName}`, margin, 'left');
-                y = addText(`RIF/Cédula: ${order.clientId}`, margin, 'left');
-                y = addText(`Dirección: ${order.clientAddress}`, margin, 'left');
-                y = addText(`Teléfono: ${order.clientPhone}`, margin, 'left');
-                y = addText(`Correos: ${order.clientEmails.join(', ')}`, margin, 'left');
+            if (logoBase64) {
+                const imgWidth = 20;
+                const imgHeight = 20;
+                let logoX = selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin - (imgWidth / 2) : margin;
+                doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
+                y += imgHeight + 3;
             }
 
-            y += 5;
+            doc.setFontSize(12);
+            y = addText(currentUser.companyName, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            doc.setFontSize(8);
+            y = addText(`RIF: ${currentUser.rif}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            y = addText(`Direc: ${currentUser.address || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            y = addText(`Tel: ${currentUser.phone || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
+            y += 3;
+
+            doc.setFontSize(12);
+            const docTitle = getDocTypeText(order.docType);
+            if (selectedTemplate === '2') {
+                y = addText(docTitle, pageWidth + margin, 'right');
+                doc.setFontSize(8);
+                y = addText(`Tipo: ${docTitle}`, pageWidth + margin, 'right');
+                y = addText(`Nº Doc: ${order.docNumber}`, pageWidth + margin, 'right');
+                if (order.status === 'invoiced') {
+                    y = addText(`Nº Ctrl: ${order.controlNumber}`, pageWidth + margin, 'right');
+                }
+                y = addText(`Fecha: ${order.date}`, pageWidth + margin, 'right');
+            } else {
+                y = addText(docTitle, margin, 'left');
+                doc.setFontSize(8);
+                y = addText(`Tipo: ${docTitle}`, margin, 'left');
+                y = addText(`Nº Doc: ${order.docNumber}`, margin, 'left');
+                if (order.status === 'invoiced') {
+                    y = addText(`Nº Ctrl: ${order.controlNumber}`, margin, 'left');
+                }
+                y = addText(`Fecha: ${order.date}`, margin, 'left');
+            }
+            y += 3;
+
+            doc.setFontSize(12);
+            y = addText('Cliente', margin, 'left');
+            doc.setFontSize(8);
+            y = addText(`Nombre: ${order.clientName}`, margin, 'left');
+            y = addText(`RIF/Céd: ${order.clientId}`, margin, 'left');
+            y = addText(`Direc: ${order.clientAddress || '-'}`, margin, 'left');
+            y = addText(`Tel: ${order.clientPhone || '-'}`, margin, 'left');
+            y = addText(`Correos: ${order.clientEmails.length > 0 ? order.clientEmails.join(', ') : '-'}`, margin, 'left');
+            y += 3;
+
+            const itemsTableData = order.items.map(item => [
+                item.code || '-',
+                item.description,
+                item.quantity.toString(),
+                formatCurrency(item.price),
+                formatCurrency(item.subtotal)
+            ]);
             doc.autoTable({
-                head: [['Código', 'Descripción', 'Cantidad', 'Precio Unitario (Bs)', 'Subtotal (Bs)']],
-                body: order.items.map(item => [
-                    item.code || '-',
-                    item.description,
-                    item.quantity,
-                    formatCurrency(item.price),
-                    formatCurrency(item.subtotal)
-                ]),
+                head: [['Cód.', 'Desc.', 'Cant.', 'Prec. Unit. (Bs)', 'Subtotal (Bs)']],
+                body: itemsTableData,
                 startY: y,
                 theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
                 columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 50 }, 2: { cellWidth: 15 }, 3: { cellWidth: 25 }, 4: { cellWidth: 25 } },
                 margin: { top: margin },
                 didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
@@ -657,19 +1222,18 @@
 
             const totalTableData = [
                 ['Subtotal', formatCurrency(order.subtotalBs), formatCurrency(order.subtotalUsd)],
-                ['Monto exento', formatCurrency(order.exemptAmountBs), formatCurrency(order.exemptAmountUsd)],
-                ['Base imponible', formatCurrency(order.taxableBaseBs), formatCurrency(order.taxableBaseUsd)],
+                ['Mto. Exento', formatCurrency(order.exemptAmountBs), formatCurrency(order.exemptAmountUsd)],
+                ['Base Imp.', formatCurrency(order.taxableBaseBs), formatCurrency(order.taxableBaseUsd)],
                 [`IVA (${order.alicuota}%)`, formatCurrency(order.taxBs), formatCurrency(order.taxUsd)],
                 ['IGTF (3%)', formatCurrency(order.igtfBs), formatCurrency(order.igtfUsd)],
                 ['Total', formatCurrency(order.totalBs), formatCurrency(order.totalUsd)]
             ];
-
             doc.autoTable({
                 head: [['', 'Bs', 'USD']],
                 body: totalTableData,
                 startY: y,
                 theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
                 columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 } },
                 margin: { left: pageWidth - 90 + margin },
                 didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
@@ -677,37 +1241,48 @@
             y = doc.lastAutoTable.finalY + 3;
 
             doc.setFontSize(8);
-            y = addText(`Método de Pago: ${order.paymentMethod}`, margin, 'left');
-            y = addText(`Tasa de cambio: ${order.exchangeRate} Bs/USD`, margin, 'left');
-            y += 5;
-            doc.setFontSize(7);
-            doc.setTextColor(100);
-            doc.setLineWidth(0.5);
-            doc.line(margin, y, pageWidth + margin, y);
+            y = addText(`Mét. Pago: ${order.paymentMethod}`, margin, 'left');
+            y = addText(`Tasa: ${order.exchangeRate} Bs/USD`, margin, 'left');
             y += 3;
-            const controlNumber = order.controlNumber;
-            const invoiceDate = order.date;
-            const footerText = `ESTE DOCUMENTO SE EMITE BAJO LA PROVIDENCIA ADMINISTRATIVA SNAT/2024/000102 DE FECHA 17/10/2024\n` +
-                              `SOLUCIONES LASER, C.A RIF: J-003629162. N.º DE PROVIDENCIA: SENIAT/INTI/2021 0000029 DE FECHA 16/06/2021.\n` +
-                              `No. CONTROL ${controlNumber} HASTA No. CONTROL ${controlNumber} DE FECHA ${invoiceDate}`;
-            y = addText(footerText, (pageWidth / 2) + margin, 'center');
+
+            if (order.status === 'invoiced') {
+                doc.setFontSize(7);
+                doc.setTextColor(100);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y, pageWidth + margin, y);
+                y += 3;
+                // Coletilla actualizada
+                const footerText = `ESTE DOCUMENTO SE EMITE BAJO LA PROVIDENCIA ADMINISTRATIVA SNAT/2024/000102 DE FECHA 17/10/2024\n` +
+                                  `SOLUCIONES LASER, C.A RIF: J-003629162. N.º DE PROVIDENCIA: SENIAT/INTI/2021 0000029 DE FECHA 16/06/2021.\n` +
+                                  `No. CONTROL ${order.controlNumber} HASTA No. CONTROL ${order.controlNumber} DE FECHA ${order.date}`;
+                y = addText(footerText, (pageWidth / 2) + margin, 'center');
+            }
+
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7);
+                doc.text(`Pg. ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 5, { align: 'center' });
+            }
 
             doc.save(`Factura_${order.docNumber}.pdf`);
-            addActivityEntry(currentUser, `Factura generada para el documento ${order.docNumber}`);
-
-            renderPendingOrders(orders, currentUser);
-            renderInvoices(orders, currentUser);
-
-            const totalDocs = parseInt(localStorage.getItem(`totalDocs_${currentUser.rif}`)) || 0;
-            const consumedDocs = parseInt(localStorage.getItem(`consumedDocs_${currentUser.rif}`)) || 0;
-            localStorage.setItem(`consumedDocs_${currentUser.rif}`, consumedDocs + 1);
-            document.getElementById('consumedDocs').textContent = consumedDocs + 1;
-            document.getElementById('availableDocs').textContent = totalDocs - (consumedDocs + 1);
-
-            showAlert('Factura generada exitosamente.', 'success');
-            document.getElementById('viewModal').style.display = 'none';
+            addActivityEntry(currentUser, `Descargó factura ${order.docNumber} como PDF`);
         }
 
+        function sendOrderByEmail(index, type) {
+            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
+            const orders = type === 'invoiced' ? userOrders.filter(order => order.status === 'invoiced') : userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+            const order = orders[index];
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            showOrderDetails(index, type);
+            const subject = encodeURIComponent(`Factura ${order.docNumber} - ${order.clientName}`);
+            const body = encodeURIComponent(document.getElementById('invoiceDetails').innerText);
+            const clientEmails = order.clientEmails.length > 0 ? order.clientEmails.join(',') : 'cliente@ejemplo.com';
+            window.location.href = `mailto:${clientEmails}?subject=${subject}&body=${body}`;
+            addActivityEntry(currentUser, `Envió factura ${order.docNumber} por correo a ${clientEmails}`);
+        }
+
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             const currentUser = loadUserData();
             if (!currentUser) return;
@@ -716,163 +1291,90 @@
                 document.body.classList.add('dark-theme');
             }
 
-            document.getElementById('userName').textContent = currentUser.name;
+            const userOrders = getUserOrders(currentUser);
+            const availableDocuments = loadStats(userOrders, currentUser);
 
-            const totalDocs = parseInt(localStorage.getItem(`totalDocs_${currentUser.rif}`)) || 0;
-            const consumedDocs = parseInt(localStorage.getItem(`consumedDocs_${currentUser.rif}`)) || 0;
-            document.getElementById('totalDocs').textContent = totalDocs;
-            document.getElementById('consumedDocs').textContent = consumedDocs;
-            document.getElementById('availableDocs').textContent = totalDocs - consumedDocs;
+            // Renderizar el registro de actividades al cargar la página
+            renderActivityLog(currentUser);
 
-            const orders = JSON.parse(localStorage.getItem('orders')) || [];
-            renderPendingOrders(orders, currentUser);
-            renderInvoices(orders, currentUser);
+            // Event listeners para los filtros de pedidos pendientes
+            document.getElementById('pendingDateFilter').addEventListener('change', () => loadPendingOrdersTable(userOrders));
+            document.getElementById('pendingClientFilter').addEventListener('input', () => loadPendingOrdersTable(userOrders));
+            document.getElementById('pendingDocTypeFilter').addEventListener('change', () => loadPendingOrdersTable(userOrders));
 
-            const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
-            const activityList = document.getElementById('activityList');
-            activityLog.forEach(entry => {
-                const li = document.createElement('li');
-                li.textContent = entry;
-                activityList.appendChild(li);
-            });
-
-            document.getElementById('pendingOrdersBody').addEventListener('click', (e) => {
-                const viewButton = e.target.closest('.btn-view');
-                if (viewButton) {
-                    const docNumber = viewButton.getAttribute('data-id');
-                    const order = orders.find(o => o.docNumber === docNumber && o.userRif === currentUser.rif);
-                    if (order) {
-                        document.getElementById('modalDocNumber').textContent = order.docNumber;
-                        document.getElementById('modalClientName').textContent = order.clientName;
-                        document.getElementById('modalClientId').textContent = order.clientId;
-                        document.getElementById('modalClientAddress').textContent = order.clientAddress;
-                        document.getElementById('modalClientPhone').textContent = order.clientPhone;
-                        document.getElementById('modalClientEmails').textContent = order.clientEmails.join(', ');
-                        document.getElementById('modalDate').textContent = order.date;
-                        document.getElementById('modalSubtotalBs').textContent = order.subtotalBs.toFixed(2);
-                        document.getElementById('modalTaxBs').textContent = order.taxBs.toFixed(2);
-                        document.getElementById('modalTotalBs').textContent = order.totalBs.toFixed(2);
-                        document.getElementById('modalTotalUsd').textContent = order.totalUsd.toFixed(2);
-                        document.getElementById('modalPaymentMethod').textContent = order.paymentMethod;
-
-                        const itemsBody = document.getElementById('modalItemsBody');
-                        itemsBody.innerHTML = '';
-                        order.items.forEach(item => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${item.code || '-'}</td>
-                                <td>${item.description}</td>
-                                <td>${item.quantity}</td>
-                                <td>${item.price.toFixed(2)}</td>
-                                <td>${item.subtotal.toFixed(2)}</td>
-                            `;
-                            itemsBody.appendChild(row);
-                        });
-
-                        const editButton = document.getElementById('editOrderButton');
-                        const confirmPaymentButton = document.getElementById('confirmPaymentButton');
-                        const generateInvoiceButton = document.getElementById('generateInvoiceButton');
-
-                        editButton.style.display = order.status === 'pending' ? 'inline-flex' : 'none';
-                        confirmPaymentButton.style.display = order.status === 'pending' ? 'inline-flex' : 'none';
-                        generateInvoiceButton.style.display = order.status === 'paid' ? 'inline-flex' : 'none';
-
-                        editButton.onclick = () => {
-                            localStorage.setItem('editOrder', JSON.stringify(order));
-                            window.location.href = `nueva-factura.html?edit=${order.docNumber}`;
-                        };
-
-                        confirmPaymentButton.onclick = () => {
-                            order.status = 'paid';
-                            localStorage.setItem('orders', JSON.stringify(orders));
-                            addActivityEntry(currentUser, `Pago confirmado para el documento ${order.docNumber}`);
-                            showAlert('Pago confirmado.', 'success');
-                            renderPendingOrders(orders, currentUser);
-                            confirmPaymentButton.style.display = 'none';
-                            generateInvoiceButton.style.display = 'inline-flex';
-                        };
-
-                        generateInvoiceButton.onclick = () => {
-                            const totalDocs = parseInt(localStorage.getItem(`totalDocs_${currentUser.rif}`)) || 0;
-                            const consumedDocs = parseInt(localStorage.getItem(`consumedDocs_${currentUser.rif}`)) || 0;
-                            if (consumedDocs >= totalDocs) {
-                                showAlert('No hay documentos disponibles para emitir facturas.', 'error');
-                                return;
-                            }
-                            document.getElementById('generateInvoiceModal').style.display = 'flex';
-                            document.getElementById('confirmGenerateInvoice').onclick = () => {
-                                document.getElementById('generateInvoiceModal').style.display = 'none';
-                                generateInvoice(order.docNumber);
-                            };
-                        };
-
-                        document.getElementById('viewModal').style.display = 'flex';
-                    }
-                }
-            });
-
-            document.getElementById('invoicesBody').addEventListener('click', (e) => {
-                const viewButton = e.target.closest('.btn-view');
-                if (viewButton) {
-                    const docNumber = viewButton.getAttribute('data-id');
-                    const order = orders.find(o => o.docNumber === docNumber && o.userRif === currentUser.rif);
-                    if (order) {
-                        document.getElementById('modalDocNumber').textContent = order.docNumber;
-                        document.getElementById('modalClientName').textContent = order.clientName;
-                        document.getElementById('modalClientId').textContent = order.clientId;
-                        document.getElementById('modalClientAddress').textContent = order.clientAddress;
-                        document.getElementById('modalClientPhone').textContent = order.clientPhone;
-                        document.getElementById('modalClientEmails').textContent = order.clientEmails.join(', ');
-                        document.getElementById('modalDate').textContent = order.date;
-                        document.getElementById('modalSubtotalBs').textContent = order.subtotalBs.toFixed(2);
-                        document.getElementById('modalTaxBs').textContent = order.taxBs.toFixed(2);
-                        document.getElementById('modalTotalBs').textContent = order.totalBs.toFixed(2);
-                        document.getElementById('modalTotalUsd').textContent = order.totalUsd.toFixed(2);
-                        document.getElementById('modalPaymentMethod').textContent = order.paymentMethod;
-
-                        const itemsBody = document.getElementById('modalItemsBody');
-                        itemsBody.innerHTML = '';
-                        order.items.forEach(item => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${item.code || '-'}</td>
-                                <td>${item.description}</td>
-                                <td>${item.quantity}</td>
-                                <td>${item.price.toFixed(2)}</td>
-                                <td>${item.subtotal.toFixed(2)}</td>
-                            `;
-                            itemsBody.appendChild(row);
-                        });
-
-                        document.getElementById('editOrderButton').style.display = 'none';
-                        document.getElementById('confirmPaymentButton').style.display = 'none';
-                        document.getElementById('generateInvoiceButton').style.display = 'none';
-
-                        document.getElementById('viewModal').style.display = 'flex';
-                    }
-                }
-            });
-
-            document.getElementById('viewModalClose').addEventListener('click', () => {
-                document.getElementById('viewModal').style.display = 'none';
-            });
-
-            document.getElementById('continueEditing').addEventListener('click', () => {
-                document.getElementById('generateInvoiceModal').style.display = 'none';
-            });
-
-            document.getElementById('generateInvoiceModalClose').addEventListener('click', () => {
-                document.getElementById('generateInvoiceModal').style.display = 'none';
-            });
-
-            document.getElementById('newOrderButton').addEventListener('click', () => {
-                window.location.href = 'nueva-factura.html';
-            });
+            // Event listeners para los filtros de facturas emitidas
+            document.getElementById('invoicesDateFilter').addEventListener('change', () => loadInvoicesTable(userOrders));
+            document.getElementById('invoicesClientFilter').addEventListener('input', () => loadInvoicesTable(userOrders));
+            document.getElementById('invoicesDocTypeFilter').addEventListener('change', () => loadInvoicesTable(userOrders));
 
             document.getElementById('logoutButton').addEventListener('click', () => {
+                addActivityEntry(currentUser, 'Cerró sesión');
                 localStorage.removeItem('currentUser');
                 window.location.href = 'index.html';
             });
+
+            document.getElementById('userButton').addEventListener('click', () => {
+                addActivityEntry(currentUser, 'Accedió a la página de usuario');
+                window.location.href = 'user.html';
+            });
+
+            document.getElementById('digitalButton').addEventListener('click', () => {
+                addActivityEntry(currentUser, 'Accedió a Mi Factura Digital');
+                window.location.href = 'mi-factura-digital.html';
+            });
+
+            document.getElementById('prevPendingPage').addEventListener('click', () => {
+                if (currentPendingPage > 1) {
+                    currentPendingPage--;
+                    loadPendingOrdersTable(userOrders);
+                }
+            });
+
+            document.getElementById('nextPendingPage').addEventListener('click', () => {
+                const pendingOrders = userOrders.filter(order => order.status === 'pending' || order.status === 'confirmed');
+                const totalPages = Math.ceil(pendingOrders.length / ORDERS_PER_PAGE);
+                if (currentPendingPage < totalPages) {
+                    currentPendingPage++;
+                    loadPendingOrdersTable(userOrders);
+                }
+            });
+
+            document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentInvoicesPage > 1) {
+                    currentInvoicesPage--;
+                    loadInvoicesTable(userOrders);
+                }
+            });
+
+            document.getElementById('nextPage').addEventListener('click', () => {
+                const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
+                const totalPages = Math.ceil(invoicedOrders.length / ORDERS_PER_PAGE);
+                if (currentInvoicesPage < totalPages) {
+                    currentInvoicesPage++;
+                    loadInvoicesTable(userOrders);
+                }
+            });
+
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('detailsModal').style.display = 'none';
+            });
+
+            document.getElementById('generateOrderButton').addEventListener('click', () => {
+                if (availableDocuments > 0) {
+                    addActivityEntry(currentUser, 'Inició la generación de un nuevo pedido');
+                    window.location.href = 'new-invoice.html';
+                } else {
+                    showAlert('No puedes generar más documentos. Has alcanzado el límite de 100. Contacta soporte.', 'warning');
+                }
+            });
+
+            document.getElementById('backButton').addEventListener('click', () => {
+                addActivityEntry(currentUser, 'Regresó a la página anterior');
+                window.location.href = 'index.html';
+            });
+
+            loadPendingOrdersTable(userOrders);
+            loadInvoicesTable(userOrders);
         });
     </script>
 </body>
