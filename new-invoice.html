@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wakal Blitz - Nuevo Documento</title>
+    <title>Wakal Blitz - Gestión de Pedidos</title>
     <style>
+        /* Mantengo los estilos originales intactos */
         * {
             margin: 0;
             padding: 0;
@@ -327,45 +328,45 @@
         .dark-theme .modal-close {
             color: #f5f5f5;
         }
-        .invoice-preview {
+        .order-preview {
             font-size: 12px;
             padding: 10px;
             border: 1px solid #ddd;
         }
-        .dark-theme .invoice-preview {
+        .dark-theme .order-preview {
             border-color: #666;
         }
-        .invoice-header {
+        .order-header {
             margin-bottom: 10px;
         }
-        .template-1 .invoice-header {
+        .template-1 .order-header {
             text-align: center;
         }
-        .template-2 .invoice-header {
+        .template-2 .order-header {
             display: flex;
             justify-content: space-between;
         }
-        .template-3 .invoice-header {
+        .template-3 .order-header {
             background: #f8f9fa;
             padding: 5px;
             border-radius: 4px;
             text-align: center;
         }
-        .dark-theme .template-3 .invoice-header {
+        .dark-theme .template-3 .order-header {
             background: #555;
         }
-        .invoice-details table {
+        .order-details table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 10px;
         }
-        .invoice-details th, .invoice-details td {
+        .order-details th, .order-details td {
             padding: 5px;
             border: 1px solid #ddd;
             text-align: left;
             font-size: 12px;
         }
-        .dark-theme .invoice-details th, .dark-theme .invoice-details td {
+        .dark-theme .order-details th, .dark-theme .order-details td {
             border-color: #666;
         }
         .two-column-table {
@@ -382,7 +383,7 @@
         .dark-theme .two-column-table th, .dark-theme .two-column-table td {
             border-color: #666;
         }
-        .invoice-footer {
+        .order-footer {
             margin-top: 10px;
             font-size: 10px;
             color: #666;
@@ -390,7 +391,7 @@
             border-top: 1px solid #ddd;
             padding-top: 5px;
         }
-        .dark-theme .invoice-footer {
+        .dark-theme .order-footer {
             color: #ddd;
             border-top-color: #666;
         }
@@ -444,8 +445,8 @@
         </div>
     </div>
     <div class="container">
-        <h2 class="section-title">Nuevo documento</h2>
-        <div class="invoice-form">
+        <h2 class="section-title">Crear o Gestionar Pedido</h2>
+        <div class="order-form">
             <div class="form-section">
                 <h3>Información del cliente</h3>
                 <div class="form-row">
@@ -484,23 +485,24 @@
                 </div>
             </div>
             <div class="form-section">
-                <h3>Detalles del documento</h3>
+                <h3>Detalles del pedido</h3>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="docType">Tipo de documento*</label>
-                        <select id="docType" required>
-                            <option value="factura">Factura</option>
-                            <option value="nota-credito">Nota de crédito</option>
-                            <option value="nota-debito">Nota de débito</option>
+                        <label for="orderDate">Fecha*</label>
+                        <input type="date" id="orderDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderStatus">Estado del Pedido</label>
+                        <select id="orderStatus" disabled>
+                            <option value="draft">Borrador</option>
+                            <option value="sent">Enviado</option>
+                            <option value="paid">Pagado</option>
+                            <option value="completed">Finalizado</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="invoiceDate">Fecha*</label>
-                        <input type="date" id="invoiceDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="paymentMethod">Método de pago*</label>
-                        <select id="paymentMethod" required>
+                        <label for="paymentMethod">Método de pago (al confirmar)</label>
+                        <select id="paymentMethod" disabled>
                             <option value="bolivares-efectivo">Bolívares Efectivo</option>
                             <option value="pago-movil">Pago Móvil</option>
                             <option value="transferencia-bancaria">Transferencia Bancaria</option>
@@ -541,8 +543,8 @@
                         <input type="number" id="exemptAmount" step="0.01" min="0" value="0.00">
                     </div>
                     <div class="form-group">
-                        <label for="alicuota">Alícuota IVA (%)*</label>
-                        <select id="alicuota" required>
+                        <label for="alicuota">Alícuota IVA (%) (al facturar)</label>
+                        <select id="alicuota" disabled>
                             <option value="16">16%</option>
                             <option value="8">8%</option>
                             <option value="0">0%</option>
@@ -591,30 +593,32 @@
                     </tbody>
                 </table>
             </div>
-            <div class="action-buttons">
-                <button class="btn btn-secondary" id="cancelInvoiceBtn">Cancelar</button>
-                <button class="btn btn-success" id="previewInvoiceBtn">Vista previa</button>
-                <button class="btn" id="saveInvoiceBtn">Generar documento</button>
+            <div class="action-buttons" id="actionButtons">
+                <button class="btn btn-secondary" id="cancelOrderBtn">Cancelar</button>
+                <button class="btn btn-success" id="saveDraftBtn">Guardar Borrador</button>
+                <button class="btn" id="sendOrderBtn" disabled>Enviar Pedido</button>
+                <button class="btn" id="confirmPaymentBtn" disabled>Confirmar Pago</button>
+                <button class="btn" id="generateInvoiceBtn" disabled>Generar Factura</button>
             </div>
         </div>
     </div>
     <div class="modal" id="previewModal">
         <div class="modal-content">
             <span class="modal-close" id="modalClose">×</span>
-            <div class="invoice-preview" id="invoicePreview"></div>
+            <div class="order-preview" id="orderPreview"></div>
             <div style="text-align: right; margin-top: 10px;">
                 <button class="btn btn-secondary" id="downloadPreviewBtn">Descargar como PDF</button>
             </div>
         </div>
     </div>
 
-    <!-- Incluir jsPDF para generación de PDFs desde el repositorio local -->
     <script src="./jspdf.umd.min.js"></script>
     <script src="./jspdf.plugin.autotable.min.js"></script>
 
     <script>
         // Variables globales
         let exchangeRate = 64.74;
+        let currentOrder = null;
 
         // Funciones de utilidad
         function formatCurrency(amount) {
@@ -652,7 +656,7 @@
 
         async function fetchExchangeRate() {
             try {
-                const response = { Success: true, rate: 64.74, date: '2025-03-07' };
+                const response = { Success: true, rate: 64.74, date: '2025-03-20' };
                 if (response.Success) {
                     exchangeRate = response.rate;
                     showAlert(`Tasa del dólar BCV (${response.date}): ${exchangeRate} VES/USD`, 'info');
@@ -660,20 +664,24 @@
             } catch (error) {
                 showAlert('Error al cargar tasa del dólar. Usando valor por defecto: 64.74.', 'warning');
             }
-            updateInvoiceTotals();
+            updateOrderTotals();
         }
 
-        function generateDocNumber(docType) {
+        function generateOrderNumber() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userOrdersKey = `orders_${currentUser.rif}`;
+            const allOrders = JSON.parse(localStorage.getItem(userOrdersKey) || '[]');
+            const lastNumber = allOrders.length > 0 ? Math.max(...allOrders.map(order => parseInt(order.orderNumber, 10) || 0)) : 0;
+            return (lastNumber + 1).toString().padStart(8, '0');
+        }
+
+        function generateInvoiceNumber(docType) {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const userInvoicesKey = `invoices_${currentUser.rif}`;
             const allInvoices = JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
             const invoicesOfType = allInvoices.filter(invoice => invoice.docType === docType);
             const lastNumber = invoicesOfType.length > 0 ? Math.max(...invoicesOfType.map(invoice => parseInt(invoice.docNumber, 10) || 0)) : 0;
             return (lastNumber + 1).toString().padStart(8, '0');
-        }
-
-        function extractDocNumberForDisplay(docNumber) {
-            return parseInt(docNumber, 10).toString();
         }
 
         function addEmailField() {
@@ -687,11 +695,8 @@
             `;
             emailFields.appendChild(newEmailDiv);
             newEmailDiv.querySelector('.remove-email-btn').addEventListener('click', () => {
-                if (emailFields.children.length > 1) {
-                    newEmailDiv.remove();
-                } else {
-                    showAlert('Debe haber al menos un campo de correo.', 'warning');
-                }
+                if (emailFields.children.length > 1) newEmailDiv.remove();
+                else showAlert('Debe haber al menos un campo de correo.', 'warning');
             });
         }
 
@@ -708,26 +713,26 @@
             `;
             tbody.appendChild(row);
             attachItemListeners(row);
-            updateInvoiceTotals();
+            updateOrderTotals();
         }
 
         function attachItemListeners(row) {
             const quantity = row.querySelector('.item-quantity');
             const price = row.querySelector('.item-price');
             const removeBtn = row.querySelector('.remove-item');
-            quantity.addEventListener('input', updateInvoiceTotals);
-            price.addEventListener('input', updateInvoiceTotals);
+            quantity.addEventListener('input', updateOrderTotals);
+            price.addEventListener('input', updateOrderTotals);
             removeBtn.addEventListener('click', () => {
                 if (document.querySelectorAll('#itemsTableBody tr').length > 1) {
                     row.remove();
-                    updateInvoiceTotals();
+                    updateOrderTotals();
                 } else {
                     showAlert('Debe haber al menos un artículo.', 'warning');
                 }
             });
         }
 
-        function updateInvoiceTotals() {
+        function updateOrderTotals() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             let subtotal = 0;
             const items = document.querySelectorAll('#itemsTableBody tr');
@@ -744,7 +749,7 @@
             const taxableBase = subtotal - exemptAmount;
             const tax = taxableBase * (alicuota / 100);
             const igtf = (currentUser.specialTaxPayer || paymentMethod === 'dolares-efectivo' || paymentMethod === 'dolares-transferencia') ? subtotal * 0.03 : 0;
-            const total = subtotal + tax + igtf;
+            const total = subtotal + (document.getElementById('orderStatus').value === 'completed' ? tax + igtf : 0);
 
             const subtotalUsd = subtotal / exchangeRate;
             const exemptUsd = exemptAmount / exchangeRate;
@@ -767,11 +772,7 @@
             document.getElementById('totalUsd').textContent = formatCurrency(totalUsd);
         }
 
-        function getDefaultFooterText(controlNumber, invoiceDate) {
-            return `Providencia SNAT/2024/000102 (17/10/2024), SOLUCIONES LASER, CA (RIF: J-003629162), Providencia SENIAT/INTI/2021 00000029 (16/06/2021), Control: ${controlNumber}, Fecha: ${invoiceDate}`;
-        }
-
-        function getInvoiceFormData() {
+        function getOrderFormData() {
             const items = Array.from(document.querySelectorAll('#itemsTableBody tr')).map(row => ({
                 code: row.querySelector('.item-code').value,
                 description: row.querySelector('.item-description').value,
@@ -789,9 +790,9 @@
                 clientAddress: document.getElementById('clientAddress').value.trim(),
                 clientPhone: document.getElementById('clientPhone').value.trim(),
                 clientEmails: clientEmails,
-                docType: document.getElementById('docType').value,
-                invoiceDate: document.getElementById('invoiceDate').value,
+                orderDate: document.getElementById('orderDate').value,
                 paymentMethod: document.getElementById('paymentMethod').value,
+                status: document.getElementById('orderStatus').value,
                 items: items,
                 exemptAmountBs: parseFloat(document.getElementById('exemptBs').textContent.replace(/,/g, '')) || 0,
                 exemptAmountUsd: parseFloat(document.getElementById('exemptUsd').textContent.replace(/,/g, '')) || 0,
@@ -815,8 +816,7 @@
                 showAlert('El nombre o razón social del cliente es obligatorio.', 'warning');
                 isValid = false;
             }
-            const clientIdNumber = document.getElementById('clientIdNumber').value;
-            if (!validateClientId(clientIdNumber)) {
+            if (!validateClientId(document.getElementById('clientIdNumber').value)) {
                 showAlert('El número de cédula o RIF debe tener entre 7 y 9 dígitos.', 'warning');
                 isValid = false;
             }
@@ -825,266 +825,44 @@
                 isValid = false;
             }
             if (data.clientEmails.length > 0 && !data.clientEmails.every(validateEmail)) {
-                showAlert('Uno o más correos electrónicos no tienen un formato válido. Ejemplo: cliente@dominio.com', 'warning');
+                showAlert('Uno o más correos electrónicos no tienen un formato válido.', 'warning');
                 isValid = false;
             }
-            if (!data.invoiceDate) {
-                showAlert('La fecha del documento es obligatoria.', 'warning');
+            if (!data.orderDate) {
+                showAlert('La fecha del pedido es obligatoria.', 'warning');
                 isValid = false;
             }
-            if (!data.items.length || data.items.some(item => !item.description || item.quantity <= 0 || item.price < 0 || item.subtotal < 0)) {
+            if (!data.items.length || data.items.some(item => !item.description || item.quantity <= 0 || item.price < 0)) {
                 showAlert('Verifica los ítems: descripción, cantidad y precio deben ser válidos.', 'warning');
-                isValid = false;
-            }
-            if (data.subtotalBs < 0 || data.exemptAmountBs < 0 || data.taxableBaseBs < 0 || data.taxBs < 0 || data.igtfBs < 0 || data.totalBs < 0) {
-                showAlert('Los montos en Bs. no pueden ser negativos.', 'warning');
-                isValid = false;
-            }
-            if (data.subtotalUsd < 0 || data.exemptAmountUsd < 0 || data.taxableBaseUsd < 0 || data.taxUsd < 0 || data.igtfUsd < 0 || data.totalUsd < 0) {
-                showAlert('Los montos en USD no pueden ser negativos.', 'warning');
-                isValid = false;
-            }
-            if (Math.abs(data.totalBs / exchangeRate - data.totalUsd) > 0.01) {
-                showAlert('Inconsistencia detectada entre los totales en Bs. y USD.', 'warning');
                 isValid = false;
             }
             return isValid;
         }
 
-        async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'Anonymous';
-                img.src = url;
-
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                    } else {
-                        if (height > maxHeight) {
-                            width = Math.round((width * maxHeight) / height);
-                            height = maxHeight;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                    const base64 = dataUrl.split(',')[1];
-                    resolve(base64);
-                };
-
-                img.onerror = (error) => {
-                    console.error('Error al cargar la imagen para redimensionar:', error);
-                    reject(error);
-                };
-            });
-        }
-
-        async function loadImageAsBase64(url) {
-            try {
-                const base64 = await resizeImage(url, 20, 20, 0.7); // Reducido a 20x20 mm
-                return base64;
-            } catch (error) {
-                console.error('Error al cargar y redimensionar la imagen:', error);
-                return null;
-            }
-        }
-
-        async function downloadPreviewAsPdf(data, docNumber, controlNumber, footerText) {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
-            const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
-
-            const logoBase64 = await loadImageAsBase64(logoUrl);
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
-                putOnlyUsedFonts: true,
-                floatPrecision: 16,
-                compress: true
-            });
-
-            const margin = 5; // Reducido a 5 mm
-            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
-            let y = margin;
-
-            function addText(text, x, align = 'left') {
-                const lines = doc.splitTextToSize(text, pageWidth - 10); // Ajuste para margen interno
-                lines.forEach(line => {
-                    if (y > doc.internal.pageSize.getHeight() - 10) {
-                        doc.addPage();
-                        y = margin;
-                    }
-                    doc.text(line, x, y, { align: align });
-                    y += 3; // Espaciado reducido
-                });
-                return y;
-            }
-
-            // Agregar logo
-            if (logoBase64) {
-                const imgWidth = 20; // Reducido a 20 mm
-                const imgHeight = 20; // Reducido a 20 mm
-                let logoX = selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin - (imgWidth / 2) : margin;
-                doc.addImage(logoBase64, 'JPEG', logoX, y, imgWidth, imgHeight, undefined, 'FAST');
-                y += imgHeight + 3;
-            }
-
-            // Información de la empresa
-            doc.setFontSize(12); // Reducido a 12px
-            y = addText(currentUser.companyName, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
-            doc.setFontSize(8); // Reducido a 8px
-            y = addText(`RIF: ${currentUser.rif}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
-            y = addText(`Dirección: ${currentUser.address || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
-            y = addText(`Teléfono: ${currentUser.phone || '-'}`, selectedTemplate === '1' || selectedTemplate === '3' ? (pageWidth / 2) + margin : margin, selectedTemplate === '1' || selectedTemplate === '3' ? 'center' : 'left');
-            y += 3;
-
-            // Información de la factura
-            doc.setFontSize(12);
-            const docTitle = data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito';
-            if (selectedTemplate === '2') {
-                y = addText(docTitle, pageWidth + margin, 'right');
-                doc.setFontSize(8);
-                y = addText(`Tipo: ${docTitle}`, pageWidth + margin, 'right');
-                y = addText(`Nº Doc: ${docNumber}`, pageWidth + margin, 'right');
-                y = addText(`Nº Ctrl: ${controlNumber}`, pageWidth + margin, 'right');
-                y = addText(`Fecha: ${data.invoiceDate}`, pageWidth + margin, 'right');
-            } else {
-                y = addText(docTitle, margin, 'left');
-                doc.setFontSize(8);
-                y = addText(`Tipo: ${docTitle}`, margin, 'left');
-                y = addText(`Nº Doc: ${docNumber}`, margin, 'left');
-                y = addText(`Nº Ctrl: ${controlNumber}`, margin, 'left');
-                y = addText(`Fecha: ${data.invoiceDate}`, margin, 'left');
-            }
-            y += 3;
-
-            // Información del cliente
-            doc.setFontSize(12);
-            y = addText('Cliente', margin, 'left');
-            doc.setFontSize(8);
-            y = addText(`Nombre: ${data.clientName}`, margin, 'left');
-            y = addText(`RIF/Céd: ${data.clientId}`, margin, 'left');
-            y = addText(`Direc: ${data.clientAddress || '-'}`, margin, 'left');
-            y = addText(`Tel: ${data.clientPhone || '-'}`, margin, 'left');
-            y = addText(`Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}`, margin, 'left');
-            y += 3;
-
-            // Tabla de ítems (optimizada para 10 ítems)
-            const itemsTableData = data.items.map(item => [
-                item.code || '-',
-                item.description,
-                item.quantity.toString(),
-                formatCurrency(item.price),
-                formatCurrency(item.subtotal)
-            ]);
-            doc.autoTable({
-                head: [['Cód.', 'Desc.', 'Cant.', 'Prec. Unit. (Bs)', 'Subtotal (Bs)']],
-                body: itemsTableData,
-                startY: y,
-                theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
-                columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 50 }, 2: { cellWidth: 15 }, 3: { cellWidth: 25 }, 4: { cellWidth: 25 } },
-                margin: { top: margin },
-                didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
-            });
-            y = doc.lastAutoTable.finalY + 3;
-
-            // Tabla de totales
-            const totalTableData = [
-                ['Subtotal', formatCurrency(data.subtotalBs), formatCurrency(data.subtotalUsd)],
-                ['Mto. Exento', formatCurrency(data.exemptAmountBs), formatCurrency(data.exemptAmountUsd)],
-                ['Base Imp.', formatCurrency(data.taxableBaseBs), formatCurrency(data.taxableBaseUsd)],
-                [`IVA (${data.alicuota}%)`, formatCurrency(data.taxBs), formatCurrency(data.taxUsd)],
-                ['IGTF (3%)', formatCurrency(data.igtfBs), formatCurrency(data.igtfUsd)],
-                ['Total', formatCurrency(data.totalBs), formatCurrency(data.totalUsd)]
-            ];
-            doc.autoTable({
-                head: [['', 'Bs', 'USD']],
-                body: totalTableData,
-                startY: y,
-                theme: 'striped',
-                styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
-                columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 } },
-                margin: { left: pageWidth - 90 + margin },
-                didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
-            });
-            y = doc.lastAutoTable.finalY + 3;
-
-            // Método de pago y tasa de cambio
-            doc.setFontSize(8);
-            y = addText(`Mét. Pago: ${data.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`, margin, 'left');
-            y = addText(`Tasa: ${exchangeRate} Bs/USD`, margin, 'left');
-            y += 3;
-
-            // Footer (abreviado para ahorrar espacio)
-            if (footerText) {
-                doc.setFontSize(7);
-                doc.setTextColor(100);
-                doc.setLineWidth(0.5);
-                doc.line(margin, y, pageWidth + margin, y);
-                y += 3;
-                y = addText(footerText, (pageWidth / 2) + margin, 'center');
-            }
-
-            // Numeración de páginas
-            const totalPages = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= totalPages; i++) {
-                doc.setPage(i);
-                doc.setFontSize(7);
-                doc.text(`Pg. ${i} de ${totalPages}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 5, { align: 'center' });
-            }
-
-            doc.save(`Factura_Preview_${docNumber}.pdf`);
-        }
-
-        function previewInvoice() {
-            const data = getInvoiceFormData();
+        async function previewOrder() {
+            const data = getOrderFormData();
             if (!validateForm(data)) return;
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const orderNumber = currentOrder ? currentOrder.orderNumber : generateOrderNumber();
             const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
-            const docNumber = generateDocNumber(data.docType);
-            const docNumberDisplay = extractDocNumberForDisplay(docNumber);
-            const userInvoicesKey = `invoices_${currentUser.rif}`;
-            const userInvoices = JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
-            const controlNumberIndex = userInvoices.length + 1;
-            const controlNumber = formatControlNumber(controlNumberIndex);
-            const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
-            const preview = document.getElementById('invoicePreview');
+            const preview = document.getElementById('orderPreview');
             let templateHtml = '';
 
             if (selectedTemplate === '1') {
                 templateHtml = `
                     <div class="template-1">
-                        <div class="invoice-header">
+                        <div class="order-header">
                             <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
                             <h2>${currentUser.companyName}</h2>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Direc: ${currentUser.address || '-'}</p>
                             <p>Tel: ${currentUser.phone || '-'}</p>
                         </div>
-                        <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
-                        <p>Tipo: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
-                        <p>Nº Doc: ${docNumberDisplay}</p>
-                        <p>Nº Ctrl: ${controlNumber}</p>
-                        <p>Fecha: ${data.invoiceDate}</p>
-                        <div class="invoice-details">
+                        <h3>Resumen de Pedido</h3>
+                        <p>Nº Pedido: ${orderNumber}</p>
+                        <p>Fecha: ${data.orderDate}</p>
+                        <div class="order-details">
                             <h3>Cliente</h3>
                             <p>Nombre: ${data.clientName}</p>
                             <p>RIF/Céd: ${data.clientId}</p>
@@ -1096,21 +874,19 @@
             } else if (selectedTemplate === '2') {
                 templateHtml = `
                     <div class="template-2">
-                        <div class="invoice-header">
+                        <div class="order-header">
                             <div>
                                 <img src="${logo}" alt="Logo" style="width: 40px; height: 40px; float: left; margin-right: 5px;">
                                 <h2>${currentUser.companyName}</h2>
                                 <p>RIF: ${currentUser.rif}</p>
                             </div>
                             <div>
-                                <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
-                                <p>Tipo: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
-                                <p>Nº Doc: ${docNumberDisplay}</p>
-                                <p>Nº Ctrl: ${controlNumber}</p>
-                                <p>Fecha: ${data.invoiceDate}</p>
+                                <h3>Resumen de Pedido</h3>
+                                <p>Nº Pedido: ${orderNumber}</p>
+                                <p>Fecha: ${data.orderDate}</p>
                             </div>
                         </div>
-                        <div class="invoice-details">
+                        <div class="order-details">
                             <h3>Cliente</h3>
                             <p>Nombre: ${data.clientName}</p>
                             <p>RIF/Céd: ${data.clientId}</p>
@@ -1119,22 +895,20 @@
                             <p>Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}</p>
                         </div>
                 `;
-            } else if (selectedTemplate === '3') {
+            } else {
                 templateHtml = `
                     <div class="template-3">
-                        <div class="invoice-header">
+                        <div class="order-header">
                             <img src="${logo}" alt="Logo" style="width: 50px; height: 50px; border-radius: 50%;">
                             <h2>${currentUser.companyName}</h2>
                             <p>RIF: ${currentUser.rif}</p>
                             <p>Direc: ${currentUser.address || '-'}</p>
                             <p>Tel: ${currentUser.phone || '-'}</p>
                         </div>
-                        <h3>${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</h3>
-                        <p>Tipo: ${data.docType === 'factura' ? 'Factura' : data.docType === 'nota-credito' ? 'Nota de Crédito' : 'Nota de Débito'}</p>
-                        <p>Nº Doc: ${docNumberDisplay}</p>
-                        <p>Nº Ctrl: ${controlNumber}</p>
-                        <p>Fecha: ${data.invoiceDate}</p>
-                        <div class="invoice-details">
+                        <h3>Resumen de Pedido</h3>
+                        <p>Nº Pedido: ${orderNumber}</p>
+                        <p>Fecha: ${data.orderDate}</p>
+                        <div class="order-details">
                             <h3>Cliente</h3>
                             <p>Nombre: ${data.clientName}</p>
                             <p>RIF/Céd: ${data.clientId}</p>
@@ -1146,7 +920,7 @@
             }
 
             templateHtml += `
-                <table class="invoice-details">
+                <table class="order-details">
                     <thead>
                         <tr>
                             <th>Cód.</th>
@@ -1178,73 +952,231 @@
                     </thead>
                     <tbody>
                         <tr><th>Subtotal</th><td>${formatCurrency(data.subtotalBs)}</td><td>${formatCurrency(data.subtotalUsd)}</td></tr>
-                        <tr><th>Mto. Exento</th><td>${formatCurrency(data.exemptAmountBs)}</td><td>${formatCurrency(data.exemptAmountUsd)}</td></tr>
-                        <tr><th>Base Imp.</th><td>${formatCurrency(data.taxableBaseBs)}</td><td>${formatCurrency(data.taxableBaseUsd)}</td></tr>
-                        <tr><th>IVA (${data.alicuota}%)</th><td>${formatCurrency(data.taxBs)}</td><td>${formatCurrency(data.taxUsd)}</td></tr>
-                        <tr><th>IGTF (3%)</th><td>${formatCurrency(data.igtfBs)}</td><td>${formatCurrency(data.igtfUsd)}</td></tr>
-                        <tr><th>Total</th><td>${formatCurrency(data.totalBs)}</td><td>${formatCurrency(data.totalUsd)}</td></tr>
                     </tbody>
                 </table>
-                <p>Mét. Pago: ${data.paymentMethod.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
-                <p>Tasa: ${exchangeRate} Bs/USD</p>
-                <div class="invoice-footer">
-                    <p>${footerText}</p>
-                </div>
             </div>`;
 
             preview.innerHTML = templateHtml;
             document.getElementById('previewModal').style.display = 'flex';
 
-            document.getElementById('downloadPreviewBtn').onclick = () => downloadPreviewAsPdf(data, docNumberDisplay, controlNumber, footerText);
+            document.getElementById('downloadPreviewBtn').onclick = () => downloadOrderAsPdf(data, orderNumber);
         }
 
-        function saveInvoice() {
-            const data = getInvoiceFormData();
+        async function downloadOrderAsPdf(data, orderNumber) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const selectedTemplate = localStorage.getItem('selectedTemplate') || '1';
+            const logoUrl = currentUser.profilePic || 'https://via.placeholder.com/100';
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const margin = 10;
+            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            let y = margin;
+
+            doc.setFontSize(12);
+            if (selectedTemplate === '1' || selectedTemplate === '3') {
+                doc.addImage(logoUrl, 'JPEG', pageWidth / 2 - 10, y, 20, 20);
+                y += 25;
+                doc.text(currentUser.companyName, pageWidth / 2 + margin, y, { align: 'center' });
+                y += 5;
+                doc.setFontSize(8);
+                doc.text(`RIF: ${currentUser.rif}`, pageWidth / 2 + margin, y, { align: 'center' });
+                y += 5;
+                doc.text(`Dirección: ${currentUser.address || '-'}`, pageWidth / 2 + margin, y, { align: 'center' });
+                y += 5;
+                doc.text(`Teléfono: ${currentUser.phone || '-'}`, pageWidth / 2 + margin, y, { align: 'center' });
+                y += 5;
+            } else {
+                doc.addImage(logoUrl, 'JPEG', margin, y, 20, 20);
+                doc.text(currentUser.companyName, margin + 25, y + 10);
+                y += 15;
+                doc.setFontSize(8);
+                doc.text(`RIF: ${currentUser.rif}`, margin, y);
+                y += 5;
+            }
+
+            doc.setFontSize(12);
+            doc.text('Resumen de Pedido', margin, y);
+            y += 5;
+            doc.setFontSize(8);
+            doc.text(`Nº Pedido: ${orderNumber}`, margin, y);
+            y += 5;
+            doc.text(`Fecha: ${data.orderDate}`, margin, y);
+            y += 10;
+
+            doc.text('Cliente', margin, y);
+            y += 5;
+            doc.text(`Nombre: ${data.clientName}`, margin, y);
+            y += 5;
+            doc.text(`RIF/Céd: ${data.clientId}`, margin, y);
+            y += 5;
+            doc.text(`Direc: ${data.clientAddress || '-'}`, margin, y);
+            y += 5;
+            doc.text(`Tel: ${data.clientPhone || '-'}`, margin, y);
+            y += 5;
+            doc.text(`Correos: ${data.clientEmails.length > 0 ? data.clientEmails.join(', ') : '-'}`, margin, y);
+            y += 10;
+
+            const itemsTableData = data.items.map(item => [
+                item.code || '-',
+                item.description,
+                item.quantity.toString(),
+                formatCurrency(item.price),
+                formatCurrency(item.subtotal)
+            ]);
+            doc.autoTable({
+                head: [['Cód.', 'Desc.', 'Cant.', 'Prec. Unit. (Bs)', 'Subtotal (Bs)']],
+                body: itemsTableData,
+                startY: y,
+                theme: 'striped',
+                styles: { fontSize: 8, cellPadding: 2 }
+            });
+            y = doc.lastAutoTable.finalY + 5;
+
+            doc.autoTable({
+                head: [['', 'Bs', 'USD']],
+                body: [['Subtotal', formatCurrency(data.subtotalBs), formatCurrency(data.subtotalUsd)]],
+                startY: y,
+                theme: 'striped',
+                styles: { fontSize: 8, cellPadding: 2 },
+                margin: { left: pageWidth - 60 + margin }
+            });
+
+            doc.save(`Pedido_${orderNumber}.pdf`);
+        }
+
+        function saveOrder(status) {
+            const data = getOrderFormData();
             if (!validateForm(data)) return;
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const docNumber = generateDocNumber(data.docType);
+            const userOrdersKey = `orders_${currentUser.rif}`;
+            const allOrders = JSON.parse(localStorage.getItem(userOrdersKey) || '[]');
+            const orderNumber = currentOrder ? currentOrder.orderNumber : generateOrderNumber();
+            const orderData = {
+                sellerRif: currentUser.rif,
+                orderNumber: orderNumber,
+                ...data,
+                status: status || data.status
+            };
+            const existingOrderIndex = allOrders.findIndex(o => o.orderNumber === orderNumber);
+            if (existingOrderIndex !== -1) allOrders[existingOrderIndex] = orderData;
+            else allOrders.push(orderData);
+            localStorage.setItem(userOrdersKey, JSON.stringify(allOrders));
+            showAlert(`Pedido ${status === 'draft' ? 'guardado como borrador' : 'actualizado'} exitosamente.`, 'success');
+            currentOrder = orderData;
+            updateButtonStates();
+            if (status !== 'draft') disableFormInputs();
+        }
+
+        function sendOrder() {
+            previewOrder();
+            saveOrder('sent');
+            showAlert('Pedido enviado. Por favor, envía el PDF al cliente manualmente.', 'info');
+        }
+
+        function confirmPayment() {
+            const paymentMethod = document.getElementById('paymentMethod');
+            paymentMethod.disabled = false;
+            const alicuota = document.getElementById('alicuota');
+            alicuota.disabled = false;
+            if (confirm('¿Confirmar que el cliente ha pagado?')) {
+                saveOrder('paid');
+                updateOrderTotals();
+            }
+            paymentMethod.disabled = true;
+            alicuota.disabled = true;
+        }
+
+        async function generateInvoice() {
+            const data = getOrderFormData();
+            if (!validateForm(data)) return;
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const docType = 'factura'; // Por ahora solo facturas
+            const docNumber = generateInvoiceNumber(docType);
             const userInvoicesKey = `invoices_${currentUser.rif}`;
             const userInvoices = JSON.parse(localStorage.getItem(userInvoicesKey) || '[]');
             const controlNumberIndex = userInvoices.length + 1;
             const controlNumber = formatControlNumber(controlNumberIndex);
-            const footerText = getDefaultFooterText(controlNumber, data.invoiceDate || new Date().toISOString().split('T')[0]);
+            const footerText = `Providencia SNAT/2024/000102, SOLUCIONES LASER, CA (RIF: J-003629162), Control: ${controlNumber}, Fecha: ${data.orderDate}`;
             const invoiceData = {
                 sellerRif: currentUser.rif,
-                docType: data.docType,
+                docType: docType,
                 docNumber: docNumber,
                 controlNumber: controlNumber,
-                clientName: data.clientName,
-                clientId: data.clientId,
-                clientAddress: data.clientAddress,
-                clientPhone: data.clientPhone,
-                clientEmails: data.clientEmails,
-                date: data.invoiceDate,
-                paymentMethod: data.paymentMethod,
-                items: data.items,
-                exemptAmountBs: data.exemptAmountBs,
-                exemptAmountUsd: data.exemptAmountUsd,
-                alicuota: data.alicuota,
-                subtotalBs: data.subtotalBs,
-                subtotalUsd: data.subtotalUsd,
-                taxableBaseBs: data.taxableBaseBs,
-                taxableBaseUsd: data.taxableBaseUsd,
-                taxBs: data.taxBs,
-                taxUsd: data.taxUsd,
-                igtfBs: data.igtfBs,
-                igtfUsd: data.igtfUsd,
-                totalBs: data.totalBs,
-                totalUsd: data.totalUsd,
-                exchangeRate: exchangeRate,
-                footerText: footerText
+                ...data,
+                status: 'completed'
             };
-            if (userInvoices.some(invoice => invoice.docType === data.docType && invoice.docNumber === docNumber)) {
-                showAlert('Error: El número de documento ya existe para este tipo.', 'warning');
-                return;
-            }
             userInvoices.push(invoiceData);
             localStorage.setItem(userInvoicesKey, JSON.stringify(userInvoices));
-            showAlert('Documento generado exitosamente.', 'success');
+            saveOrder('completed');
+            showAlert('Factura generada exitosamente.', 'success');
             setTimeout(() => window.location.href = 'dashboard.html', 1500);
+            // Aquí podrías descargar la factura como PDF si quisieras
+        }
+
+        function updateButtonStates() {
+            const status = document.getElementById('orderStatus').value;
+            document.getElementById('saveDraftBtn').disabled = status !== 'draft';
+            document.getElementById('sendOrderBtn').disabled = status !== 'draft';
+            document.getElementById('confirmPaymentBtn').disabled = status !== 'sent';
+            document.getElementById('generateInvoiceBtn').disabled = status !== 'paid';
+        }
+
+        function disableFormInputs() {
+            const inputs = document.querySelectorAll('.order-form input, .order-form select:not(#orderStatus, #paymentMethod, #alicuota)');
+            inputs.forEach(input => input.disabled = true);
+            document.getElementById('addItemBtn').disabled = true;
+            document.querySelectorAll('.remove-item').forEach(btn => btn.disabled = true);
+        }
+
+        function loadOrderData(order) {
+            currentOrder = order;
+            document.getElementById('clientName').value = order.clientName;
+            document.getElementById('clientIdType').value = order.clientId.split('-')[0];
+            document.getElementById('clientIdNumber').value = order.clientId.split('-')[1];
+            document.getElementById('clientAddress').value = order.clientAddress || '';
+            document.getElementById('clientPhone').value = order.clientPhone || '';
+            const emailFields = document.getElementById('emailFields');
+            emailFields.innerHTML = '';
+            order.clientEmails.forEach((email, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group email-container';
+                div.innerHTML = `
+                    <label for="clientEmail">Correo Electrónico</label>
+                    <input type="email" class="client-email" value="${email}" placeholder="Ej: cliente@dominio.com">
+                    ${index === 0 ? '<button class="add-email-btn" id="addEmailBtn">+</button>' : '<button class="remove-email-btn">-</button>'}
+                `;
+                emailFields.appendChild(div);
+                if (index > 0) div.querySelector('.remove-email-btn').addEventListener('click', () => div.remove());
+            });
+            document.getElementById('orderDate').value = order.orderDate;
+            document.getElementById('orderStatus').value = order.status;
+            document.getElementById('paymentMethod').value = order.paymentMethod;
+            document.getElementById('exemptAmount').value = order.exemptAmountBs.toFixed(2);
+            document.getElementById('alicuota').value = order.alicuota;
+            const tbody = document.getElementById('itemsTableBody');
+            tbody.innerHTML = '';
+            order.items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" class="item-code" value="${item.code || ''}" placeholder="Código"></td>
+                    <td><input type="text" class="item-description" value="${item.description}" placeholder="Descripción" required></td>
+                    <td><input type="number" class="item-quantity" min="1" value="${item.quantity}" required></td>
+                    <td><input type="number" step="0.01" class="item-price" min="0" value="${item.price.toFixed(2)}" placeholder="Precio en Bs." required></td>
+                    <td class="item-subtotal">${formatCurrency(item.subtotal)}</td>
+                    <td><button class="btn-secondary remove-item">X</button></td>
+                `;
+                tbody.appendChild(row);
+                attachItemListeners(row);
+            });
+            updateOrderTotals();
+            updateButtonStates();
+            if (order.status !== 'draft') disableFormInputs();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1254,40 +1186,43 @@
                 return;
             }
             document.getElementById('userDisplayName').textContent = currentUser.companyName;
-            document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
 
-            if (currentUser.darkTheme) {
-                document.body.classList.add('dark-theme');
+            if (currentUser.darkTheme) document.body.classList.add('dark-theme');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            if (orderId) {
+                const userOrdersKey = `orders_${currentUser.rif}`;
+                const orders = JSON.parse(localStorage.getItem(userOrdersKey) || '[]');
+                const order = orders.find(o => o.orderNumber === orderId);
+                if (order) loadOrderData(order);
             }
 
             fetchExchangeRate();
 
-            document.getElementById('backButton').addEventListener('click', () => {
-                window.location.href = 'dashboard.html';
-            });
-
+            document.getElementById('backButton').addEventListener('click', () => window.location.href = 'dashboard.html');
             document.getElementById('logoutButton').addEventListener('click', () => {
                 localStorage.removeItem('currentUser');
                 window.location.href = 'index.html';
             });
-
             document.getElementById('addItemBtn').addEventListener('click', addItemRow);
             document.getElementById('addEmailBtn').addEventListener('click', addEmailField);
-            document.getElementById('cancelInvoiceBtn').addEventListener('click', () => {
-                if (confirm('¿Seguro que deseas cancelar?')) {
-                    window.location.href = 'dashboard.html';
-                }
+            document.getElementById('cancelOrderBtn').addEventListener('click', () => {
+                if (confirm('¿Seguro que deseas cancelar?')) window.location.href = 'dashboard.html';
             });
-            document.getElementById('previewInvoiceBtn').addEventListener('click', previewInvoice);
-            document.getElementById('saveInvoiceBtn').addEventListener('click', saveInvoice);
+            document.getElementById('saveDraftBtn').addEventListener('click', () => saveOrder('draft'));
+            document.getElementById('sendOrderBtn').addEventListener('click', sendOrder);
+            document.getElementById('confirmPaymentBtn').addEventListener('click', confirmPayment);
+            document.getElementById('generateInvoiceBtn').addEventListener('click', generateInvoice);
             document.getElementById('modalClose').addEventListener('click', () => {
                 document.getElementById('previewModal').style.display = 'none';
             });
-            document.getElementById('exemptAmount').addEventListener('input', updateInvoiceTotals);
-            document.getElementById('alicuota').addEventListener('change', updateInvoiceTotals);
-            document.getElementById('paymentMethod').addEventListener('change', updateInvoiceTotals);
+            document.getElementById('exemptAmount').addEventListener('input', updateOrderTotals);
+            document.getElementById('alicuota').addEventListener('change', updateOrderTotals);
+            document.getElementById('paymentMethod').addEventListener('change', updateOrderTotals);
             document.querySelectorAll('#itemsTableBody tr').forEach(row => attachItemListeners(row));
-            updateInvoiceTotals();
+            updateButtonStates();
         });
     </script>
 </body>
