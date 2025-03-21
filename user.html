@@ -12,14 +12,14 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f0f4f8; /* Fondo más suave */
             color: #333;
             line-height: 1.6;
             transition: background-color 0.3s, color 0.3s;
         }
         body.dark-theme {
-            background-color: #333;
-            color: #f5f5f5;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
         }
         .navbar {
             background-color: #2968c8;
@@ -27,7 +27,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease;
         }
         .dark-theme .navbar {
@@ -46,83 +46,102 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        .logo span {
+            font-size: 14px;
+            font-weight: normal;
+            display: block;
+            color: #ddd;
+        }
         .container {
             max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid #ddd;
+            margin: 30px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
         }
         .dark-theme .container {
-            background: #444;
+            background: #3a3a3a;
             border-color: #555;
         }
         .section-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            color: #2968c8;
+            font-weight: 600;
         }
         .dark-theme .section-title {
-            color: #f5f5f5;
-            border-bottom-color: #555;
+            color: #4a90e2;
+            border-bottom-color: #666;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #555;
+            color: #444;
         }
         .dark-theme label {
-            color: #ddd;
+            color: #ccc;
         }
         input, textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 16px;
             box-sizing: border-box;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: #f9f9f9;
         }
         .dark-theme input, .dark-theme textarea {
-            background: #555;
+            background: #4a4a4a;
             border-color: #666;
-            color: #f5f5f5;
+            color: #e0e0e0;
         }
         input:focus, textarea:focus {
             outline: none;
-            border-color: #2968c8;
-            box-shadow: 0 0 5px rgba(41, 104, 200, 0.3);
+            border-color: #28a745;
+            box-shadow: 0 0 6px rgba(40, 167, 69, 0.2);
+        }
+        input:disabled, textarea:disabled {
+            background: #e9ecef;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .dark-theme input:disabled, .dark-theme textarea:disabled {
+            background: #555;
+            color: #999;
         }
         textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
         }
         .btn {
-            background: #2968c8;
+            background: linear-gradient(90deg, #2968c8, #28a745); /* Gradiente azul-verde */
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
         }
         .btn:hover {
-            background: #1d4f9e;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(90deg, #1d4f9e, #218838);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
         .btn-back {
             background: #6c757d;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
         .btn-back:hover {
             background: #5a6268;
@@ -135,28 +154,29 @@
         }
         .profile-pic-container {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         .profile-pic {
-            width: 150px;
-            height: 150px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #ddd;
+            border: 3px solid #28a745;
             transition: border-color 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         .dark-theme .profile-pic {
-            border-color: #666;
+            border-color: #4a90e2;
         }
         .alert {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px;
-            border-radius: 4px;
+            padding: 12px 20px;
+            border-radius: 6px;
             z-index: 1001;
-            font-size: 16px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
         }
         .alert-success {
             background: #d4edda;
@@ -178,34 +198,62 @@
         }
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: flex-end;
             flex-wrap: wrap;
+            margin-top: 20px;
         }
         .history-log {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 30px;
+            padding: 20px;
             background: #f8f9fa;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
         .dark-theme .history-log {
-            background: #555;
+            background: #444;
         }
         .history-log ul {
             list-style: none;
             padding: 0;
         }
         .history-log li {
-            padding: 5px 0;
-            border-bottom: 1px solid #ddd;
+            padding: 12px 0;
+            border-left: 3px solid #28a745;
+            padding-left: 15px;
+            position: relative;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
         }
         .dark-theme .history-log li {
-            border-bottom-color: #666;
+            border-left-color: #4a90e2;
+            color: #ccc;
+        }
+        .history-log li::before {
+            content: '•';
+            position: absolute;
+            left: -8px;
+            top: 12px;
+            color: #28a745;
+            font-size: 20px;
+        }
+        .dark-theme .history-log li::before {
+            color: #4a90e2;
+        }
+        .history-timestamp {
+            font-size: 12px;
+            color: #888;
+            display: block;
+            margin-top: 2px;
+        }
+        .dark-theme .history-timestamp {
+            color: #aaa;
         }
         .toggle-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         .toggle-btn {
             background: #ccc;
@@ -218,7 +266,7 @@
             transition: background 0.3s ease;
         }
         .toggle-btn.active {
-            background: #2968c8;
+            background: #28a745;
         }
         .dark-theme .toggle-btn.active {
             background: #4a90e2;
@@ -239,8 +287,8 @@
         }
         @media (max-width: 768px) {
             .container {
-                margin: 10px;
-                padding: 15px;
+                margin: 15px;
+                padding: 20px;
             }
             .profile-pic {
                 width: 120px;
@@ -254,13 +302,13 @@
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">Wakal Blitz</div>
+        <div class="logo">Wakal Blitz<span>by: Soluciones Láser</span></div>
     </div>
 
     <div class="container">
         <h2 class="section-title">Perfil de Usuario</h2>
         
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 25px;">
             <button class="btn btn-back" id="topBackButton">
                 <span>←</span> Regresar al Dashboard
             </button>
@@ -269,17 +317,22 @@
         <div class="profile-pic-container">
             <img src="" alt="Foto de perfil" class="profile-pic" id="profilePic">
             <input type="file" id="profilePicInput" accept="image/*" style="display: none;">
-            <button class="btn" onclick="document.getElementById('profilePicInput').click()">Cambiar Foto</button>
+            <button class="btn" onclick="document.getElementById('profilePicInput').click()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M4.5 3a2.5 2.5 0 0 1 5 0 2.5 2.5 0 0 1 5 0v9a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 0 12V3a2.5 2.5 0 0 1 2.5-2.5h9zm-1 2h-2v2h2v-2zm0 3h-2v2h2v-2zm3-3h-2v2h2v-2zm0 3h-2v2h2v-2zm3-3h-2v2h2v-2zm0 3h-2v2h2v-2z"/>
+                </svg>
+                Cambiar Foto
+            </button>
         </div>
 
         <div class="form-group">
             <label for="companyName">Nombre o Razón Social</label>
-            <input type="text" id="companyName" required>
+            <input type="text" id="companyName" disabled>
         </div>
 
         <div class="form-group">
             <label for="rif">RIF</label>
-            <input type="text" id="rif" required placeholder="Ejemplo: 123456789 (solo números)">
+            <input type="text" id="rif" disabled>
         </div>
 
         <div class="form-group">
@@ -321,11 +374,21 @@
         </div>
 
         <div class="button-group">
-            <button class="btn btn-danger" id="deleteAccountButton">Eliminar Cuenta</button>
+            <button class="btn btn-danger" id="deleteAccountButton">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1H11zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47zM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/>
+                </svg>
+                Eliminar Cuenta
+            </button>
             <button class="btn btn-back" id="backButton">
                 <span>←</span> Regresar al Dashboard
             </button>
-            <button class="btn" id="saveButton">Guardar Cambios</button>
+            <button class="btn" id="saveButton">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm0 1h12v12H2V2zm4.5 10.5v-3h3v3h-3zm0-4.5v-3h5v3h-5z"/>
+                </svg>
+                Guardar Cambios
+            </button>
         </div>
     </div>
 
@@ -341,21 +404,14 @@
 
         // Transformar RIF al formato J-12345678-9
         function formatRif(rif, prefix = 'J') {
-            // Si ya tiene el formato correcto, devolverlo tal cual
             if (/^[VEPGJ]-[0-9]{7,8}-[0-9]$/.test(rif)) {
                 return rif;
             }
-            // Si es solo números, transformarlo
-            const digits = rif.replace(/\D/g, ''); // Solo números
+            const digits = rif.replace(/\D/g, '');
             if (digits.length < 7 || digits.length > 9) return rif;
-            const mainPart = digits.slice(0, -1); // Todos menos el último dígito
-            const lastDigit = digits.slice(-1); // Último dígito
+            const mainPart = digits.slice(0, -1);
+            const lastDigit = digits.slice(-1);
             return `${prefix}-${mainPart}-${lastDigit}`;
-        }
-
-        // Extraer solo los números del RIF para validación y edición
-        function extractRifNumbers(rif) {
-            return rif.replace(/\D/g, '');
         }
 
         // Sincronizar currentUser con la lista de usuarios
@@ -377,7 +433,6 @@
                 return null;
             }
 
-            // Sincronizar con la lista de usuarios para obtener los datos más recientes
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const storedUser = users.find(u => u.email === currentUser.email);
             if (storedUser) {
@@ -386,8 +441,7 @@
             }
 
             document.getElementById('companyName').value = currentUser.companyName || '';
-            // Mostrar el RIF en formato J-12345678-9
-            document.getElementById('rif').value = currentUser.rif || '';
+            document.getElementById('rif').value = formatRif(currentUser.rif || '', 'J');
             document.getElementById('phone').value = currentUser.phone || '';
             document.getElementById('email').value = currentUser.email || '';
             document.getElementById('address').value = currentUser.address || '';
@@ -396,12 +450,10 @@
             const profilePic = document.getElementById('profilePic');
             profilePic.src = currentUser.profilePic || 'https://via.placeholder.com/150';
 
-            // Aplicar tema oscuro si está activado
             if (currentUser.darkTheme) {
                 document.body.classList.add('dark-theme');
             }
 
-            // Cargar historial de actividad
             loadActivityLog(currentUser);
             return currentUser;
         }
@@ -410,7 +462,12 @@
         function loadActivityLog(currentUser) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const logList = document.getElementById('activityLog');
-            logList.innerHTML = activityLog.length > 0 ? activityLog.map(entry => `<li>${entry}</li>`).join('') : '<li>No hay actividad reciente.</li>';
+            logList.innerHTML = activityLog.length > 0 
+                ? activityLog.map(entry => {
+                    const [timestamp, message] = entry.split(': ', 2);
+                    return `<li>${message}<span class="history-timestamp">${timestamp}</span></li>`;
+                }).join('')
+                : '<li>No hay actividad reciente.</li>';
         }
 
         // Agregar entrada al historial
@@ -418,7 +475,7 @@
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const timestamp = new Date().toLocaleString('es-ES');
             activityLog.unshift(`${timestamp}: ${message}`);
-            if (activityLog.length > 10) activityLog.pop(); // Limitar a 10 entradas
+            if (activityLog.length > 10) activityLog.pop();
             localStorage.setItem(`activity_${currentUser.rif}`, JSON.stringify(activityLog));
             loadActivityLog(currentUser);
         }
@@ -426,14 +483,12 @@
         // Validar formulario
         function validateForm() {
             const email = document.getElementById('email').value.trim();
-            const companyName = document.getElementById('companyName').value.trim();
-            const rif = extractRifNumbers(document.getElementById('rif').value.trim());
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (!email || !companyName || !rif || !phone || !address) {
+            if (!email || !phone || !address) {
                 showAlert('Por favor completa todos los campos obligatorios.', 'error');
                 return false;
             }
@@ -441,13 +496,6 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showAlert('Por favor ingresa un correo electrónico válido.', 'error');
-                return false;
-            }
-
-            // Validar formato de RIF (solo números, longitud entre 7 y 9)
-            const rifRegex = /^[0-9]{7,9}$/;
-            if (!rifRegex.test(rif)) {
-                showAlert('El RIF debe contener solo números y tener entre 7 y 9 dígitos.', 'error');
                 return false;
             }
 
@@ -467,7 +515,7 @@
 
         // Validar la imagen seleccionada
         function validateImage(file) {
-            const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+            const maxSizeInBytes = 2 * 1024 * 1024;
             const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
             if (!validTypes.includes(file.type)) {
@@ -488,13 +536,9 @@
             if (!validateForm()) return;
 
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const rawRif = extractRifNumbers(document.getElementById('rif').value.trim());
-            const formattedRif = formatRif(rawRif, 'J'); // Siempre usar 'J' como prefijo por ahora
 
             const updatedUser = {
                 ...currentUser,
-                companyName: document.getElementById('companyName').value.trim(),
-                rif: formattedRif,
                 phone: document.getElementById('phone').value.trim(),
                 email: document.getElementById('email').value.trim(),
                 address: document.getElementById('address').value.trim(),
@@ -503,14 +547,8 @@
                 ...(document.getElementById('password').value && { password: document.getElementById('password').value })
             };
 
-            // Sincronizar con la lista de usuarios
             syncCurrentUserWithUsers(updatedUser);
-
-            // Actualizar el currentUser local para reflejar los cambios
             currentUser = updatedUser;
-
-            // Actualizar el campo de RIF para mostrar el formato correcto
-            document.getElementById('rif').value = formattedRif;
 
             addActivityEntry(currentUser, 'Perfil actualizado');
             showAlert('Cambios guardados exitosamente.', 'success');
@@ -539,7 +577,7 @@
                 const file = e.target.files[0];
                 if (file) {
                     if (!validateImage(file)) {
-                        e.target.value = ''; // Limpiar el input si la imagen no es válida
+                        e.target.value = '';
                         return;
                     }
 
@@ -576,6 +614,7 @@
                 document.body.classList.toggle('dark-theme', isDarkTheme);
                 currentUser.darkTheme = isDarkTheme;
                 syncCurrentUserWithUsers(currentUser);
+                addActivityEntry(currentUser, `Tema ${isDarkTheme ? 'oscuro' : 'claro'} activado`);
             });
         });
     </script>
