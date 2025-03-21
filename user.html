@@ -4,260 +4,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Facture - Perfil de Usuario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8; /* Fondo más suave */
-            color: #333;
-            line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(120deg, #f6f9fc 0%, #ffffff 100%);
+            color: #1a1a1a;
+            line-height: 1.5;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
+
         body.dark-theme {
-            background-color: #2a2a2a;
-            color: #e0e0e0;
+            background: linear-gradient(120deg, #1f2a44 0%, #2c3e50 100%);
+            color: #d1d8e0;
         }
+
+        /* Navbar */
         .navbar {
-            background-color: #2968c8;
-            padding: 15px 20px;
+            background: #034f9e;
+            padding: 1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
+            box-shadow: 0 6px 15px rgba(3, 79, 158, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: background 0.3s ease;
         }
+
         .dark-theme .navbar {
-            background-color: #1d4f9e;
+            background: #023e8a;
+            box-shadow: 0 6px 15px rgba(2, 62, 138, 0.2);
         }
-        .navbar:hover {
-            background-color: #1d4f9e;
-        }
-        .dark-theme .navbar:hover {
-            background-color: #153e7e;
-        }
-        .logo {
+
+        .logo-section {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
         }
-        .logo img {
-            height: 32px;
-            width: auto;
-            max-width: 150px;
-            transition: transform 0.3s ease;
-        }
-        .logo img:hover {
-            transform: scale(1.1);
-        }
-        .container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 25px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e0e0e0;
-        }
-        .dark-theme .container {
-            background: #3a3a3a;
-            border-color: #555;
-        }
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-            color: #2968c8;
-            font-weight: 600;
-        }
-        .dark-theme .section-title {
-            color: #4a90e2;
-            border-bottom-color: #666;
-        }
-        .form-group {
-            margin-bottom: 25px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #444;
-        }
-        .dark-theme label {
-            color: #ccc;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background: #f9f9f9;
-        }
-        .dark-theme input, .dark-theme textarea {
-            background: #4a4a4a;
-            border-color: #666;
-            color: #e0e0e0;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #28a745;
-            box-shadow: 0 0 6px rgba(40, 167, 69, 0.2);
-        }
-        input:disabled, textarea:disabled {
-            background: #e9ecef;
-            color: #666;
-            cursor: not-allowed;
-        }
-        .dark-theme input:disabled, .dark-theme textarea:disabled {
-            background: #555;
-            color: #999;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-        .btn {
-            background: linear-gradient(90deg, #2968c8, #28a745); /* Gradiente azul-verde */
-            color: white;
+
+        .back-btn {
+            background: #258D19;
+            color: #fff;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
         }
-        .btn:hover {
-            background: linear-gradient(90deg, #1d4f9e, #218838);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-            transform: translateY(-1px);
+
+        .back-btn:hover {
+            background: #1e7214;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
         }
-        .btn-back {
-            background: #6c757d;
+
+        .logo img {
+            height: 40px;
+            transition: transform 0.3s ease;
         }
-        .btn-back:hover {
-            background: #5a6268;
+
+        .logo img:hover {
+            transform: scale(1.05);
         }
-        .btn-danger {
-            background: #dc3545;
+
+        /* Main Container */
+        .container {
+            max-width: 900px;
+            margin: 1.5rem auto;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.5s ease-out;
+            position: relative;
+            padding-bottom: 5rem; /* Espacio para los botones fijos */
         }
-        .btn-danger:hover {
-            background: #c82333;
+
+        .dark-theme .container {
+            background: #2c3e50;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #034f9e;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40%;
+            height: 3px;
+            background: #258D19;
+            border-radius: 2px;
+        }
+
+        .dark-theme .section-title {
+            color: #4aafff;
+        }
+
+        /* Profile Picture */
         .profile-pic-container {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 2rem;
         }
+
         .profile-pic {
             width: 140px;
             height: 140px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #28a745;
-            transition: border-color 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: 3px solid #258D19;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, transform 0.3s ease;
         }
+
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+
         .dark-theme .profile-pic {
-            border-color: #4a90e2;
+            border-color: #4aafff;
         }
-        .alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: 6px;
-            z-index: 1001;
-            font-size: 15px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
         }
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .dark-theme .alert-success {
-            background: #28a745;
-            color: #fff;
-        }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .dark-theme .alert-error {
-            background: #dc3545;
-            color: #fff;
-        }
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        .history-log {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-        .dark-theme .history-log {
-            background: #444;
-        }
-        .history-log ul {
-            list-style: none;
-            padding: 0;
-        }
-        .history-log li {
-            padding: 12px 0;
-            border-left: 3px solid #28a745;
-            padding-left: 15px;
-            position: relative;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        .dark-theme .history-log li {
-            border-left-color: #4a90e2;
-            color: #ccc;
-        }
-        .history-log li::before {
-            content: '•';
-            position: absolute;
-            left: -8px;
-            top: 12px;
-            color: #28a745;
-            font-size: 20px;
-        }
-        .dark-theme .history-log li::before {
-            color: #4a90e2;
-        }
-        .history-timestamp {
-            font-size: 12px;
-            color: #888;
+
+        label {
             display: block;
-            margin-top: 2px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 0.3rem;
         }
-        .dark-theme .history-timestamp {
-            color: #aaa;
+
+        .dark-theme label {
+            color: #a1a1aa;
         }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e6f0ff;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            background: #f8faff;
+            transition: all 0.3s ease;
+        }
+
+        .dark-theme input, .dark-theme textarea {
+            background: #34495e;
+            border-color: #34495e;
+            color: #d1d8e0;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #034f9e;
+            box-shadow: 0 0 6px rgba(3, 79, 158, 0.2);
+            outline: none;
+        }
+
+        input:disabled, textarea:disabled {
+            background: #e5e7eb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        .dark-theme input:disabled, .dark-theme textarea:disabled {
+            background: #4b5e71;
+            color: #a1a1aa;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Toggle Switch */
         .toggle-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
         }
+
         .toggle-btn {
-            background: #ccc;
+            background: #d1d5db;
             border: none;
             border-radius: 20px;
             width: 50px;
@@ -266,12 +221,15 @@
             cursor: pointer;
             transition: background 0.3s ease;
         }
+
         .toggle-btn.active {
-            background: #28a745;
+            background: #258D19;
         }
+
         .dark-theme .toggle-btn.active {
-            background: #4a90e2;
+            background: #4aafff;
         }
+
         .toggle-btn::after {
             content: '';
             position: absolute;
@@ -283,39 +241,227 @@
             border-radius: 50%;
             transition: transform 0.3s ease;
         }
+
         .toggle-btn.active::after {
             transform: translateX(25px);
         }
+
+        /* History Log */
+        .history-log {
+            margin-top: 1.5rem;
+            padding: 0.5rem;
+            background: #f8faff;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .dark-theme .history-log {
+            background: #34495e;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .history-header h3 {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .history-toggle {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: #034f9e;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .history-toggle.active {
+            transform: rotate(180deg);
+        }
+
+        .dark-theme .history-toggle {
+            color: #4aafff;
+        }
+
+        .history-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .history-content.active {
+            max-height: 300px; /* Ajusta según necesidad */
+            overflow-y: auto;
+        }
+
+        .history-content ul {
+            list-style: none;
+            padding: 0.5rem;
+        }
+
+        .history-content li {
+            padding: 0.75rem 0;
+            border-left: 3px solid #258D19;
+            padding-left: 1rem;
+            font-size: 0.75rem;
+            color: #555;
+        }
+
+        .dark-theme .history-content li {
+            border-left-color: #4aafff;
+            color: #d1d8e0;
+        }
+
+        .history-timestamp {
+            font-size: 0.65rem;
+            color: #888;
+            display: block;
+            margin-top: 0.2rem;
+        }
+
+        .dark-theme .history-timestamp {
+            color: #a1a1aa;
+        }
+
+        /* Fixed Button Group */
+        .button-group {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            background: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            flex-wrap: wrap;
+        }
+
+        .dark-theme .button-group {
+            background: #2c3e50;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            background: #034f9e;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #023e8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(3, 79, 158, 0.25);
+        }
+
+        .btn-back {
+            background: #258D19;
+        }
+
+        .btn-back:hover {
+            background: #1e7214;
+            box-shadow: 0 4px 10px rgba(37, 141, 25, 0.25);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.25);
+        }
+
+        /* Alerts */
+        .alert {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            z-index: 1001;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: #258D19;
+            color: #fff;
+        }
+
+        .dark-theme .alert-success {
+            background: #3db32e;
+        }
+
+        .alert-error {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .dark-theme .alert-error {
+            background: #e04b59;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
-                margin: 15px;
-                padding: 20px;
+                margin: 1rem;
+                padding: 1rem;
             }
             .profile-pic {
                 width: 120px;
                 height: 120px;
             }
             .button-group {
-                justify-content: center;
+                width: 90%;
+                padding: 0.5rem;
+            }
+            .btn {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">
-            <img src="Logo E-facture-02.png" alt="Logo E-Facture">
+    <header class="navbar">
+        <div class="logo-section">
+            <button class="back-btn" id="topBackButton">←</button>
+            <div class="logo">
+                <img src="Logo E-facture-02.png" alt="Logo E-Facture">
+            </div>
         </div>
-    </div>
+    </header>
 
     <div class="container">
         <h2 class="section-title">Perfil de Usuario</h2>
-        
-        <div style="margin-bottom: 25px;">
-            <button class="btn btn-back" id="topBackButton">
-                <span>←</span> Regresar al Dashboard
-            </button>
-        </div>
 
         <div class="profile-pic-container">
             <img src="" alt="Foto de perfil" class="profile-pic" id="profilePic">
@@ -372,27 +518,32 @@
         </div>
 
         <div class="history-log">
-            <h3 class="section-title">Historial de Actividad</h3>
-            <ul id="activityLog"></ul>
+            <div class="history-header" id="historyToggle">
+                <h3>Historial de Actividad</h3>
+                <button class="history-toggle">▼</button>
+            </div>
+            <div class="history-content" id="historyContent">
+                <ul id="activityLog"></ul>
+            </div>
         </div>
+    </div>
 
-        <div class="button-group">
-            <button class="btn btn-danger" id="deleteAccountButton">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1H11zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47zM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/>
-                </svg>
-                Eliminar Cuenta
-            </button>
-            <button class="btn btn-back" id="backButton">
-                <span>←</span> Regresar al Dashboard
-            </button>
-            <button class="btn" id="saveButton">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm0 1h12v12H2V2zm4.5 10.5v-3h3v3h-3zm0-4.5v-3h5v3h-5z"/>
-                </svg>
-                Guardar Cambios
-            </button>
-        </div>
+    <div class="button-group">
+        <button class="btn btn-danger" id="deleteAccountButton">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5zM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1H11zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47zM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+            Eliminar Cuenta
+        </button>
+        <button class="btn btn-back" id="backButton">
+            <span>←</span> Regresar al Dashboard
+        </button>
+        <button class="btn" id="saveButton">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2zm0 1h12v12H2V2zm4.5 10.5v-3h3v3h-3zm0-4.5v-3h5v3h-5z"/>
+            </svg>
+            Guardar Cambios
+        </button>
     </div>
 
     <script>
@@ -405,7 +556,6 @@
             setTimeout(() => alertDiv.remove(), 3000);
         }
 
-        // Transformar RIF al formato J-12345678-9
         function formatRif(rif, prefix = 'J') {
             if (/^[VEPGJ]-[0-9]{7,8}-[0-9]$/.test(rif)) {
                 return rif;
@@ -417,7 +567,6 @@
             return `${prefix}-${mainPart}-${lastDigit}`;
         }
 
-        // Sincronizar currentUser con la lista de usuarios
         function syncCurrentUserWithUsers(currentUser) {
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const userIndex = users.findIndex(u => u.email === currentUser.email);
@@ -428,7 +577,6 @@
             }
         }
 
-        // Cargar datos del usuario
         function loadUserData() {
             let currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (!currentUser) {
@@ -461,7 +609,6 @@
             return currentUser;
         }
 
-        // Cargar historial de actividad
         function loadActivityLog(currentUser) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const logList = document.getElementById('activityLog');
@@ -473,7 +620,6 @@
                 : '<li>No hay actividad reciente.</li>';
         }
 
-        // Agregar entrada al historial
         function addActivityEntry(currentUser, message) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const timestamp = new Date().toLocaleString('es-ES');
@@ -483,7 +629,6 @@
             loadActivityLog(currentUser);
         }
 
-        // Validar formulario
         function validateForm() {
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -516,7 +661,6 @@
             return true;
         }
 
-        // Validar la imagen seleccionada
         function validateImage(file) {
             const maxSizeInBytes = 2 * 1024 * 1024;
             const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
@@ -534,7 +678,6 @@
             return true;
         }
 
-        // Guardar cambios
         function saveChanges() {
             if (!validateForm()) return;
 
@@ -557,7 +700,6 @@
             showAlert('Cambios guardados exitosamente.', 'success');
         }
 
-        // Eliminar cuenta
         function deleteAccount() {
             if (!confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.')) return;
 
@@ -571,7 +713,6 @@
             setTimeout(() => window.location.href = 'index.html', 2000);
         }
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             let currentUser = loadUserData();
             if (!currentUser) return;
@@ -588,10 +729,8 @@
                     reader.onload = () => {
                         const base64Image = reader.result;
                         document.getElementById('profilePic').src = base64Image;
-
                         currentUser.profilePic = base64Image;
                         syncCurrentUserWithUsers(currentUser);
-
                         addActivityEntry(currentUser, 'Foto de perfil actualizada');
                     };
                     reader.readAsDataURL(file);
@@ -618,6 +757,16 @@
                 currentUser.darkTheme = isDarkTheme;
                 syncCurrentUserWithUsers(currentUser);
                 addActivityEntry(currentUser, `Tema ${isDarkTheme ? 'oscuro' : 'claro'} activado`);
+            });
+
+            // Toggle para historial
+            const historyToggle = document.getElementById('historyToggle');
+            const historyContent = document.getElementById('historyContent');
+            const toggleButton = document.querySelector('.history-toggle');
+
+            historyToggle.addEventListener('click', () => {
+                historyContent.classList.toggle('active');
+                toggleButton.classList.toggle('active');
             });
         });
     </script>
