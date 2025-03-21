@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Factura Digital</title>
+    <title>Wakal Blitz - Mi Factura Digital</title>
     <style>
         * {
             margin: 0;
@@ -12,14 +12,14 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f0f4f8;
             color: #333;
             line-height: 1.6;
             transition: background-color 0.3s, color 0.3s;
         }
         body.dark-theme {
-            background-color: #333;
-            color: #f5f5f5;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
         }
         .navbar {
             background-color: #2968c8;
@@ -27,7 +27,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
         }
         .dark-theme .navbar {
             background-color: #1d4f9e;
@@ -45,97 +46,109 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        .logo span {
+            font-size: 14px;
+            font-weight: normal;
+            display: block;
+            color: #ddd;
+        }
         .dark-theme .logo {
             color: #ddd;
         }
         .container {
             max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid #ddd;
+            margin: 30px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
         }
         .dark-theme .container {
-            background: #444;
+            background: #3a3a3a;
             border-color: #555;
         }
         .section-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            color: #2968c8;
+            font-weight: 600;
         }
         .dark-theme .section-title {
-            color: #f5f5f5;
-            border-bottom-color: #555;
+            color: #4a90e2;
+            border-bottom-color: #666;
         }
         .template-options {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         .template-card {
             flex: 1;
             min-width: 250px;
-            background: #4a4a4a;
-            padding: 15px;
-            border-radius: 8px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
         .dark-theme .template-card {
-            background: #555;
+            background: #444;
         }
         .template-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
         }
         .template-card img {
             width: 100%;
             max-width: 200px;
             height: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
+            border: 2px solid #28a745;
+            border-radius: 6px;
+            margin-bottom: 15px;
             background-color: #f5f5f5;
         }
         .dark-theme .template-card img {
-            border-color: #666;
+            border-color: #4a90e2;
             background-color: #444;
         }
         .template-card h4 {
             font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .dark-theme .template-card h4 {
             color: #ddd;
-            margin-bottom: 10px;
         }
         .btn {
-            background: #2968c8;
+            background: linear-gradient(90deg, #2968c8, #28a745);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
             margin: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
         }
         .btn:hover {
-            background: #1d4f9e;
+            background: linear-gradient(90deg, #1d4f9e, #218838);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
         }
         .btn-secondary {
             background: #6c757d;
         }
         .btn-secondary:hover {
             background: #5a6268;
-        }
-        .btn-primary {
-            background: #28a745;
-        }
-        .btn-primary:hover {
-            background: #218838;
         }
         .btn-choose {
             background: #ffc107;
@@ -148,7 +161,7 @@
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
         .modal {
             display: none;
@@ -165,7 +178,7 @@
         .modal-content {
             background: white;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 10px;
             width: 80%;
             max-width: 800px;
             max-height: 80vh;
@@ -173,16 +186,16 @@
             position: relative;
         }
         .dark-theme .modal-content {
-            background: #444;
+            background: #3a3a3a;
         }
         .modal-close {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            font-size: 30px;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
+            top: 15px;
+            right: 15px;
+            font-size: 20px; /* Reducido de 30px a 20px */
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
             text-align: center;
             background: #dc3545;
             color: white;
@@ -198,6 +211,8 @@
             width: 100%;
             height: 60vh;
             border: none;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         @media (max-width: 768px) {
             .template-options {
@@ -207,38 +222,86 @@
                 flex-direction: column;
                 align-items: center;
             }
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">Mi Factura Digital</div>
+        <div class="logo">Wakal Blitz<span>by: Soluciones Láser</span></div>
     </div>
     <div class="container">
-        <h2 class="section-title">Mi Factura Digital - Selección de Plantilla</h2>
+        <h2 class="section-title">Mi Factura Digital - Selección de Plantilla para Facturas</h2>
         <div class="template-options">
             <div class="template-card">
                 <img src="" alt="Plantilla 1 - Clásica" id="template1Img">
                 <h4>Plantilla 1 - Clásica</h4>
-                <button class="btn btn-choose" onclick="chooseTemplate(1)">Elegir</button>
-                <button class="btn" onclick="previewTemplate(1)">Previsualizar</button>
+                <button class="btn btn-choose" onclick="chooseTemplate(1)">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                    Elegir
+                </button>
+                <button class="btn" onclick="previewTemplate(1)">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                    </svg>
+                    Previsualizar
+                </button>
             </div>
             <div class="template-card">
                 <img src="" alt="Plantilla 2 - Moderna" id="template2Img">
                 <h4>Plantilla 2 - Moderna</h4>
-                <button class="btn btn-choose" onclick="chooseTemplate(2)">Elegir</button>
-                <button class="btn" onclick="previewTemplate(2)">Previsualizar</button>
+                <button class="btn btn-choose" onclick="chooseTemplate(2)">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                    Elegir
+                </button>
+                <button class="btn" onclick="previewTemplate(2)">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                    </svg>
+                    Previsualizar
+                </button>
             </div>
             <div class="template-card">
                 <img src="" alt="Plantilla 3 - Elegante" id="template3Img">
                 <h4>Plantilla 3 - Elegante</h4>
-                <button class="btn btn-choose" onclick="chooseTemplate(3)">Elegir</button>
-                <button class="btn" onclick="previewTemplate(3)">Previsualizar</button>
+                <button class="btn btn-choose" onclick="chooseTemplate(3)">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                    Elegir
+                </button>
+                <button class="btn" onclick="previewTemplate(3)">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                    </svg>
+                    Previsualizar
+                </button>
             </div>
         </div>
         <div class="action-buttons">
-            <button class="btn btn-secondary" id="backToDashboard">Regresar al Tablero</button>
-            <button class="btn btn-primary" id="goToInvoice">Ir al Facturador</button>
+            <button class="btn btn-secondary" id="backToDashboard">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                </svg>
+                Regresar al Tablero
+            </button>
+            <button class="btn" id="goToInvoice">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zM2.5 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5h-11z"/>
+                    <path d="M4 4.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                Crear Pedido
+            </button>
         </div>
     </div>
     <div class="modal" id="previewModal">
@@ -248,7 +311,6 @@
         </div>
     </div>
 
-    <!-- Incluir jsPDF y AutoTable desde el repositorio local -->
     <script src="./jspdf.umd.min.js"></script>
     <script src="./jspdf.plugin.autotable.min.js"></script>
 
@@ -288,7 +350,7 @@
 
         function chooseTemplate(templateId) {
             localStorage.setItem('selectedTemplate', templateId);
-            alert(`Plantilla ${templateId} seleccionada. Se aplicará en tus facturas.`);
+            alert(`Plantilla ${templateId} seleccionada. Se aplicará a tus facturas.`);
         }
 
         function previewTemplate(templateId) {
@@ -333,109 +395,103 @@
             const doc = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
-                format: 'a4'
+                format: 'a4',
+                putOnlyUsedFonts: true,
+                floatPrecision: 16,
+                compress: true
             });
             const logo = currentUser.profilePic || 'https://via.placeholder.com/100';
-            let y = 10;
+            const margin = 5;
+            const pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+            let y = margin;
+
+            function addText(text, x, align = 'left') {
+                const lines = doc.splitTextToSize(text, pageWidth - 10);
+                lines.forEach(line => {
+                    if (y > doc.internal.pageSize.getHeight() - 10) {
+                        doc.addPage();
+                        y = margin;
+                    }
+                    doc.text(line, x, y, { align: align });
+                    y += 3;
+                });
+                return y;
+            }
 
             // Plantilla 1 - Clásica
             if (templateId === 1) {
-                doc.addImage(logo, 'JPEG', 90, y, 30, 30, undefined, 'FAST');
+                doc.addImage(logo, 'JPEG', (pageWidth / 2) + margin - 15, y, 30, 30, undefined, 'FAST');
                 y += 35;
-                doc.setFontSize(14);
-                doc.text(sampleData.companyName, 105, y, { align: 'center' });
-                y += 5;
-                doc.setFontSize(10);
-                doc.text(`RIF: ${sampleData.rif}`, 105, y, { align: 'center' });
-                y += 5;
-                doc.text(`Dirección: ${sampleData.address}`, 105, y, { align: 'center' });
-                y += 5;
-                doc.text(`Teléfono: ${sampleData.phone}`, 105, y, { align: 'center' });
-                y += 10;
                 doc.setFontSize(12);
-                doc.text('Factura', 10, y);
+                y = addText(sampleData.companyName, (pageWidth / 2) + margin, 'center');
+                doc.setFontSize(8);
+                y = addText(`RIF: ${sampleData.rif}`, (pageWidth / 2) + margin, 'center');
+                y = addText(`Dirección: ${sampleData.address}`, (pageWidth / 2) + margin, 'center');
+                y = addText(`Teléfono: ${sampleData.phone}`, (pageWidth / 2) + margin, 'center');
                 y += 5;
-                doc.setFontSize(10);
-                doc.text(`Nº Documento: ${sampleData.docNumber}`, 10, y);
+                doc.setFontSize(12);
+                y = addText('Factura', margin, 'left');
+                doc.setFontSize(8);
+                y = addText(`Nº Documento: ${sampleData.docNumber}`, margin, 'left');
+                y = addText(`Nº Control: ${sampleData.controlNumber}`, margin, 'left');
+                y = addText(`Fecha: ${sampleData.date}`, margin, 'left');
                 y += 5;
-                doc.text(`Nº Control: ${sampleData.controlNumber}`, 10, y);
-                y += 5;
-                doc.text(`Fecha: ${sampleData.date}`, 10, y);
-                y += 10;
-                doc.text(`Cliente: ${sampleData.clientName}`, 10, y);
-                y += 5;
-                doc.text(`RIF/Cédula: ${sampleData.clientId}`, 10, y);
-                y += 5;
-                doc.text(`Dirección: ${sampleData.clientAddress}`, 10, y);
-                y += 5;
-                doc.text(`Teléfono: ${sampleData.clientPhone}`, 10, y);
-                y += 5;
-                doc.text(`Correos: ${sampleData.clientEmails.join(', ')}`, 10, y);
+                y = addText(`Cliente: ${sampleData.clientName}`, margin, 'left');
+                y = addText(`RIF/Cédula: ${sampleData.clientId}`, margin, 'left');
+                y = addText(`Dirección: ${sampleData.clientAddress}`, margin, 'left');
+                y = addText(`Teléfono: ${sampleData.clientPhone}`, margin, 'left');
+                y = addText(`Correos: ${sampleData.clientEmails.join(', ')}`, margin, 'left');
             }
 
             // Plantilla 2 - Moderna
             else if (templateId === 2) {
-                doc.addImage(logo, 'JPEG', 10, y, 30, 30, undefined, 'FAST');
-                doc.setFontSize(14);
-                doc.text(sampleData.companyName, 45, y + 5);
-                y += 10;
-                doc.setFontSize(10);
-                doc.text(`RIF: ${sampleData.rif}`, 45, y);
-                y += 15;
-                doc.text('Factura', 170, y, { align: 'right' });
+                doc.addImage(logo, 'JPEG', margin, y, 30, 30, undefined, 'FAST');
+                doc.setFontSize(12);
+                y = addText(sampleData.companyName, margin + 35, 'left');
+                doc.setFontSize(8);
+                y = addText(`RIF: ${sampleData.rif}`, margin + 35, 'left');
                 y += 5;
-                doc.text(`Nº Documento: ${sampleData.docNumber}`, 170, y, { align: 'right' });
+                doc.setFontSize(12);
+                y = addText('Factura', pageWidth + margin, 'right');
+                doc.setFontSize(8);
+                y = addText(`Nº Documento: ${sampleData.docNumber}`, pageWidth + margin, 'right');
+                y = addText(`Nº Control: ${sampleData.controlNumber}`, pageWidth + margin, 'right');
+                y = addText(`Fecha: ${sampleData.date}`, pageWidth + margin, 'right');
                 y += 5;
-                doc.text(`Nº Control: ${sampleData.controlNumber}`, 170, y, { align: 'right' });
-                y += 5;
-                doc.text(`Fecha: ${sampleData.date}`, 170, y, { align: 'right' });
-                y += 10;
-                doc.text(`Cliente: ${sampleData.clientName}`, 10, y);
-                y += 5;
-                doc.text(`RIF/Cédula: ${sampleData.clientId}`, 10, y);
-                y += 5;
-                doc.text(`Dirección: ${sampleData.clientAddress}`, 10, y);
-                y += 5;
-                doc.text(`Teléfono: ${sampleData.clientPhone}`, 10, y);
-                y += 5;
-                doc.text(`Correos: ${sampleData.clientEmails.join(', ')}`, 10, y);
+                y = addText(`Cliente: ${sampleData.clientName}`, margin, 'left');
+                y = addText(`RIF/Cédula: ${sampleData.clientId}`, margin, 'left');
+                y = addText(`Dirección: ${sampleData.clientAddress}`, margin, 'left');
+                y = addText(`Teléfono: ${sampleData.clientPhone}`, margin, 'left');
+                y = addText(`Correos: ${sampleData.clientEmails.join(', ')}`, margin, 'left');
             }
 
             // Plantilla 3 - Elegante
             else if (templateId === 3) {
-                doc.addImage(logo, 'JPEG', 90, y, 30, 30, undefined, 'FAST');
+                doc.addImage(logo, 'JPEG', (pageWidth / 2) + margin - 15, y, 30, 30, undefined, 'FAST');
                 y += 35;
-                doc.setFontSize(14);
-                doc.text(sampleData.companyName, 105, y, { align: 'center' });
+                doc.setFontSize(12);
+                y = addText(sampleData.companyName, (pageWidth / 2) + margin, 'center');
+                doc.setFontSize(8);
+                y = addText(`RIF: ${sampleData.rif}`, (pageWidth / 2) + margin, 'center');
+                y = addText(`Dirección: ${sampleData.address}`, (pageWidth / 2) + margin, 'center');
+                y = addText(`Teléfono: ${sampleData.phone}`, (pageWidth / 2) + margin, 'center');
                 y += 5;
-                doc.setFontSize(10);
-                doc.text(`RIF: ${sampleData.rif}`, 105, y, { align: 'center' });
+                doc.setFontSize(12);
+                y = addText('Factura', margin, 'left');
+                doc.setFontSize(8);
+                y = addText(`Nº Documento: ${sampleData.docNumber}`, margin, 'left');
+                y = addText(`Nº Control: ${sampleData.controlNumber}`, margin, 'left');
+                y = addText(`Fecha: ${sampleData.date}`, margin, 'left');
                 y += 5;
-                doc.text(`Dirección: ${sampleData.address}`, 105, y, { align: 'center' });
-                y += 5;
-                doc.text(`Teléfono: ${sampleData.phone}`, 105, y, { align: 'center' });
-                y += 10;
-                doc.text('Factura', 10, y);
-                y += 5;
-                doc.text(`Nº Documento: ${sampleData.docNumber}`, 10, y);
-                y += 5;
-                doc.text(`Nº Control: ${sampleData.controlNumber}`, 10, y);
-                y += 5;
-                doc.text(`Fecha: ${sampleData.date}`, 10, y);
-                y += 10;
-                doc.text(`Cliente: ${sampleData.clientName}`, 10, y);
-                y += 5;
-                doc.text(`RIF/Cédula: ${sampleData.clientId}`, 10, y);
-                y += 5;
-                doc.text(`Dirección: ${sampleData.clientAddress}`, 10, y);
-                y += 5;
-                doc.text(`Teléfono: ${sampleData.clientPhone}`, 10, y);
-                y += 5;
-                doc.text(`Correos: ${sampleData.clientEmails.join(', ')}`, 10, y);
+                y = addText(`Cliente: ${sampleData.clientName}`, margin, 'left');
+                y = addText(`RIF/Cédula: ${sampleData.clientId}`, margin, 'left');
+                y = addText(`Dirección: ${sampleData.clientAddress}`, margin, 'left');
+                y = addText(`Teléfono: ${sampleData.clientPhone}`, margin, 'left');
+                y = addText(`Correos: ${sampleData.clientEmails.join(', ')}`, margin, 'left');
             }
 
             // Tabla de ítems
-            y += 10;
+            y += 5;
             doc.autoTable({
                 head: [['Código', 'Descripción', 'Cantidad', 'Precio Unitario (Bs)', 'Subtotal (Bs)']],
                 body: sampleData.items.map(item => [
@@ -447,35 +503,46 @@
                 ]),
                 startY: y,
                 theme: 'striped',
-                styles: { fontSize: 8 }
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                columnStyles: { 0: { cellWidth: 15 }, 1: { cellWidth: 50 }, 2: { cellWidth: 15 }, 3: { cellWidth: 25 }, 4: { cellWidth: 25 } },
+                margin: { top: margin },
+                didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
             });
-            y = doc.lastAutoTable.finalY + 5;
+            y = doc.lastAutoTable.finalY + 3;
 
             // Totales
+            const totalTableData = [
+                ['Subtotal', formatCurrency(sampleData.subtotalBs), formatCurrency(sampleData.subtotalUsd)],
+                ['Monto exento', formatCurrency(sampleData.exemptAmountBs), formatCurrency(sampleData.exemptAmountUsd)],
+                ['Base imponible', formatCurrency(sampleData.taxableBaseBs), formatCurrency(sampleData.taxableBaseUsd)],
+                [`IVA (${sampleData.alicuota}%)`, formatCurrency(sampleData.taxBs), formatCurrency(sampleData.taxUsd)],
+                ['IGTF (3%)', formatCurrency(sampleData.igtfBs), formatCurrency(sampleData.igtfUsd)],
+                ['Total', formatCurrency(sampleData.totalBs), formatCurrency(sampleData.totalUsd)]
+            ];
+
             doc.autoTable({
                 head: [['', 'Bs', 'USD']],
-                body: [
-                    ['Subtotal', formatCurrency(sampleData.subtotalBs), formatCurrency(sampleData.subtotalUsd)],
-                    ['Monto exento', formatCurrency(sampleData.exemptAmountBs), formatCurrency(sampleData.exemptAmountUsd)],
-                    ['Base imponible', formatCurrency(sampleData.taxableBaseBs), formatCurrency(sampleData.taxableBaseUsd)],
-                    [`IVA (${sampleData.alicuota}%)`, formatCurrency(sampleData.taxBs), formatCurrency(sampleData.taxUsd)],
-                    ['IGTF (3%)', formatCurrency(sampleData.igtfBs), formatCurrency(sampleData.igtfUsd)],
-                    ['Total', formatCurrency(sampleData.totalBs), formatCurrency(sampleData.totalUsd)]
-                ],
+                body: totalTableData,
                 startY: y,
                 theme: 'striped',
-                styles: { fontSize: 8 },
-                margin: { left: 120 }
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 } },
+                margin: { left: pageWidth - 90 + margin },
+                didDrawPage: () => { y = doc.lastAutoTable.finalY + 3; }
             });
-            y = doc.lastAutoTable.finalY + 5;
+            y = doc.lastAutoTable.finalY + 3;
 
             // Método de pago y footer
-            doc.text(`Método de Pago: ${sampleData.paymentMethod}`, 10, y);
-            y += 5;
-            doc.text(`Tasa de cambio: ${sampleData.exchangeRate} Bs/USD`, 10, y);
-            y += 10;
             doc.setFontSize(8);
-            doc.text(sampleData.footerText, 105, doc.internal.pageSize.height - 10, { align: 'center' });
+            y = addText(`Método de Pago: ${sampleData.paymentMethod}`, margin, 'left');
+            y = addText(`Tasa de cambio: ${sampleData.exchangeRate} Bs/USD`, margin, 'left');
+            y += 5;
+            doc.setFontSize(7);
+            doc.setTextColor(100);
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, pageWidth + margin, y);
+            y += 3;
+            y = addText(sampleData.footerText, (pageWidth / 2) + margin, 'center');
 
             // Mostrar en iframe
             const pdfDataUri = doc.output('datauristring');
