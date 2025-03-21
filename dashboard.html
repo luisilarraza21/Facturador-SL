@@ -64,7 +64,7 @@
             gap: 10px;
         }
         .logo img {
-            height: 40px;
+            height: 32px; /* Ajustado a la altura original del logo (32px) */
             width: auto;
             max-width: 150px;
             transition: transform 0.3s ease;
@@ -250,12 +250,6 @@
         .btn-primary:hover {
             background: #218838;
         }
-        .btn-danger {
-            background: #dc3545;
-        }
-        .btn-danger:hover {
-            background: #c82333;
-        }
         .action-bar {
             display: flex;
             justify-content: flex-end;
@@ -422,7 +416,7 @@
             color: #fff;
             border-color: #c69500;
         }
-        /* Nuevos estilos para los filtros */
+        /* Estilos para los filtros */
         .filter-bar {
             display: flex;
             gap: 15px;
@@ -461,17 +455,40 @@
             color: #fff;
             border-color: #777;
         }
-        /* Estilos para el registro de actividades */
+        /* Estilos para el registro de actividades (lista desplegable) */
         .activity-log {
             margin-top: 30px;
+        }
+        .activity-log details {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .dark-theme .activity-log details {
+            background: #555;
+            border-color: #666;
+        }
+        .activity-log summary {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            padding: 5px;
+            outline: none;
+        }
+        .dark-theme .activity-log summary {
+            color: #f5f5f5;
         }
         .activity-log ul {
             list-style: none;
             max-height: 300px;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            margin-top: 10px;
             padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
         .dark-theme .activity-log ul {
             border-color: #666;
@@ -636,10 +653,12 @@
             <button class="btn btn-secondary" id="nextPage">Siguiente</button>
         </div>
 
-        <!-- Sección de Registro de Actividades -->
+        <!-- Sección de Registro de Actividades (lista desplegable) -->
         <div class="activity-log">
-            <h2 class="section-title">Registro de Actividades</h2>
-            <ul id="activityList"></ul>
+            <details id="activityDetails">
+                <summary>Registro de Actividades</summary>
+                <ul id="activityList"></ul>
+            </details>
         </div>
     </div>
     <div class="modal" id="detailsModal">
@@ -714,7 +733,7 @@
             }
         }
 
-        // Nueva función para agregar entradas al registro de actividades
+        // Función para agregar entradas al registro de actividades
         function addActivityEntry(currentUser, message) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const timestamp = new Date().toLocaleString('es-ES');
@@ -724,7 +743,7 @@
             renderActivityLog(currentUser);
         }
 
-        // Nueva función para renderizar el registro de actividades
+        // Función para renderizar el registro de actividades
         function renderActivityLog(currentUser) {
             const activityLog = JSON.parse(localStorage.getItem(`activity_${currentUser.rif}`)) || [];
             const activityList = document.getElementById('activityList');
@@ -736,7 +755,7 @@
             });
         }
 
-        // Nueva función para filtrar pedidos
+        // Función para filtrar pedidos
         function filterOrders(orders, dateFilter, clientFilter, docTypeFilter) {
             return orders.filter(order => {
                 const matchesDate = dateFilter ? order.date === dateFilter : true;
@@ -985,7 +1004,6 @@
                 modalActions.innerHTML = `
                     <button class="btn btn-secondary" onclick="downloadOrderAsPdf(${index}, 'invoiced')">Descargar (PDF)</button>
                     <button class="btn" onclick="sendOrderByEmail(${index}, 'invoiced')">Enviar</button>
-                    <button class="btn btn-danger" onclick="cancelInvoice(${index})">Anular factura</button>
                 `;
             }
 
@@ -1042,26 +1060,6 @@
             loadInvoicesTable(userOrders);
             showAlert('Factura generada exitosamente.', 'info');
             addActivityEntry(currentUser, `Generó factura para el documento ${order.docNumber}, Nº Control: ${controlNumber}`);
-        }
-
-        // Nueva función para anular facturas
-        function cancelInvoice(index) {
-            const userOrders = getUserOrders(JSON.parse(localStorage.getItem('currentUser')));
-            const invoicedOrders = userOrders.filter(order => order.status === 'invoiced');
-            const order = invoicedOrders[index];
-            const allOrders = JSON.parse(localStorage.getItem('orders')) || [];
-            const globalIndex = allOrders.findIndex(o => o.docNumber === order.docNumber && o.userRif === order.userRif);
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-            if (confirm(`¿Está seguro de que desea anular la factura ${order.docNumber}? Esta acción no se puede deshacer.`)) {
-                allOrders[globalIndex].status = 'cancelled';
-                localStorage.setItem('orders', JSON.stringify(allOrders));
-                document.getElementById('detailsModal').style.display = 'none';
-                loadStats(userOrders, currentUser);
-                loadInvoicesTable(userOrders);
-                showAlert('Factura anulada exitosamente.', 'info');
-                addActivityEntry(currentUser, `Anuló la factura ${order.docNumber}, Nº Control: ${order.controlNumber}`);
-            }
         }
 
         async function resizeImage(url, maxWidth, maxHeight, quality = 0.7) {
@@ -1251,7 +1249,6 @@
                 doc.setLineWidth(0.5);
                 doc.line(margin, y, pageWidth + margin, y);
                 y += 3;
-                // Coletilla actualizada
                 const footerText = `ESTE DOCUMENTO SE EMITE BAJO LA PROVIDENCIA ADMINISTRATIVA SNAT/2024/000102 DE FECHA 17/10/2024\n` +
                                   `SOLUCIONES LASER, C.A RIF: J-003629162. N.º DE PROVIDENCIA: SENIAT/INTI/2021 0000029 DE FECHA 16/06/2021.\n` +
                                   `No. CONTROL ${order.controlNumber} HASTA No. CONTROL ${order.controlNumber} DE FECHA ${order.date}`;
@@ -1296,6 +1293,13 @@
 
             // Renderizar el registro de actividades al cargar la página
             renderActivityLog(currentUser);
+
+            // Event listener para registrar cuando se despliega el registro de actividades
+            document.getElementById('activityDetails').addEventListener('toggle', (e) => {
+                if (e.target.open) {
+                    addActivityEntry(currentUser, 'Desplegó el registro de actividades');
+                }
+            });
 
             // Event listeners para los filtros de pedidos pendientes
             document.getElementById('pendingDateFilter').addEventListener('change', () => loadPendingOrdersTable(userOrders));
